@@ -23,7 +23,7 @@
 ```java
 @Entity
 // @Entity(name = "Member") 같은 클래스명이 없으면 기본값 사용 권장
-// @Table(name = "MBR") 매핑할 테이블의 이름을 직접 지정 가능
+// @Table(name = "MBR") 매핑할 테이블의 이름을 직접 지정 가능하다.
 public class Member {
 
 }
