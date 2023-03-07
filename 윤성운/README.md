@@ -2,7 +2,7 @@
 
 ## 03.06(월)
 
-### 1. 엔티티 매핑
+### 엔티티 매핑
 
 #### 객체와 테이블 매핑
 
@@ -125,3 +125,145 @@ public class Member {
     private Integer tmp;
 }
 ```
+
+## 03.07(화)
+
+### 연관관계 매핑
+
+#### 단방향 연관관계
+
+<img src="https://user-images.githubusercontent.com/109272360/221084821-7f9b8ab9-ef54-43ff-a3ec-7f1e0352e318.png" width="550px">
+
+```java
+@Entity
+public class Member {
+
+    @Id @GeneratedValue
+    private Long id;
+
+    @Column(name = "USERNAME")
+    private String name;
+    
+    private int age;
+    
+		// Team과의 연관관계 생성
+    @ManyToONE
+    @JoinColumn(name = "TEAM_ID") // 테이블에서의 외래키
+    private Team team
+
+		// getter, setter
+}
+```
+
+```java
+@Entity
+public class Team {
+
+    @Id @GeneratedValue
+    private Long id;
+
+    private String name;
+
+		// getter, setter
+}
+```
+
+- 연관관계 저장하기
+	```java
+	// 팀 저장
+	Team team = new Team();
+	team.setName("TeamA");
+	em.persist(team);
+
+	// 회원 저장
+	Member member = new Member();
+	member.setName("member1");
+	member.setTeam(team); // 단방향 연관관계 설정
+	em.persist(member);
+	```
+
+- 참조로 연관관계 조회하기
+	```java
+	// 조회
+	Member findMember = em.find(Member.class, member.getId());
+
+	// 참조를 사용해서 연관관계 조회
+	Team findTeam = findMember.getTeam();
+	```
+
+- 연관관계 수정
+	```java
+	// 새로운 팀 저장
+	Team teamB = new Team();
+	teamB.setName("TeamB");
+	em.persist(teamB);
+
+	// 회원1에 새로운 팀 설정
+	// persist() 없이도 자동 반영
+	member.setTeam(teamB);
+	```
+
+#### 양방향 연관관계
+
+<img src="https://user-images.githubusercontent.com/109272360/221085893-86898fb8-4a98-43c5-9d42-1b9ffa7d8f2a.png" width="550px">
+
+```java
+@Entity
+public class Member {
+
+    @Id @GeneratedValue
+    private Long id;
+
+    @Column(name = "USERNAME")
+    private String name;
+    
+    private int age;
+    
+		// Team과의 연관관계 생성
+    @ManyToONE
+    @JoinColumn(name = "TEAM_ID")
+    private Team team
+
+		// getter, setter
+}
+```
+
+```java
+@Entity
+public class Team {
+
+    @Id @GeneratedValue
+    private Long id;
+
+    private String name;
+
+		// 양방향 매핑
+		// mappedBy: 반대편 엔티티가 참조하는 이름
+		@OneToMany(mappedBy = "team")
+		List<Member> members = new ArrayList<Member>();
+
+		// getter, setter
+}
+```
+
+- 양방향 매핑
+	```java
+  Team team = new Team();
+  team.setName("teamA");
+  em.persist(team);
+
+  Member member = new Member();
+  member.setUsername("member1");
+  member.setAge(20);
+	member.setTeam(team);
+  em.persist(member);
+
+	// flush & clear 작업을 하지 않으면 엔티티 매니저는 team을 영속성 컨텍스트에서 가져온다.
+	// 영속성 컨텍스트에서의 team은 바뀐 member를 인식하지 못한다. (member에만 team을 추가했기 때문)
+	// 따라서 flush 후 영속성 컨텍스트를 비우면 DB에서 갱신된 team을 가져올 수 있다.
+	em.flush();
+	em.clear();
+
+  Team findTeam = em.find(Team.class, team.getId());
+	int memberSize = findTeam.getMembers().size(); // 역방향 조회
+	```
