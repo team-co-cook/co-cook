@@ -6,4 +6,4 @@
 
 ### ERD 작성
 
-<img title="" src="file:///C:/Users/SSAFY/AppData/Roaming/marktext/images/2023-03-06-17-52-12-image.png" alt="" width="503">
+![](C:\Users\SSAFY\AppData\Roaming\marktext\images\2023-03-07-16-36-04-CoCook.png)
