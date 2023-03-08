@@ -44,9 +44,11 @@ Flutter를 이용한 크로스플랫폼 모바일 app 제작
 
     - `커플용 오늘의 하루 한 문장 앱` : 일정 시간을 정해놓고 휴대폰을 뒤집어놓은 후 대화 나누기. 오늘의 한 문장을 골라서 일기처럼 기록.
 
-- 와이어프레임 : 진행 전
+- 와이어프레임
+  ![와이어프레임](/README_assets/WireFrame.png/)
 
-- 디자인시스템 : 진행 전
+- 디자인시스템
+  ![디자인시스템](/README_assets/DesignSystem.png/)
 
 ## 4. 개인 학습 내용
 
@@ -152,15 +154,15 @@ Flutter를 이용한 크로스플랫폼 모바일 app 제작
 
     - share
 
-- 3.03.(토)
+- 3.04.(토)
 
   - Dart 문법
 
-- 3.03.(일)
+- 3.05.(일)
 
   - Dart 문법
 
-- 3.03.(월)
+- 3.06.(월)
 
   - flutter
 
@@ -168,9 +170,17 @@ Flutter를 이용한 크로스플랫폼 모바일 app 제작
 
   - 목업 제작 시작
 
-- 3.04.(화)
+- 3.07.(화)
 
   - 목업 70% 이상 완료
+
+- 3.08.(화)
+
+  - 목업 제작 완료
+
+![목업](/README_assets/Mockup.png/)
+
+[▶️ Figma Flow](https://www.figma.com/proto/u83HRrNeDlQm7oqFonlJan/Cocook?node-id=1%3A3&viewport=394%2C326%2C0.1&scaling=scale-down&starting-point-node-id=51%3A174&show-proto-sidebar=1)
 
 ```
 추후 필수 학습 목록
