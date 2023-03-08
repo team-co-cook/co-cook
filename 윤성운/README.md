@@ -267,3 +267,157 @@ public class Team {
   Team findTeam = em.find(Team.class, team.getId());
 	int memberSize = findTeam.getMembers().size(); // 역방향 조회
 	```
+
+## 03.08(수)
+
+### 연관관계의 주인
+
+객체끼리 연관관계를 맺기 위해서는 한 객체가 다른 객체의 정보를 갖고 있어야 한다.
+
+따라서 다른 객체와 연관관계를 맺을 **연관관계 주인**을 정해야 하는데, 연관관계 주인은 주로 **테이블 상에서 외래키를 갖고 있는 곳**으로 정한다.
+
+(비지니스 로직을 기준으로 정하지 않는다.)
+
+이렇게 연관관계 주인을 정한 뒤, 연관관계 주인이 맺은 단방향 매핑만으로도 연관관계 매핑은 완료된다.
+
+따라서 우선적으로 단방향 매핑 후 양방향 매핑은 필요 시 추가해도 무방하다.
+
+(양방향 매핑은 반대 방향으로의 조회 기능이 추가된 것 뿐)
+
+### 다양한 연관관계 매핑
+
+- **일대일 (1:1)**
+	- 외래키를 갖고 있는 객체에 `@OneToOne` 사용
+	- 양방향 매핑 시 반대편 객체에 `@OneToOne(mappedBy = "참조하는 속성명")` 사용
+
+- **다대일 (N:1)**
+	- 외래키를 갖고 있는 객체(N)에 `@ManyToOne` 사용
+	- 양방향 매핑 시 반대편 객체(1)에 `@OneToMany(mappedBy = "참조하는 속성명")` 사용
+
+- **다대다 (N:M)**
+	- `@ManyToMany`이 있지만 실무에서는 거의 사용 x
+
+		다대다로 연결된 테이블은 중개 테이블을 생성한다.
+
+		이때 중개 테이블은 두 엔티티의 id를 갖고 있는데, 여기에 추가적인 컬럼이 필요할 수도 있다.
+
+		이러한 경우 `@ManyToMany`의 사용이 불가능하다.
+
+		따라서 **중개 테이블용 엔티티를 추가한 뒤 두 엔티티와 연결**시킨다.
+
+	- 중개 테이블용 엔티티에서 N:M으로 연결시키고자 하는 두 엔티티를 `@ManyToOne`으로 추가한다.
+
+		(두 테이블의 id는 중개 테이블이 갖고 있음)
+
+		두 엔티티는 `@OneToMany(mappedBy = "참조하는 속성명")`으로 중개 테이블을 추가한다.
+	
+### 상속관계 매핑
+
+상속관계 매핑이란 슈퍼타입 서브타입 논리 모델을 실제 물리 모델로 구현하는 방법이다.
+
+슈퍼타입 엔티티는 `@Inheritance(strategy=InheritanceType.타입명)`으로 슈퍼타입임을 명시한다.
+
+서브타입 엔티티는 슈퍼타입 엔티티를 `extends`로 상속받는다.
+
+```java
+@Entity
+@Inheritance(strategy=InheritanceType.타입명)
+// 슈퍼타입 테이블에 현재 데이터가 어떤 서브타입의 데이터인지 정보를 추가할 수 있다.
+// @DiscriminatorColumn(name="xxx") (name 안 적을 시 기본값: DTYPE)
+public class Item {
+	
+    @Id @GeneratedValue
+    private Long id;
+
+    private String name;
+    private int price;
+
+    // getter, setter
+}
+```
+
+```java
+@Entity
+// 슈퍼타입 테이블의 DTYPE 컬럼에 현재 서브타입을 어떻게 명시할지 정할 수 있다.
+// 어노테이션 사용하지 않으면 기본값: 현재 엔티티명
+// @DiscriminatorValue("xxx")
+public class Album extends Item {
+    private String artist;
+
+    // artist에 대한 getter, setter
+}
+```
+
+<img src="https://user-images.githubusercontent.com/109272360/221390690-f88c1d5b-1581-4b5b-8c7f-9cceb234fdaa.png" width="550px">
+
+- 조인 전략
+	- `JOINED` type 사용
+	- 장점
+		- 테이블 정규화
+		- 외래키 참조 무결성 제약조건 활용 가능
+		- 저장공간 효율화
+	- 단점
+		- 조회시 조인을 많이 사용 -> 성능 저하
+		- 조회 쿼리가 복잡함
+		- 데이터 저장시 INSERT SQL 2번 호출
+
+	<img src="https://user-images.githubusercontent.com/109272360/221390730-a3443d4f-3650-4dda-b236-e8da8693966d.png" width="550px">
+
+- 단일 테이블 전략
+	- `SINGLE_TABLE` type 사용
+	- `@DiscriminatorColumn`을 명시하지 않아도 `DTYPE`이 테이블에 자동으로 들어감
+	- 장점
+		- 조인이 필요 없으므로 일반적으로 조회 성능이 빠름
+		- 조회 쿼리가 단순함
+	- 단점
+		- 자식 엔티티가 매핑한 컬럼은 모두 null 허용
+		- 단일 테이블에 모든 것을 저장하므로 상황에 따라 조회 성능이 오히려 느려질 수 있음
+	
+	<img src="https://user-images.githubusercontent.com/109272360/221390803-9faf1a5e-9f3c-4caf-b994-debea92c636d.png" width="200px">
+
+- 구현 클래스마다 테이블 전략
+	- `TABLE_PER_CLASS` type 사용
+	- 슈퍼타입 엔티티를 `abstract`를 이용해 추상 클래스로 생성
+	- 데이터베이스 설계자와 ORM 전문가 둘 다 추천하지 않는 방식
+	- 장점
+		- 서브 타입을 명확하게 구분해서 처리할 때 효과적
+		- not null 제약조건 활용 가능
+	- 단점
+		- 여러 자식 테이블을 함께 조회할 때 성능이 느림
+		- 자식 테이블을 통합해서 쿼리하기 어려움
+
+	<img src="https://user-images.githubusercontent.com/109272360/221390892-5fb38e90-fb5f-4967-bda3-1164aa36204b.png" width="550px">
+
+### MappedSuperclass
+
+두 개 이상의 엔티티가 공통 속성을 갖고 있을 때, 각 엔티티마다 속성을 명시하기 번거로울 수 있다.
+
+이런 상황에서 공통 속성을 한 엔티티가 관리하고 다른 엔티티들이 상속을 받을 수 있다.
+
+공통 속성을 갖는 엔티티에 `@MappedSuperclass`를 사용하면 상속받는 클래스에 속성만 제공하며, 부모 클래스는 조회, 검색이 불가능하다.
+
+직접 생성해서 사용할 일이 없으므로 **추상 클래스**로 생성하는 것을 권장한다.
+
+<img src="https://user-images.githubusercontent.com/109272360/221391797-a6cff766-2979-4c38-9e58-a306fdb031a5.png" width="600px">
+
+
+```java
+@MappedSuperClass
+public abstract class BaseEntity {
+    private String createBy;
+    private LocalDateTime createdDate;
+    private String lastModifiedBy;
+    private LocalDateTime lastModifiedDate;
+
+    // getter, setter
+}
+```
+
+```java
+@Entity
+public class Member extends BaseEntity {
+    private String name;
+
+    // getter, setter
+}
+```
