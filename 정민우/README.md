@@ -82,13 +82,13 @@ Flutter를 이용한 크로스플랫폼 모바일 app 제작
 
     - Layout
 
-      - child, children: []
+      - `child`, `children: []`
 
-      - Container(), SizedBox()
+      - `Container()`, `SizedBox()`
 
-      - Row(), Column()
+      - `Row()`, `Column()`
 
-      - Flexible()
+      - `Flexible()`
 
     - Style
 
@@ -96,47 +96,47 @@ Flutter를 이용한 크로스플랫폼 모바일 app 제작
 
   - Dart 기본 문법 학습
 
-    - 함수, final/const, class
+    - 함수, `final`/`const`, `class`
 
 - 2.27.(월)
 
   - Flutter Todo-List 만들기 실습
 
-    - MaterialApp()
+    - `MaterialApp()`
 
-    - StatefulWidget vs StatelessWidget
+    - `StatefulWidget` vs `StatelessWidget`
 
-    - Scaffold() 내부 구조 => appBar, Body, bottomNavigationBar
+    - Scaffold() 내부 구조 => `appBar`, `Body`, `bottomNavigationBar`
 
 - 2.28.(화)
 
   - Flutter Todo-List 만들기 실습
 
-    - Map, List, 반복문, 조건문을 활용한 간단한 CRUD
+    - `Map`, `List`, `반복문`, `조건문`을 활용한 간단한 CRUD
 
-    - ListView()를 이용한 Widget 반복 출력
+    - `ListView()`를 이용한 Widget 반복 출력
 
-    - setState()
+    - `setState()`
 
     - Color, Style 설정하는 방법
 
-- 3.01.(수)
+- 3.1.(수)
 
   - Flutter 연락처 앱 만들기 실습
 
-    - dependencies 세팅(Pubspec.yaml, Pub get)
+    - dependencies 세팅(`Pubspec.yaml`, `Pub get`)
 
     - Permission : 유저에게 데이터 접근권한 요청하는 방법
 
-      - permission_handler 라이브러리를 활용한 연락처 데이터 접근
+      - `permission_handler` 라이브러리를 활용한 연락처 데이터 접근
 
-    - async, await
+    - `async`, `await`
 
-- 3.02.(목)
+- 3.2.(목)
 
   - Flutter 인스타그램 클론코딩
 
-    - theme()
+    - `theme()`
 
     - import custom font
 
@@ -146,7 +146,7 @@ Flutter를 이용한 크로스플랫폼 모바일 app 제작
 
     - TTS
 
-- 3.03.(금)
+- 3.3.(금)
 
   - flutter
 
@@ -154,15 +154,15 @@ Flutter를 이용한 크로스플랫폼 모바일 app 제작
 
     - share
 
-- 3.04.(토)
+- 3.4.(토)
 
   - Dart 문법
 
-- 3.05.(일)
+- 3.5.(일)
 
   - Dart 문법
 
-- 3.06.(월)
+- 3.6.(월)
 
   - flutter
 
@@ -170,17 +170,108 @@ Flutter를 이용한 크로스플랫폼 모바일 app 제작
 
   - 목업 제작 시작
 
-- 3.07.(화)
+- 3.7.(화)
 
   - 목업 70% 이상 완료
 
-- 3.08.(화)
+- 3.8.(수)
 
   - 목업 제작 완료
 
 ![목업](/README_assets/Mockup.png/)
 
 [▶️ Figma Flow](https://www.figma.com/proto/u83HRrNeDlQm7oqFonlJan/Cocook?node-id=1%3A3&viewport=394%2C326%2C0.1&scaling=scale-down&starting-point-node-id=51%3A174&show-proto-sidebar=1)
+
+- 3.9.(목)
+
+  - flutter : `shared preference`, `page transition`, `gestureDetector()`, `Provider`를 이용한 상태관리, `Gridview`
+
+  - 프로젝트 구조 설계
+
+    ```
+    📦 co_cook
+    ├─ android/
+    ├─ assets/
+    │  ├─ images/
+    │  │  └─ ...
+    │  └─ fonts/
+    │     └─ ...
+    ├─ ios/
+    └─ lib/
+      ├─ providers/
+      │  ├─ auth_provider.dart
+      │  └─ ...
+      ├─ screens/
+      │  ├─ screen1/
+      │  │  ├─ screen1.dart
+      │  │  └─ widgets/
+      │  │     ├─ local_widget1.dart
+      │  │     ├─ local_widget2.dart
+      │  │     └─ ...
+      │  └─ ...
+      ├─ services/
+      │  ├─ feature1.dart
+      │  ├─ feature2.dart
+      │  └─ ...
+      ├─ styles/
+      │  ├─ colors.dart
+      │  └─ fonts.dart
+      ├─ utils/
+      │  ├─ feature1.dart
+      │  ├─ feature2.dart
+      │  └─ ...
+      ├─ widgets/
+      │  ├─ button/
+      │  │  ├─ button1.dart
+      │  │  ├─ button2.dart
+      │  │  └─ ...
+      │  ├─ input/
+      │  │  ├─ input1.dart
+      │  │  ├─ input2.dart
+      │  │  └─ ...
+      │  └─ ...
+      └─ main.dart
+    ```
+
+    - `assets`: 앱에서 사용하는 이미지 및 폰트와 같은 리소스 파일을 포함하는 폴더
+
+    - `providers`: 앱의 상태 관리를 위한 Provider 클래스를 포함하는 폴더
+
+    - `screens`: 앱의 화면을 담당하는 위젯을 포함하는 폴더
+
+    - `services`: 데이터베이스, 인증, 푸시 알림과 같은 서비스와 관련된 클래스를 포함하는 폴더
+
+    - `styles`: 앱의 테마와 관련된 파일을 포함하는 폴더
+
+    - `utils`: 유틸리티 클래스와 함수를 포함하는 폴더
+
+    - `widgets`: 재사용 가능한 전역 위젯을 포함하는 폴더
+
+    - `android` 및 `ios`: 각각 Android 및 iOS 앱을 빌드하는 데 필요한 파일을 포함하는 폴더
+
+  - Code Convention
+
+    - 폴더, 파일 명 규칙
+
+      - snake_case
+
+    - 코드 스타일 규칙
+
+      - 함수 : PascalCase, 동사로 시작
+
+        - 예) getUserData, addIngredientsTag ...
+
+      - 변수 : camelCase, 명사, 선언
+
+        - 예) userName, recipeId ...
+
+        - List : 변수명 + List
+
+          - 예) mainRecipeList ...
+
+      - id값 : 변수명 + Id
+
+        - 예) userId ...
 
 ```
 추후 필수 학습 목록
