@@ -421,3 +421,96 @@ public class Member extends BaseEntity {
     // getter, setter
 }
 ```
+
+## 03.09(목)
+
+### 값 타입
+
+JPA의 데이터 타입을 분류하면 다음과 같다.
+
+- 엔티티 타입
+  - `@Entity`로 정의하는 객체
+  - 데이터가 변해도 식별자로 지속해서 추적 가능
+- 값 타입
+  - int, Integer, String 처럼 단순히 값으로 사용하는 자바 기본 타입이나 객체
+  - 식별자가 없고 값만 있으므로 변경시 추적 불가
+
+값 타입은 다시 다음과 같이 분류할 수 있다.
+
+- 기본값 타입
+  - 자바 기본 타입(int, double)
+  - 래퍼 클래스(Integer, Long)
+  - String
+- 임베디드 타입(embedded type, 복합 값 타입)
+- 컬렉션 값 타입(collection value type)
+
+값 타입은 **생명 주기를 엔티티에 의존**한다.
+
+또한 하나의 값 타입이 여러 곳에서 사용되지 않도록 **절대 공유하지 않아야 한다.**
+
+(한 객체의 속성을 변경했을 때 다른 객체의 속성이 같이 변경되는 side effect 발생 가능)
+
+#### 기본값 타입
+
+자바 기본 타입, 래퍼 클래스, String이 기본값 타입에 해당된다.
+
+#### 임베디드 타입
+
+새로운 값 타입을 직접 정의할 수 있다.
+
+만약 `Member` 엔티티가 `city`, `street`, `zipcode` 속성을 가지고 있다면, 이 세 속성은 `Address`라는 타입으로 묶어서 관리할 수 있다.
+
+`@Embeddable`로 값 타입을 정의하고, `@Embedded`로 정의한 값 타입을 사용할 수 있다.
+
+생성한 임베디드 타입은 **기본 생성자를 필수로 넣어야 한다.**
+
+임베디드 타입은 재사용성과 높은 응집도를 가지고 있어, 타입 내부에서 해당 타입에 관한 메소드를 작성할 수 있다.
+
+임베디드 타입을 사용해도 테이블의 컬럼에는 차이가 없다.
+
+<img src="https://user-images.githubusercontent.com/109272360/221508147-b1f5aca9-366e-4ee0-8d42-fa0d55baa705.png" width="400px">
+
+```java
+@Entity
+public class Member {
+    
+    @Id @GeneratedValue
+    private Long id;
+
+    private String name;
+
+    @Embedded
+    private Address address;
+
+	// getter, setter
+}
+```
+
+```java
+@Embeddable
+public class Address {
+
+    private String city;
+    private String street;
+    private String zipcode;
+
+    // 기본 생성자를 필수로 넣어야 한다.
+    public Address() {
+
+	}
+
+    public Address(String city, String street, String zipcode) {
+        this.city = city;
+        this.street = street;
+        this.zipcode = zipcode;
+    }
+
+    // getter, setter
+}
+```
+
+```java
+Member member = new Member();
+// setter의 인자로 해당 임베디드 타입을 넣는다.
+member.setAddress(new Address("city", "street", "zipcode"));
+```
