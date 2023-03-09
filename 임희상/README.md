@@ -4,15 +4,11 @@
 
 [CoCook - Google Sheets](https://docs.google.com/spreadsheets/d/1zkbUUTM7u95iIkUOWzOjrRlMH-YVcKjaYatXHJFF1fw/edit#gid=2066790816)
 
-
-
 0307
 
 ### ERD 작성
 
 ![](C:\Users\SSAFY\AppData\Roaming\marktext\images\2023-03-07-16-36-04-CoCook.png)
-
-
 
 0308
 
@@ -168,3 +164,9 @@ Object detection(객체 인식), 공부하기 좋음
 - 유사도 측정은 String으로 판별, 유사도 측정은 프론트, 백 어디서 하던 상관 없음.
 
 유사도 측정 알고리즘은 구현이 간단.
+
+
+
+0309
+
+### API 명세
