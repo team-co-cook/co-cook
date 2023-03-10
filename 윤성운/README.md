@@ -514,3 +514,103 @@ Member member = new Member();
 // setter의 인자로 해당 임베디드 타입을 넣는다.
 member.setAddress(new Address("city", "street", "zipcode"));
 ```
+
+## 03.10(금)
+
+### 값 타입과 불변 객체
+
+임베디드 타입 같은 값 타입을 여러 객체가 공유하면 예상치 못한 버그가 발생할 수 있다.
+
+```java
+// 입베디드 타입 생성
+Address address = new Address("city", "street", "zipcode");
+
+Member member1 = new Member();
+member1.setAddress(address);
+
+// 같은 값 타입 공유
+Member member2 = new Member();
+member2.setAddress(address);
+
+// member1의 주소를 바꾸고자 함
+address.setCity("newCity");
+
+// member2의 주소도 함께 바뀌어버림
+System.out.println(member2.getAddress().getCity()); // newCity
+```
+
+**임베디드 타입은 자바의 기본 타입이 아니라 객체 타입이므로 참조 형태로 전달된다.**
+
+따라서 다음과 같이 값을 복사해서 사용할 것을 권장한다.
+
+```java
+Address address = new Address("city", "street", "zipcode");
+
+Member member1 = new Member();
+member1.setAddress(address);
+
+// 값을 복사해서 사용
+Member member2 = new Member();
+member2.setAddress(new Address(address.getCity(), address.getStreet(), address.getZipcode()));
+
+// member1의 주소를 바꾸고자 함
+address.setCity("newCity");
+
+// member2의 주소는 변하지 않음
+System.out.println(member2.getAddress().getCity()); // city
+```
+
+또는 부작용을 원천 차단하기 위해 값 타입은 **불변 객체로 설계**해, 생성 시점 이후 값을 변경할 수 없도록 할 수 있다.
+
+-> 생성자로만 값을 설정하고 setter 삭제하기 (Integer, String은 자바가 제공하는 대표적인 불변 객체)
+
+```java
+@Embeddable
+public class Address {
+
+    private String city;
+    private String street;
+    private String zipcode;
+
+    public Address(String city, String street, String zipcode) {
+        this.city = city;
+        this.street = street;
+        this.zipcode = zipcode;
+    }
+
+    // setter는 존재 x
+
+    public String getCity() {
+        return city;
+    }
+
+    public String getStreet() {
+        return street;
+    }
+
+    public String getZipcode() {
+        return zipcode;
+    }
+}
+```
+
+```java
+Address address = new Address("city", "street", "zipcode");
+
+Member member1 = new Member();
+member1.setAddress(address);
+
+Member member2 = new Member();
+member2.setAddress(address);
+
+// setter는 이제 불가능
+// address.setCity("newCity");
+
+// 생성자로만 값을 설정 가능
+Address newAddress = new Address("newCity", "street", "zipcode");
+member1.setAddress(newAddress);
+
+// member2의 주소는 이제 변하지 않음
+System.out.println(member2.getAddress().getCity()); // city
+
+```
