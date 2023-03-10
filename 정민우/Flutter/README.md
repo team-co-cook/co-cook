@@ -4,7 +4,7 @@
 
 ## Flutter 기본 구조 파악
 
-### [Link](https://lab.ssafy.com/s08-ai-speech-sub1/S08P21B302/-/tree/conference/정민우/Flutter/230224_Flutter_test_app)
+### [Link](https://lab.ssafy.com/s08-ai-speech-sub2/S08P22B302/-/tree/TIL/정민우/Flutter/230224_Flutter_test_app)
 
 ```Dart
 // main.dart
@@ -246,7 +246,7 @@ class MyApp extends StatelessWidget {
 
 ## 연락처 앱
 
-### [Link](https://lab.ssafy.com/s08-ai-speech-sub1/S08P21B302/-/tree/conference/정민우/Flutter/230227_Contact_app)
+### [Link](https://lab.ssafy.com/s08-ai-speech-sub2/S08P22B302/-/tree/TIL/정민우/Flutter/230227_Contact_app)
 
 ```Dart
 // main.dart
@@ -392,9 +392,9 @@ class _userDialogState extends State<userDialog> {
 }
 ```
 
-## 인스타그램 클론코딩(학습중)
+## 인스타그램 클론코딩
 
-### [Link](https://lab.ssafy.com/s08-ai-speech-sub1/S08P21B302/-/tree/conference/정민우/Flutter/230302_instagram_app)
+### [Link](https://lab.ssafy.com/s08-ai-speech-sub2/S08P22B302/-/tree/TIL/정민우/Flutter/230302_instagram_app)
 
 ```Dart
 // main.dart
@@ -438,4 +438,223 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
+```
+
+## STT 앱
+
+### [Link](https://lab.ssafy.com/s08-ai-speech-sub2/S08P22B302/-/tree/TIL/정민우/Flutter/230310_flutter_stt)
+
+```Dart
+// main.dart
+
+import 'dart:async';
+
+import 'package:avatar_glow/avatar_glow.dart';
+import 'package:flutter/material.dart';
+import 'package:highlight_text/highlight_text.dart';
+import 'package:speech_to_text/speech_recognition_result.dart';
+import 'package:speech_to_text/speech_to_text.dart';
+import 'package:record/record.dart';
+
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        primarySwatch: Colors.red,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+      ),
+      title: 'Flutter Demo',
+      home: SpeechScreen(),
+    );
+  }
+}
+
+class SpeechScreen extends StatefulWidget {
+  const SpeechScreen({Key? key}) : super(key: key);
+
+  @override
+  State<SpeechScreen> createState() => _SpeechScreenState();
+}
+
+class _SpeechScreenState extends State<SpeechScreen> {
+  /////////////////////////////////////////////////////////
+  // audio meter
+  Record myRecording = Record();
+  Timer? timer;
+
+  bool _isRecording = false;
+
+  double volume = 0.0;
+  double minVolume = -45.0;
+
+  startTimer() async {
+    timer ??= Timer.periodic(
+        Duration(milliseconds: 10),
+            (timer) => updateVolume()
+    );
+  }
+
+  updateVolume() async {
+    Amplitude ampl = await myRecording.getAmplitude();
+    if (ampl.current > minVolume) {
+      if (ampl.current > -15) {
+        _switchMic();
+      }
+      setState(() {
+        volume = (ampl.current - minVolume) / minVolume;
+      });
+      print("Volume : $volume, ampl.current : ${ampl.current}");
+    }
+  }
+
+  int volume0to(int maxVolumeToDisplay) {
+    return (volume * maxVolumeToDisplay).round().abs();
+  }
+
+  Future<bool> startRecording() async {
+    if (await myRecording.hasPermission()) {
+      if (!await myRecording.isRecording()) {
+        await myRecording.start();
+      }
+      startTimer();
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  _stopRecording() async {
+    myRecording.stop();
+    setState(() {
+      volume = 0.0;
+    });
+  }
+
+  _switchMic() async {
+    if (_isRecording) {
+      myRecording.stop();
+      _startListening();
+    }
+  }
+
+  /////////////////////////////////////////////////////////
+
+  // late stt.SpeechToText _speech;
+  SpeechToText _speechToText = SpeechToText();
+  bool _speechEnabled = false;
+  bool _isListening = false;
+
+  String _text = 'Press the button and start speaking';
+  double _confidence = 1.0;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _initSpeech();
+  }
+
+  /// This has to happen only once per app
+  void _initSpeech() async {
+    _speechEnabled = await _speechToText.initialize(
+      onStatus: (val) {
+        print('onStatus: $val');
+        if (val == 'notListening') {
+          setState(() {
+            _isListening = false;
+          });
+          startRecording();
+        }
+      },
+      onError: (val) => print('onStatus: $val'),
+    );
+    setState(() {});
+  }
+
+  /// Each time to start a speech recognition session
+  void _startListening() async {
+    await _speechToText.listen(
+      onResult: _onSpeechResult,
+    );
+    setState(() {
+      _isListening = true;
+    });
+  }
+
+  /// Manually stop the active speech recognition session
+  /// Note that there are also timeouts that each platform enforces
+  /// and the SpeechToText plugin supports setting timeouts on the
+  /// listen method.
+  void _stopListening() async {
+    await _speechToText.stop();
+    setState(() {
+      _isListening = false;
+    });
+  }
+
+  /// This is the callback that the SpeechToText plugin calls when
+  /// the platform returns recognized words.
+  void _onSpeechResult(SpeechRecognitionResult result) {
+    setState(() {
+      _text = result.recognizedWords;
+    });
+  }
+
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Confidence: ${(_confidence * 100.0).toStringAsFixed(1)}%'),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: AvatarGlow(
+        animate: _isListening,
+        glowColor: Theme.of(context).primaryColor,
+        endRadius: 75.0,
+        duration: const Duration(milliseconds: 2000),
+        repeatPauseDuration: const Duration(milliseconds: 0),
+        repeat: true,
+        child: FloatingActionButton(
+          onPressed: _isListening ? _stopListening : _startListening,
+          child: Icon(_isListening ? Icons.mic : Icons.mic_none),
+        ),
+      ),
+      body: Column(
+        children: [
+          SizedBox(
+            height: 50,
+            child: ElevatedButton(
+              onPressed: () async {
+                setState(() {
+                  _isRecording = !_isRecording;
+                });
+                if (_isRecording) {
+                  await startRecording();
+                } else {
+                  await _stopRecording();
+                }
+              },
+              child: Text(_isRecording ? volume0to(100).toString() : "Start Recording"),
+            ),
+          ),
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(30, 30, 30, 150),
+              child: Text('$_text')
+            ),
+          ),
+        ]
+      ),
+    );
+  }
+}
+
 ```
