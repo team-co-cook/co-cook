@@ -52,11 +52,11 @@ Flutter를 이용한 크로스플랫폼 모바일 app 제작
 
 ## 4. 개인 학습 내용
 
-### [🤖 SubPJT1](https://lab.ssafy.com/s08-ai-speech-sub1/S08P21B302/-/tree/conference/정민우/SubPJT1)
+### [🤖 SubPJT1](https://lab.ssafy.com/s08-ai-speech-sub2/S08P22B302/-/tree/TIL/정민우/SubPJT1)
 
-### [📱 Flutter](https://lab.ssafy.com/s08-ai-speech-sub1/S08P21B302/-/tree/conference/정민우/Flutter)
+### [📱 Flutter](https://lab.ssafy.com/s08-ai-speech-sub2/S08P22B302/-/tree/TIL/정민우/Flutter)
 
-### [💻 Dart](https://lab.ssafy.com/s08-ai-speech-sub1/S08P21B302/-/tree/conference/정민우/Dart)
+### [💻 Dart](https://lab.ssafy.com/s08-ai-speech-sub2/S08P22B302/-/tree/TIL/정민우/Dart)
 
 ---
 
@@ -272,6 +272,12 @@ Flutter를 이용한 크로스플랫폼 모바일 app 제작
       - id값 : 변수명 + Id
 
         - 예) userId ...
+
+- 3.10.(금)
+
+  - flutter : `speech-to-text`, `record` 라이브러리 활용 음성인식 앱 제작, 음성 크기에 따른 비동기 처리
+
+  ### [Link](https://lab.ssafy.com/s08-ai-speech-sub2/S08P22B302/-/tree/TIL/정민우/Flutter/230310_flutter_stt)
 
 ```
 추후 필수 학습 목록
