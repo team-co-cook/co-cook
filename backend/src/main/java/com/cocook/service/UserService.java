@@ -7,7 +7,9 @@ import com.cocook.dto.user.SignupRequestDto;
 import com.cocook.entity.User;
 import com.cocook.repository.UserRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -15,11 +17,16 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @Service
-@AllArgsConstructor
 public class UserService {
 
-    private UserRepository authRepository;
-    private JwtTokenProvider jwtTokenProvider;
+    private final UserRepository userRepository;
+    private final JwtTokenProvider jwtTokenProvider;
+
+    @Autowired
+    public UserService(UserRepository userRepository, JwtTokenProvider jwtTokenProvider) {
+        this.userRepository = userRepository;
+        this.jwtTokenProvider = jwtTokenProvider;
+    }
 
     public LoginResponseDto login(String access_token) {
 
@@ -30,7 +37,7 @@ public class UserService {
         GoogleOAuthResponseDto googleOAuthResponse = (GoogleOAuthResponseDto) response.getBody();
 
         String userEmail = googleOAuthResponse.getEmail();
-        User foundUser = authRepository.getUserByEmail(userEmail);
+        User foundUser = userRepository.getUserByEmail(userEmail);
         if (foundUser == null) {
             return new LoginResponseDto(null, googleOAuthResponse.getEmail(), null, null);
         }
@@ -45,11 +52,11 @@ public class UserService {
             throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰입니다.");
         }
 
-        if (authRepository.getUserByEmail(signupRequestDto.getEmail()) != null) {
+        if (userRepository.getUserByEmail(signupRequestDto.getEmail()) != null) {
             throw new DataIntegrityViolationException("이미 존재하는 이메일입니다.");
         }
 
-        if (authRepository.getUserByNickname(signupRequestDto.getNickname()) != null) {
+        if (userRepository.getUserByNickname(signupRequestDto.getNickname()) != null) {
             throw new DataIntegrityViolationException("이미 존재하는 닉네임입니다.");
         }
 
@@ -58,7 +65,7 @@ public class UserService {
         newUser.setNickname(signupRequestDto.getNickname());
         newUser.setRoles("ROLE_USER");
         newUser.setIsActive(true);
-        User savedUser = authRepository.save(newUser);
+        User savedUser = userRepository.save(newUser);
         String jwtToken = jwtTokenProvider.createToken(savedUser.getEmail(), savedUser.getRoleList());
         return new LoginResponseDto(savedUser.getId(), savedUser.getEmail(), savedUser.getNickname(), jwtToken);
     }
@@ -75,6 +82,10 @@ public class UserService {
         } catch (HttpClientErrorException e) {
             return ResponseEntity.status(e.getStatusCode()).body(e.getMessage());
         }
+    }
+
+    public void deleteUser(Long user_idx) {
+        userRepository.deleteById(user_idx);
     }
 
 }
