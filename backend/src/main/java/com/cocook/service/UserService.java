@@ -88,4 +88,11 @@ public class UserService {
         userRepository.deleteById(user_idx);
     }
 
+    public String changeUserNickname(Long user_idx, String nickname) {
+        User foundUser = userRepository.getUserById(user_idx);
+        foundUser.setNickname(nickname);
+        return userRepository.save(foundUser).getNickname();
+    }
+
+
 }
