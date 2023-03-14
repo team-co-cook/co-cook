@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 @Service
 public class UserService {
@@ -82,7 +83,7 @@ public class UserService {
         } catch (HttpClientErrorException e) {
             return ResponseEntity.status(e.getStatusCode()).body(e.getMessage());
         }
-        catch (WebClientResponseException) {
+        catch (WebClientResponseException e) {
             return ResponseEntity.status(e.getStatusCode()).body(e.getMessage());
         }
     }
