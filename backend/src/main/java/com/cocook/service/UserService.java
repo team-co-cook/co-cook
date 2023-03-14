@@ -82,6 +82,9 @@ public class UserService {
         } catch (HttpClientErrorException e) {
             return ResponseEntity.status(e.getStatusCode()).body(e.getMessage());
         }
+        catch (WebClientResponseException) {
+            return ResponseEntity.status(e.getStatusCode()).body(e.getMessage());
+        }
     }
 
     public void deleteUser(Long user_idx) {
