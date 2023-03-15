@@ -7,15 +7,20 @@ import com.cocook.dto.user.SignupRequestDto;
 import com.cocook.entity.User;
 import com.cocook.repository.UserRepository;
 import lombok.AllArgsConstructor;
+
+import org.hibernate.ObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationServiceException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
+
+import javax.persistence.EntityNotFoundException;
 
 @Service
 public class UserService {
@@ -33,14 +38,17 @@ public class UserService {
 
         ResponseEntity<?> response = this.checkToken(access_token);
         if (response.getStatusCode() == HttpStatus.UNAUTHORIZED) {
-            throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰입니다.");
+            throw new AuthenticationServiceException("유효하지 않은 토큰입니다.");
         }
         GoogleOAuthResponseDto googleOAuthResponse = (GoogleOAuthResponseDto) response.getBody();
 
         String userEmail = googleOAuthResponse.getEmail();
-        User foundUser = userRepository.getUserByEmail(userEmail);
+        User foundUser = userRepository.findByEmail(userEmail);
         if (foundUser == null) {
             return new LoginResponseDto(null, googleOAuthResponse.getEmail(), null, null);
+        }
+        if (!foundUser.getIsActive()) {
+            throw new EntityNotFoundException("삭제된 회원의 이메일입니다.");
         }
         String jwtToken = jwtTokenProvider.createToken(foundUser.getEmail(), foundUser.getRoleList());
         return new LoginResponseDto(foundUser.getId(), foundUser.getEmail(), foundUser.getNickname(), jwtToken);
@@ -50,14 +58,14 @@ public class UserService {
 
         ResponseEntity<?> response = this.checkToken(signupRequestDto.getAccess_token());
         if (response.getStatusCode() == HttpStatus.UNAUTHORIZED) {
-            throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰입니다.");
+            throw new AuthenticationServiceException("유효하지 않은 토큰입니다.");
         }
 
-        if (userRepository.getUserByEmail(signupRequestDto.getEmail()) != null) {
+        if (userRepository.findByEmail(signupRequestDto.getEmail()) != null) {
             throw new DataIntegrityViolationException("이미 존재하는 이메일입니다.");
         }
 
-        if (userRepository.getUserByNickname(signupRequestDto.getNickname()) != null) {
+        if (userRepository.findByNickname(signupRequestDto.getNickname()) != null) {
             throw new DataIntegrityViolationException("이미 존재하는 닉네임입니다.");
         }
 
@@ -82,18 +90,28 @@ public class UserService {
             return ResponseEntity.status(HttpStatus.OK).body(res);
         } catch (HttpClientErrorException e) {
             return ResponseEntity.status(e.getStatusCode()).body(e.getMessage());
-        }
-        catch (WebClientResponseException e) {
+        } catch (WebClientResponseException e) {
             return ResponseEntity.status(e.getStatusCode()).body(e.getMessage());
         }
     }
 
     public void deleteUser(Long user_idx) {
-        userRepository.deleteById(user_idx);
+        User foundUser = userRepository.findByIdAndIsActiveTrue(user_idx);
+        if (foundUser == null) {
+            throw new EntityNotFoundException("존재하지 않는 유저입니다.");
+        }
+        foundUser.setIsActive(false);
+        userRepository.save(foundUser);
     }
 
     public String changeUserNickname(Long user_idx, String nickname) {
-        User foundUser = userRepository.getUserById(user_idx);
+        User foundUser = userRepository.findByIdAndIsActiveTrue(user_idx);
+        if (foundUser == null) {
+            throw new EntityNotFoundException("존재하지 않는 유저입니다.");
+        }
+        if (userRepository.findByNickname(nickname) != null) {
+            throw new DataIntegrityViolationException("이미 존재하는 닉네임입니다.");
+        }
         foundUser.setNickname(nickname);
         return userRepository.save(foundUser).getNickname();
     }
