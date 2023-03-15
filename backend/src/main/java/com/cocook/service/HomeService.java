@@ -2,6 +2,7 @@ package com.cocook.service;
 
 import com.cocook.auth.JwtTokenProvider;
 import com.cocook.dto.home.CategoryResDto;
+import com.cocook.dto.home.RandomResDto;
 import com.cocook.dto.home.RecommendResDto;
 import com.cocook.dto.home.ThemeResDto;
 import com.cocook.dto.recipe.RecipeListResDto;
@@ -51,28 +52,9 @@ public class HomeService {
             themeName = "야식";
         }
 
-//      List<Recipe> foundRecipes = recipeRepository.findByTags_Theme_ThemeName(themeName);
-        List<Recipe> foundRecipes = recipeRepository.findByTags_Theme_ThemeName("아침");
-        List<RecipeListResDto> resultRecipes = new ArrayList<>();
-
-        for (Recipe recipe : foundRecipes) {
-            Long userIdx = jwtTokenProvider.getUserIdx(authToken);
-            Favorite foundFavorite = favoriteRepository.findByUserIdAndRecipeId(userIdx, recipe.getId());
-            boolean isFavorite;
-            if (foundFavorite != null) {
-                isFavorite = true;
-            } else {
-                isFavorite = false;
-            }
-            RecipeListResDto recipeListResDto = RecipeListResDto.builder()
-                    .recipeIdx(recipe.getId())
-                    .recipeName(recipe.getRecipeName())
-                    .recipeDifficulty(recipe.getDifficulty())
-                    .recipeImgPath(recipe.getImgPath())
-                    .recipeRunningTime(recipe.getRunningTime())
-                    .isFavorite(isFavorite).build();
-            resultRecipes.add(recipeListResDto);
-        }
+        Long userIdx = jwtTokenProvider.getUserIdx(authToken);
+        List<Recipe> foundRecipes = recipeRepository.findByTags_Theme_ThemeName(themeName);
+        List<RecipeListResDto> resultRecipes = addRecipeToRecipeListResDto(foundRecipes, userIdx);
 
         return new RecommendResDto(resultRecipes);
     }
@@ -85,6 +67,40 @@ public class HomeService {
     public CategoryResDto getCategories() {
         List<Category> categories = categoryRepository.findAll();
         return new CategoryResDto(categories);
+    }
+
+    public RandomResDto getRandomRecipes(String authToken) {
+        Long userIdx = jwtTokenProvider.getUserIdx(authToken);
+        List<Recipe> recipes = recipeRepository.findRandomRecipes();
+        List<RecipeListResDto> recipeListResDtos = addRecipeToRecipeListResDto(recipes, userIdx);
+        return new RandomResDto(recipeListResDtos);
+    }
+
+    private List<RecipeListResDto> addRecipeToRecipeListResDto(List<Recipe> orgRecipeList, Long userIdx) {
+        List<RecipeListResDto> newRecipes = new ArrayList<>();
+        for (Recipe recipe : orgRecipeList) {
+            boolean isFavorite = getIsFavorite(userIdx, recipe.getId());
+            RecipeListResDto recipeListResDto = RecipeListResDto.builder()
+                    .recipeIdx(recipe.getId())
+                    .recipeName(recipe.getRecipeName())
+                    .recipeDifficulty(recipe.getDifficulty())
+                    .recipeImgPath(recipe.getImgPath())
+                    .recipeRunningTime(recipe.getRunningTime())
+                    .isFavorite(isFavorite).build();
+            newRecipes.add(recipeListResDto);
+        }
+        return newRecipes;
+    }
+
+    private boolean getIsFavorite(Long userIdx, Long recipeIdx) {
+        boolean isFavorite;
+        Favorite foundFavorite = favoriteRepository.findByUserIdAndRecipeId(userIdx, recipeIdx);
+        if (foundFavorite != null) {
+            isFavorite = true;
+        } else {
+            isFavorite = false;
+        }
+        return isFavorite;
     }
 
 }

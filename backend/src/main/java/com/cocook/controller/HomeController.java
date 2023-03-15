@@ -2,6 +2,7 @@ package com.cocook.controller;
 
 import com.cocook.dto.ApiResponse;
 import com.cocook.dto.home.CategoryResDto;
+import com.cocook.dto.home.RandomResDto;
 import com.cocook.dto.home.RecommendResDto;
 import com.cocook.dto.home.ThemeResDto;
 import com.cocook.dto.recipe.RecipeListResDto;
@@ -40,6 +41,12 @@ public class HomeController {
     public ResponseEntity<ApiResponse<CategoryResDto>> getCategories() {
         CategoryResDto categoryResDto = homeService.getCategories();
         return ApiResponse.ok(categoryResDto);
+    }
+
+    @GetMapping("/random")
+    public ResponseEntity<ApiResponse<RandomResDto>> getRandomRecipes(@RequestHeader("AUTH-TOKEN") String authToken) {
+        RandomResDto randomResDto = homeService.getRandomRecipes(authToken);
+        return ApiResponse.ok(randomResDto);
     }
 
 }
