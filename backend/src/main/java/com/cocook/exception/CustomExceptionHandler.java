@@ -3,14 +3,18 @@ package com.cocook.exception;
 import com.cocook.dto.ApiResponse;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 import javax.persistence.EntityNotFoundException;
+import java.util.Set;
 
 
 @RestControllerAdvice
@@ -42,6 +46,14 @@ public class CustomExceptionHandler {
     public ResponseEntity<ApiResponse<?>> handleEntityNotFoundException(EntityNotFoundException e) {
         ApiResponse<?> apiResponse = new ApiResponse<Object>(e.getMessage(), 404, null);
         return new ResponseEntity<>(apiResponse, HttpStatus.NOT_FOUND);
+    }
+
+    // 요청의 method가 잘못된 경우
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<ApiResponse<?>> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException e) {
+        Set<HttpMethod> supportedMethods = e.getSupportedHttpMethods();
+        ApiResponse<?> apiResponse = new ApiResponse<Object>("지원되지 않는 메소드입니다. 다음 메소드를 이용해주세요: " + supportedMethods, 405, null);
+        return new ResponseEntity<>(apiResponse, HttpStatus.METHOD_NOT_ALLOWED);
     }
 
     // 생성 또는 수정 시, DB에 중복되는 값이 있는 경우
