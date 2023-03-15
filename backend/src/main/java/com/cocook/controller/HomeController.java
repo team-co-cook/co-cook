@@ -1,8 +1,10 @@
 package com.cocook.controller;
 
 import com.cocook.dto.ApiResponse;
+import com.cocook.dto.home.CategoryResDto;
 import com.cocook.dto.home.RecommendResDto;
 import com.cocook.dto.home.ThemeResDto;
+import com.cocook.dto.recipe.RecipeListResDto;
 import com.cocook.service.HomeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +34,12 @@ public class HomeController {
     public ResponseEntity<ApiResponse<ThemeResDto>> getThemes() {
         ThemeResDto themeResDto = homeService.getThemes();
         return ApiResponse.ok(themeResDto);
+    }
+
+    @GetMapping("/category")
+    public ResponseEntity<ApiResponse<CategoryResDto>> getCategories() {
+        CategoryResDto categoryResDto = homeService.getCategories();
+        return ApiResponse.ok(categoryResDto);
     }
 
 }

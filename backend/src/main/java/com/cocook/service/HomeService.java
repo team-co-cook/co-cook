@@ -1,12 +1,15 @@
 package com.cocook.service;
 
 import com.cocook.auth.JwtTokenProvider;
+import com.cocook.dto.home.CategoryResDto;
 import com.cocook.dto.home.RecommendResDto;
 import com.cocook.dto.home.ThemeResDto;
 import com.cocook.dto.recipe.RecipeListResDto;
+import com.cocook.entity.Category;
 import com.cocook.entity.Favorite;
 import com.cocook.entity.Recipe;
 import com.cocook.entity.Theme;
+import com.cocook.repository.CategoryRepository;
 import com.cocook.repository.FavoriteRepository;
 import com.cocook.repository.RecipeRepository;
 import com.cocook.repository.ThemeRepository;
@@ -24,13 +27,15 @@ public class HomeService {
     private final JwtTokenProvider jwtTokenProvider;
     private final FavoriteRepository favoriteRepository;
     private final ThemeRepository themeRepository;
+    private final CategoryRepository categoryRepository;
 
     @Autowired
-    public HomeService(RecipeRepository recipeRepository, JwtTokenProvider jwtTokenProvider, FavoriteRepository favoriteRepository, ThemeRepository themeRepository) {
+    public HomeService(RecipeRepository recipeRepository, JwtTokenProvider jwtTokenProvider, FavoriteRepository favoriteRepository, ThemeRepository themeRepository, CategoryRepository categoryRepository) {
         this.recipeRepository = recipeRepository;
         this.jwtTokenProvider = jwtTokenProvider;
         this.favoriteRepository = favoriteRepository;
         this.themeRepository = themeRepository;
+        this.categoryRepository = categoryRepository;
     }
 
     public RecommendResDto getRecommendRecipes(String authToken) {
@@ -75,6 +80,11 @@ public class HomeService {
     public ThemeResDto getThemes() {
         List<Theme> themes = themeRepository.findAll();
         return new ThemeResDto(themes);
+    }
+
+    public CategoryResDto getCategories() {
+        List<Category> categories = categoryRepository.findAll();
+        return new CategoryResDto(categories);
     }
 
 }
