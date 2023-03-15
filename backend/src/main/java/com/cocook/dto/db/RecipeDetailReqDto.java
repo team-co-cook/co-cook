@@ -6,7 +6,7 @@ import lombok.Data;
 public class RecipeDetailReqDto {
     private String recipeName;
     private String imgPath;
-    private Integer difficulty;
+    private String difficulty;
     private Integer runningTime;
     private Integer calorie;
     private Integer serving;

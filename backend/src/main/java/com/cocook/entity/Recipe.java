@@ -27,7 +27,7 @@ public class Recipe {
 
     private String recipeName;
 
-    private Integer difficulty;
+    private String difficulty;
 
     private Integer runningTime;
 
@@ -49,7 +49,7 @@ public class Recipe {
 //    @OneToMany(mappedBy = "recipe")
 //    private List<Amount> amounts = new ArrayList<>();
 //
-//    @OneToMany(mappedBy = "recipe")
-//    private List<Tag> tags = new ArrayList<>();
+    @OneToMany(mappedBy = "recipe", fetch = FetchType.LAZY)
+    private List<Tag> tags = new ArrayList<>();
 
 }

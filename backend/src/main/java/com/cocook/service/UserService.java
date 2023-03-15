@@ -50,7 +50,7 @@ public class UserService {
         if (!foundUser.getIsActive()) {
             throw new EntityNotFoundException("삭제된 회원의 이메일입니다.");
         }
-        String jwtToken = jwtTokenProvider.createToken(foundUser.getEmail(), foundUser.getRoleList());
+        String jwtToken = jwtTokenProvider.createToken(foundUser.getId(), foundUser.getRoleList());
         return new LoginResponseDto(foundUser.getId(), foundUser.getEmail(), foundUser.getNickname(), jwtToken);
     }
 
@@ -75,7 +75,7 @@ public class UserService {
         newUser.setRoles("ROLE_USER");
         newUser.setIsActive(true);
         User savedUser = userRepository.save(newUser);
-        String jwtToken = jwtTokenProvider.createToken(savedUser.getEmail(), savedUser.getRoleList());
+        String jwtToken = jwtTokenProvider.createToken(savedUser.getId(), savedUser.getRoleList());
         return new LoginResponseDto(savedUser.getId(), savedUser.getEmail(), savedUser.getNickname(), jwtToken);
     }
 

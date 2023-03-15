@@ -1,4 +1,30 @@
 package com.cocook.controller;
 
+import com.cocook.dto.ApiResponse;
+import com.cocook.dto.home.RecommendResDto;
+import com.cocook.service.HomeService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/api/v1/home")
 public class HomeController {
+
+    private HomeService homeService;
+
+    @Autowired
+    public HomeController(HomeService homeService) {
+        this.homeService = homeService;
+    }
+
+    @GetMapping("/recommend")
+    public ResponseEntity<ApiResponse<RecommendResDto>> recommend(@RequestHeader("AUTH-TOKEN") String authToken) {
+        RecommendResDto recommendResDto = homeService.recommend(authToken);
+        return ApiResponse.ok(recommendResDto);
+    }
+
 }
