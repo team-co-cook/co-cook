@@ -28,14 +28,14 @@ class LoginScreen extends StatelessWidget {
             ),
             Positioned(
               top: MediaQuery.of(context).size.height / 2 + 100,
-              left: MediaQuery.of(context).size.width / 2 - 190,
+              left: MediaQuery.of(context).size.width / 2 - 140,
               child: GestureDetector(
                 onTap: () async {
                   signInWithGoogle(context); // 구글 로그인 리다이렉트
                 },
                 child: Image.asset(
                   'assets/google_login_btn.png',
-                  width: 380,
+                  width: 280,
                 ),
               ),
             ),
