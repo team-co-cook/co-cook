@@ -75,12 +75,13 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   // 이미 로그인 되어 있는지 판단하고, 홈/로그인 분기합니다.
-  void _navigateToNextScreen() async{
+  void _navigateToNextScreen() async {
     // 데이터 가져오기
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    final String userData = prefs.getString('userData') ?? ''; // 기본값으로 빈 문자열을 사용합니다.
+    final String userData =
+        prefs.getString('userData') ?? ''; // 기본값으로 빈 문자열을 사용합니다.
     print('DB유저정보: ${userData}');
-    
+
     if (userData != null && userData.isNotEmpty) {
       // 로컬에 유저정보가 존재한다면,
       // final Map<String, dynamic> userData = json.decode(jsonString);
@@ -94,14 +95,16 @@ class _SplashScreenState extends State<SplashScreen> {
       Navigator.pushReplacement(context, home); // 로그인 상태이면 홈화면으로 이동합니다.
     } else {
       Navigator.pushReplacement(
-        context,
-        PageRouteBuilder(
-          // 연결할 페이지
-          pageBuilder: (c, a1, a2) => LoginScreen(),
-          // 적용할 애니메이션
-          transitionsBuilder: (c, a1, a2, child) => FadeTransition(opacity: a1, child: child),
-          // 적용 시간 설정
-          transitionDuration: Duration(milliseconds : 500),)); // 로그인 상태가 아니면 로그인화면으로 이동합니다.
+          context,
+          PageRouteBuilder(
+            // 연결할 페이지
+            pageBuilder: (c, a1, a2) => LoginScreen(),
+            // 적용할 애니메이션
+            transitionsBuilder: (c, a1, a2, child) =>
+                FadeTransition(opacity: a1, child: child),
+            // 적용 시간 설정
+            transitionDuration: Duration(milliseconds: 500),
+          )); // 로그인 상태가 아니면 로그인화면으로 이동합니다.
     }
   }
 }

@@ -11,7 +11,7 @@ import 'package:co_cook/styles/text_styles.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({Key? key}) : super(key: key);
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,7 +30,7 @@ class LoginScreen extends StatelessWidget {
               top: MediaQuery.of(context).size.height / 2 + 100,
               left: MediaQuery.of(context).size.width / 2 - 190,
               child: GestureDetector(
-                onTap: () async{
+                onTap: () async {
                   signInWithGoogle(context); // 구글 로그인 리다이렉트
                 },
                 child: Image.asset(
@@ -46,20 +46,21 @@ class LoginScreen extends StatelessWidget {
   }
 }
 
-
 Future<void> signInWithGoogle(BuildContext context) async {
   final GoogleSignIn googleSignIn = GoogleSignIn(); // 구글 로그인 함수 불러오기
   print('로그인 시작!');
   try {
-    final GoogleSignInAccount? googleSignInAccount = await googleSignIn.signIn();
+    final GoogleSignInAccount? googleSignInAccount =
+        await googleSignIn.signIn();
     print('로그인 상태확인 $googleSignInAccount');
     if (googleSignInAccount == null) {
       // 사용자가 로그인 창을 닫거나 로그인을 취소한 경우
       print('사용자가 로그인을 취소했습니다.');
       return;
     }
-    
-    final GoogleSignInAuthentication googleSignInAuthentication = await googleSignInAccount!.authentication;
+
+    final GoogleSignInAuthentication googleSignInAuthentication =
+        await googleSignInAccount!.authentication;
 
     print('토큰 수납!');
     print(googleSignInAuthentication.accessToken);
@@ -68,8 +69,9 @@ Future<void> signInWithGoogle(BuildContext context) async {
     print('유저정보 확인!');
     ApiService _apiService = ApiService();
     Map<String, dynamic> userData = {'access_token': userToken};
-    Response? response  = await _apiService.loginUser(userData);
-    print('응답: ${response}'); // {"message":"OK","status":200,"data":{"user_idx":null,"email":"xxxx@gmail.com","nickname":null,"jwtToken":null}}
+    Response? response = await _apiService.loginUser(userData);
+    print(
+        '응답: ${response}'); // {"message":"OK","status":200,"data":{"user_idx":null,"email":"xxxx@gmail.com","nickname":null,"jwtToken":null}}
 
     // 디코딩
     Map<String, dynamic> decodeRes = jsonDecode(response.toString());
@@ -78,7 +80,9 @@ Future<void> signInWithGoogle(BuildContext context) async {
     if (decodeRes['data']['user_idx'] == null) {
       print('회원가입으로 이동!');
       String userEmail = decodeRes['data']['email'];
-      Route signup = MaterialPageRoute(builder: (context) => SignupScreen(email: userEmail, token: userToken));
+      Route signup = MaterialPageRoute(
+          builder: (context) =>
+              SignupScreen(email: userEmail, token: userToken));
       Navigator.pushReplacement(context, signup);
     } else {
       print('로컬에 유저정보 저장!');

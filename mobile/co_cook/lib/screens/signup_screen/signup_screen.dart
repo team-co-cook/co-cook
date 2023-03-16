@@ -7,6 +7,7 @@ import 'package:co_cook/widgets/text_field/custom_text_field.dart';
 import 'dart:convert';
 import 'package:co_cook/styles/colors.dart';
 import 'package:co_cook/styles/text_styles.dart';
+import 'package:co_cook/widgets/button/button.dart';
 
 class SignupScreen extends StatefulWidget {
   final String email; // 이메일 필드 추가
@@ -23,7 +24,7 @@ class _SignupScreenState extends State<SignupScreen> {
   String? _errorMessage;
   bool _isError = false;
   final _focusNode = FocusNode(); // 포커싱 여부를 추적하는 클래스 인스턴스
-  
+
   // 위젯이 소멸될 때 호출되는 메서드
   @override
   void dispose() {
@@ -31,17 +32,17 @@ class _SignupScreenState extends State<SignupScreen> {
     super.dispose();
   }
 
-  // 키보드 외 화면을 눌렀을 때, 포커스 해제 
+  // 키보드 외 화면을 눌렀을 때, 포커스 해제
   void _dismissKeyboard(BuildContext context) {
     final currentFocus = FocusScope.of(context); // 현재 포커싱된 위젯을 반환
-    if (!currentFocus.hasPrimaryFocus && currentFocus.focusedChild != null) { // 현재 포커싱된 위젯이 최상위 FocusScope가 아니면서, 포커싱이 존재한다면.
+    if (!currentFocus.hasPrimaryFocus && currentFocus.focusedChild != null) {
+      // 현재 포커싱된 위젯이 최상위 FocusScope가 아니면서, 포커싱이 존재한다면.
       currentFocus.focusedChild?.unfocus(); // 현재 포커싱된 자식 위젯의 포커싱을 해제
     }
   }
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       body: GestureDetector(
         onTap: () {
@@ -54,35 +55,30 @@ class _SignupScreenState extends State<SignupScreen> {
               Center(
                 child: Container(
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        '사용하실 닉네임을 입력해주세요.',
-                        style: CustomTextStyles()
-                          .subtitle1
-                      ),
-                      const SizedBox(height: 16), // 공백
-                      Stack( // 텍스트 필드와 에러 텍스트 위치를 위한 스택
-                        children: [
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text('사용하실 닉네임을 입력해주세요.',
+                            style: CustomTextStyles().subtitle1),
+                        const SizedBox(height: 16), // 공백
+                        Stack(// 텍스트 필드와 에러 텍스트 위치를 위한 스택
+                            children: [
                           CustomTextField(
                             onChanged: onNicknameChanged,
                             isError: _isError,
                           ),
                           Positioned(
-                            bottom: 0,
-                            child: ErrorMessage(errorMessage: _errorMessage)
-                          ),
-                        ]
-                      ),
-                      SizedBox(height: 16), // 공백
-                      ElevatedButton(
-                        onPressed: () {
-                          _signUp(context);
-                        },
-                        child: Text('완료'),
-                      ),
-                    ]
-                  ),
+                              bottom: 0,
+                              child: ErrorMessage(errorMessage: _errorMessage)),
+                        ]),
+                        SizedBox(height: 16), // 공백
+                        CommonButton(
+                          label: '확인',
+                          color: ButtonType.red,
+                          onPressed: () {
+                            _signUp(context);
+                          },
+                        ),
+                      ]),
                 ),
               ),
               Positioned(
@@ -108,10 +104,9 @@ class _SignupScreenState extends State<SignupScreen> {
       _errorMessage = null;
     });
   }
-  
+
   // 회원가입 로직
   Future<void> _signUp(BuildContext context) async {
-
     // 유효성 검증
     if (_nickname == null || _nickname == '') {
       setState(() {
@@ -176,7 +171,7 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 }
 
-// 커스텀 에러 메시지     
+// 커스텀 에러 메시지
 class ErrorMessage extends StatelessWidget {
   final String? errorMessage;
   const ErrorMessage({super.key, this.errorMessage});
@@ -187,12 +182,10 @@ class ErrorMessage extends StatelessWidget {
       padding: const EdgeInsets.only(left: 16.0),
       child: Container(
         alignment: Alignment.centerLeft, // 왼쪽 정렬 추가
-        child: Text(
-          errorMessage ?? '',
-          style: const CustomTextStyles()
-            .subtitle2
-            .copyWith(color: CustomColors.redPrimary)
-        ),
+        child: Text(errorMessage ?? '',
+            style: const CustomTextStyles()
+                .subtitle2
+                .copyWith(color: CustomColors.redPrimary)),
       ),
     );
   }
