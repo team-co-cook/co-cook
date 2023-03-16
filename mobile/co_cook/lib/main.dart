@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-import 'styles/colors.dart';
-import 'styles/text_styles.dart';
+import 'package:co_cook/styles/colors.dart';
+import 'package:co_cook/styles/text_styles.dart';
 
-void main() {
+Future main() async {
+  await dotenv.load(fileName: ".env");
+
   runApp(const Main());
 }
 
