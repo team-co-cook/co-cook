@@ -3,7 +3,7 @@ import 'package:dio/dio.dart'; // Response 가져오기 위함.
 import 'package:co_cook/services/api_service.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:co_cook/screens/signup_screen/signup_screen.dart';
-import 'package:co_cook/utils/logout.dart';
+import 'package:co_cook/screens/user_screen/user_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:co_cook/styles/colors.dart';
@@ -90,7 +90,7 @@ Future<void> signInWithGoogle(BuildContext context) async {
       prefs.setString('userData', response.toString());
 
       // print('홈으로 이동!');
-      Route home = MaterialPageRoute(builder: (context) => LogOut());
+      Route home = MaterialPageRoute(builder: (context) => const UserScreen());
       Navigator.pushReplacement(context, home);
     }
   } catch (error) {

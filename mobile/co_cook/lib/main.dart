@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:co_cook/screens/splash_screen/splash_screen.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-
+import 'package:co_cook/screens/user_screen/user_screen.dart';
 import 'package:co_cook/styles/colors.dart';
 import 'package:co_cook/styles/text_styles.dart';
 
@@ -17,7 +17,8 @@ class Main extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: SplashScreen(),
+      // home: SplashScreen(),
+      home: UserScreen(),
     );
   }
 }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
-import 'package:co_cook/utils/logout.dart';
+import 'package:co_cook/screens/user_screen/user_screen.dart';
 import 'package:co_cook/screens/login_screen/login_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -91,7 +91,7 @@ class _SplashScreenState extends State<SplashScreen> {
     }
 
     if (_isLoggedIn) {
-      Route home = MaterialPageRoute(builder: (context) => const LogOut());
+      Route home = MaterialPageRoute(builder: (context) => const UserScreen());
       Navigator.pushReplacement(context, home); // 로그인 상태이면 홈화면으로 이동합니다.
     } else {
       Navigator.pushReplacement(
