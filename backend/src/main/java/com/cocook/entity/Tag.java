@@ -16,11 +16,11 @@ public class Tag {
     @Column(name = "tag_idx")
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "recipe_idx")
     private Recipe recipe;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "theme_idx")
     private Theme theme;
 }

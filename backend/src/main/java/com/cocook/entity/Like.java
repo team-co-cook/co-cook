@@ -1,32 +1,26 @@
 package com.cocook.entity;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
 @Entity
-@Builder
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
-public class Step {
+public class Like {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "step_idx")
+    @Column(name = "like_idx")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "recipe_idx")
-    private Recipe recipe;
+    @JoinColumn(name = "review_idx")
+    private Review reveiw;
 
-    private String imgPath;
-
-    private Integer timer;
-
-    private String content;
-
-    private Integer currentStep;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_idx")
+    private User user;
 }

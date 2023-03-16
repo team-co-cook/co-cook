@@ -21,7 +21,7 @@ public class Recipe {
     @Column(name = "recipe_idx")
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_idx")
     private Category category;
 
@@ -49,6 +49,9 @@ public class Recipe {
 //    @OneToMany(mappedBy = "recipe")
 //    private List<Amount> amounts = new ArrayList<>();
 //
+    @OneToMany(mappedBy = "recipe", fetch = FetchType.LAZY)
+    private List<Review> reviews = new ArrayList<>();
+
     @OneToMany(mappedBy = "recipe", fetch = FetchType.LAZY)
     private List<Tag> tags = new ArrayList<>();
 
