@@ -36,8 +36,8 @@ public class JwtTokenProvider {
         secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes(StandardCharsets.UTF_8));
     }
 
-    public String createToken(String email, List<String> roles) {
-        Claims claims = Jwts.claims().setSubject(email);
+    public String createToken(Long userIdx, List<String> roles) {
+        Claims claims = Jwts.claims().setSubject(userIdx.toString());
         claims.put("roles", roles);
         Date now = new Date();
 
@@ -52,13 +52,14 @@ public class JwtTokenProvider {
     }
 
     public Authentication getAuthentication(String token) {
-        UserDetails userDetails = principalDetailsService.loadUserByUsername(this.getEmail(token));
+        UserDetails userDetails = principalDetailsService.loadUserByUsername(this.getUserIdx(token).toString());
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 
-    public String getEmail(String token) {
-        String email = Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token).getBody().getSubject();
-        return email;
+    public Long getUserIdx(String token) {
+        String userIdx = Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token).getBody().getSubject();
+        Long longUserIdx = Long.parseLong(userIdx);
+        return longUserIdx;
     }
 
     public String resolveToken(HttpServletRequest request) {

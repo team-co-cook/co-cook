@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
-import 'styles/colors.dart';
-import 'styles/text_styles.dart';
 import 'package:co_cook/screens/splash_screen/splash_screen.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-void main() {
+import 'package:co_cook/styles/colors.dart';
+import 'package:co_cook/styles/text_styles.dart';
+
+Future main() async {
+  await dotenv.load(fileName: ".env");
+
   runApp(const Main());
 }
 

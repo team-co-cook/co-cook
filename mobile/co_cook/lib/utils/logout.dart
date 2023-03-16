@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:co_cook/screens/login_screen/login_screen.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:co_cook/widgets/bottom_nav_bar/bottom_nav_bar.dart';
 
 class LogOut extends StatelessWidget {
   const LogOut({Key? key}) : super(key: key);
@@ -20,6 +21,7 @@ class LogOut extends StatelessWidget {
           child: Text('로그아웃')
         ),
       ),
+      bottomNavigationBar: BottomNavBar(currentIndex: 0, onTap: (int i) {}),
     );
   }
 }
