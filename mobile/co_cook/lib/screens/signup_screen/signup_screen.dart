@@ -54,31 +54,35 @@ class _SignupScreenState extends State<SignupScreen> {
             children: [
               Center(
                 child: Container(
-                  child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text('사용하실 닉네임을 입력해주세요.',
-                            style: CustomTextStyles().subtitle1),
-                        const SizedBox(height: 16), // 공백
-                        Stack(// 텍스트 필드와 에러 텍스트 위치를 위한 스택
-                            children: [
-                          CustomTextField(
-                            onChanged: onNicknameChanged,
-                            isError: _isError,
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(24, 0, 24, 0),
+                    child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text('사용하실 닉네임을 입력해주세요.',
+                              style: CustomTextStyles().subtitle1),
+                          const SizedBox(height: 16), // 공백
+                          Stack(// 텍스트 필드와 에러 텍스트 위치를 위한 스택
+                              children: [
+                            CustomTextField(
+                              onChanged: onNicknameChanged,
+                              isError: _isError,
+                            ),
+                            Positioned(
+                                bottom: 0,
+                                child:
+                                    ErrorMessage(errorMessage: _errorMessage)),
+                          ]),
+                          SizedBox(height: 16), // 공백
+                          CommonButton(
+                            label: '확인',
+                            color: ButtonType.red,
+                            onPressed: () {
+                              _signUp(context);
+                            },
                           ),
-                          Positioned(
-                              bottom: 0,
-                              child: ErrorMessage(errorMessage: _errorMessage)),
                         ]),
-                        SizedBox(height: 16), // 공백
-                        CommonButton(
-                          label: '확인',
-                          color: ButtonType.red,
-                          onPressed: () {
-                            _signUp(context);
-                          },
-                        ),
-                      ]),
+                  ),
                 ),
               ),
               Positioned(
