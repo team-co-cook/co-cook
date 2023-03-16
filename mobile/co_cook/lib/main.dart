@@ -4,6 +4,8 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:co_cook/styles/colors.dart';
 import 'package:co_cook/styles/text_styles.dart';
 
+import 'screens/main_screen/main_screen.dart';
+
 Future main() async {
   await dotenv.load(fileName: ".env");
 
@@ -15,6 +17,8 @@ class Main extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return const MaterialApp(
+      home: MainScreen(),
+    );
   }
 }

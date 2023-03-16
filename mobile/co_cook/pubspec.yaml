@@ -35,6 +35,7 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
   flutter_dotenv: ^5.0.2
+  card_swiper: ^2.0.4
 
 dev_dependencies:
   flutter_test:
@@ -64,7 +65,8 @@ flutter:
     - .env.local
 
     # images
-    - assets/images/logo/logo_circle.png
+    - assets/images/logo/
+    - assets/images/background/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
