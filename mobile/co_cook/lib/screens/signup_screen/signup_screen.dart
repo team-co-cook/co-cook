@@ -123,9 +123,9 @@ class _SignupScreenState extends State<SignupScreen> {
       'nickname': _nickname,
       'access_token': widget.token
     };
-    print('body: $userData'); // 데이터 확인
+    // print('body: $userData'); // 데이터 확인
     Response? response = await _apiService.signupUser(userData);
-    print('응답: $response');
+    // print('응답: $response');
 
     // 디코딩
     Map<String, dynamic> decodeRes = jsonDecode(response.toString());
@@ -133,7 +133,7 @@ class _SignupScreenState extends State<SignupScreen> {
     // 상태 분기
     if (decodeRes['status'] == 409) {
       // 중복 닉네임 에러 409
-      print('이미 존재하는 이메일 or 이미 존재하는 닉네임인 경우');
+      // print('이미 존재하는 이메일 or 이미 존재하는 닉네임인 경우');
 
       setState(() {
         _errorMessage = decodeRes['message'];
@@ -145,21 +145,21 @@ class _SignupScreenState extends State<SignupScreen> {
       // shared preferences에 저장
       SharedPreferences prefs = await SharedPreferences.getInstance();
       prefs.setString('userData', response.toString());
-      print('저장 완료');
+      // print('저장 완료');
 
       setState(() {
         _errorMessage = null;
         _isError = false;
       });
 
-      print('홈으로 이동!');
+      // print('홈으로 이동!');
       Route home = MaterialPageRoute(builder: (context) => LogOut());
       Navigator.pushReplacement(context, home);
 
       return;
     } else {
       // 기타 에러
-      print('기타 에러 발생');
+      // print('기타 에러 발생');
 
       setState(() {
         _errorMessage = '요청이 잘못되었습니다.';
