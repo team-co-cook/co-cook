@@ -53,7 +53,7 @@ public class HomeService {
         }
 
         Long userIdx = jwtTokenProvider.getUserIdx(authToken);
-        List<Recipe> foundRecipes = recipeRepository.findByTags_Theme_ThemeName(themeName);
+        List<Recipe> foundRecipes = recipeRepository.findRandom5RecipesByThemeName(themeName);
         List<RecipeListResDto> resultRecipes = addRecipeToRecipeListResDto(foundRecipes, userIdx);
 
         return new RecommendResDto(resultRecipes);

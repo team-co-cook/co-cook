@@ -9,9 +9,14 @@ import java.util.List;
 
 public interface RecipeRepository extends JpaRepository<Recipe, Long> {
 
-    List<Recipe> findByTags_Theme_ThemeName(String themeName);
+    @Query(value = "SELECT * FROM recipe r " +
+            "JOIN tag t ON t.recipe_idx = r.recipe_idx " +
+            "JOIN theme th ON t.theme_idx = th.theme_idx " +
+            "WHERE th.theme_name = :themeName " +
+            "ORDER BY RAND() LIMIT 5;", nativeQuery = true)
+    List<Recipe> findRandom5RecipesByThemeName(@Param("themeName") String themeName);
 
-    @Query(value = "select * from recipe order by rand() limit 6", nativeQuery = true)
+    @Query(value = "SELECT * FROM recipe ORDER BY RAND() limit 6", nativeQuery = true)
     List<Recipe> findRandomRecipes();
 
 }

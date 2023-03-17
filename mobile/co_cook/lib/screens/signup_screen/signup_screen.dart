@@ -1,3 +1,4 @@
+import 'package:co_cook/screens/main_screen/main_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart'; // Response 가져오기 위함.
 import 'package:co_cook/services/api_service.dart';
@@ -157,7 +158,7 @@ class _SignupScreenState extends State<SignupScreen> {
       });
 
       // print('홈으로 이동!');
-      Route home = MaterialPageRoute(builder: (context) => const UserScreen());
+      Route home = MaterialPageRoute(builder: (context) => const MainScreen());
       Navigator.pushReplacement(context, home);
 
       return;

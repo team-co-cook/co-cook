@@ -18,7 +18,8 @@ class DioServices {
 
     if (userData.isNotEmpty) {
       Map<String, dynamic> parsedUserData = json.decode(userData);
-      jwtToken = parsedUserData['jwtToken'] ?? '';
+      jwtToken = parsedUserData["data"]["jwtToken"] ?? '';
+      print(jwtToken);
     }
 
     BaseOptions _options = BaseOptions(
@@ -27,7 +28,7 @@ class DioServices {
       receiveTimeout: const Duration(seconds: 5),
       sendTimeout: const Duration(seconds: 5),
       headers: {
-        if (jwtToken.isNotEmpty) 'Authorization': 'Bearer $jwtToken',
+        if (jwtToken.isNotEmpty) 'AUTH-TOKEN': jwtToken,
       },
     );
 

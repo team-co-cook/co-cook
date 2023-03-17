@@ -35,7 +35,7 @@ class _GridCardState extends State<GridCard> {
   void initState() {
     super.initState();
     setState(() {
-      isAdd = widget.data["isFavorite"];
+      isAdd = widget.data["isFavorite"] ?? false;
     });
   }
 
