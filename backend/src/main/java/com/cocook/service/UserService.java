@@ -43,12 +43,9 @@ public class UserService {
         GoogleOAuthResponseDto googleOAuthResponse = (GoogleOAuthResponseDto) response.getBody();
 
         String userEmail = googleOAuthResponse.getEmail();
-        User foundUser = userRepository.findByEmail(userEmail);
+        User foundUser = userRepository.findByEmailAndIsActiveTrue(userEmail);
         if (foundUser == null) {
             return new LoginResponseDto(null, googleOAuthResponse.getEmail(), null, null);
-        }
-        if (!foundUser.getIsActive()) {
-            throw new EntityNotFoundException("삭제된 회원의 이메일입니다.");
         }
         String jwtToken = jwtTokenProvider.createToken(foundUser.getId(), foundUser.getRoleList());
         return new LoginResponseDto(foundUser.getId(), foundUser.getEmail(), foundUser.getNickname(), jwtToken);
@@ -61,12 +58,23 @@ public class UserService {
             throw new AuthenticationServiceException("유효하지 않은 토큰입니다.");
         }
 
-        if (userRepository.findByEmail(signupRequestDto.getEmail()) != null) {
-            throw new DataIntegrityViolationException("이미 존재하는 이메일입니다.");
-        }
-
         if (userRepository.findByNickname(signupRequestDto.getNickname()) != null) {
             throw new DataIntegrityViolationException("이미 존재하는 닉네임입니다.");
+        }
+
+        User foundUser = userRepository.findByEmail(signupRequestDto.getEmail());
+        if (foundUser != null) {
+            if (foundUser.getIsActive()) {
+                throw new DataIntegrityViolationException("이미 존재하는 이메일입니다.");
+            } else {
+                foundUser.setIsActive(true);
+                foundUser.setEmail(signupRequestDto.getEmail());
+                foundUser.setNickname(signupRequestDto.getNickname());
+                foundUser.setRoles("ROLE_USER");
+                User savedUser = userRepository.save(foundUser);
+                String jwtToken = jwtTokenProvider.createToken(savedUser.getId(), savedUser.getRoleList());
+                return new LoginResponseDto(savedUser.getId(), savedUser.getEmail(), savedUser.getNickname(), jwtToken);
+            }
         }
 
         User newUser = new User();
