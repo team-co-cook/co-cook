@@ -1,13 +1,16 @@
-import 'package:flutter/material.dart';
-import 'package:dio/dio.dart'; // Response 가져오기 위함.
-import 'package:co_cook/services/auth_service.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-import 'package:co_cook/screens/signup_screen/signup_screen.dart';
-import 'package:co_cook/screens/user_screen/user_screen.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
+import 'package:dio/dio.dart'; // Response 가져오기 위함.
+import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+
 import 'package:co_cook/styles/colors.dart';
 import 'package:co_cook/styles/text_styles.dart';
+
+import 'package:co_cook/services/auth_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:co_cook/screens/main_screen/main_screen.dart';
+import 'package:co_cook/screens/user_screen/user_screen.dart';
+import 'package:co_cook/screens/signup_screen/signup_screen.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -52,7 +55,7 @@ Future<void> signInWithGoogle(BuildContext context) async {
   try {
     final GoogleSignInAccount? googleSignInAccount =
         await googleSignIn.signIn();
-    // print('로그인 상태확인 $googleSignInAccount');
+    print('로그인 상태확인 $googleSignInAccount');
     if (googleSignInAccount == null) {
       // 사용자가 로그인 창을 닫거나 로그인을 취소한 경우
       // print('사용자가 로그인을 취소했습니다.');
@@ -70,11 +73,12 @@ Future<void> signInWithGoogle(BuildContext context) async {
     AuthService _apiService = AuthService();
     Map<String, dynamic> userData = {'access_token': userToken};
     Response? response = await _apiService.loginUser(userData);
-    // print('응답: ${response}'); // {"message":"OK","status":200,"data":{"user_idx":null,"email":"xxxx@gmail.com","nickname":null,"jwtToken":null}}
+    print(
+        '응답: ${response}'); // {"message":"OK","status":200,"data":{"user_idx":null,"email":"xxxx@gmail.com","nickname":null,"jwtToken":null}}
 
     // 디코딩
-    Map<String, dynamic> decodeRes = jsonDecode(response.toString());
-    // print('디코딩 : $decodeRes');
+    Map<String, dynamic> decodeRes = response?.data;
+    print('디코딩 : $decodeRes');
 
     if (decodeRes['data']['user_idx'] == null) {
       // print('회원가입으로 이동!');
@@ -87,10 +91,10 @@ Future<void> signInWithGoogle(BuildContext context) async {
       // print('로컬에 유저정보 저장!');
       // shared preferences에 저장
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      prefs.setString('userData', decodeRes['data'].toString());
+      prefs.setString('userData', jsonEncode(decodeRes['data']));
 
       // print('홈으로 이동!');
-      Route home = MaterialPageRoute(builder: (context) => const UserScreen());
+      Route home = MaterialPageRoute(builder: (context) => const MainScreen());
       Navigator.pushReplacement(context, home);
     }
   } catch (error) {

@@ -5,6 +5,8 @@ import 'package:co_cook/screens/user_screen/user_screen.dart';
 import 'package:co_cook/styles/colors.dart';
 import 'package:co_cook/styles/text_styles.dart';
 
+import 'screens/main_screen/main_screen.dart';
+
 Future main() async {
   await dotenv.load(fileName: ".env");
 
@@ -16,9 +18,8 @@ class Main extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      // home: SplashScreen(),
-      home: UserScreen(),
+    return const MaterialApp(
+      home: SplashScreen(),
     );
   }
 }

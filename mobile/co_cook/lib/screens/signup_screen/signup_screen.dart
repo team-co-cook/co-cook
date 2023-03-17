@@ -1,3 +1,4 @@
+import 'package:co_cook/screens/main_screen/main_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart'; // Response 가져오기 위함.
 import 'package:co_cook/services/auth_service.dart';
@@ -132,7 +133,7 @@ class _SignupScreenState extends State<SignupScreen> {
     // print('응답: $response');
 
     // 디코딩
-    Map<String, dynamic> decodeRes = jsonDecode(response.toString());
+    Map<String, dynamic> decodeRes = response?.data;
 
     // 상태 분기
     if (decodeRes['status'] == 409) {
@@ -148,7 +149,7 @@ class _SignupScreenState extends State<SignupScreen> {
     } else if (decodeRes['status'] == 200) {
       // shared preferences에 저장
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      prefs.setString('userData', response.toString());
+      prefs.setString('userData', jsonEncode(decodeRes['data']));
       // print('저장 완료');
 
       setState(() {
@@ -157,7 +158,7 @@ class _SignupScreenState extends State<SignupScreen> {
       });
 
       // print('홈으로 이동!');
-      Route home = MaterialPageRoute(builder: (context) => const UserScreen());
+      Route home = MaterialPageRoute(builder: (context) => const MainScreen());
       Navigator.pushReplacement(context, home);
 
       return;

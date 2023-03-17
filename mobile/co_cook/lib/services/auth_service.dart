@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:dio/dio.dart';
 import 'package:co_cook/services/dio_service.dart';
 
@@ -32,8 +30,7 @@ class AuthService {
     }
   }
 
-  Future<Response?> signupUser(
-      Map<String, dynamic> userData, int userIdx) async {
+  Future<Response?> signupUser(Map<String, dynamic> userData) async {
     try {
       Dio _dio = await _getDio(); // 새로운 Dio 객체 생성
       return await _dio.post('/account/signup', data: userData);
@@ -45,10 +42,20 @@ class AuthService {
 
   // PUT
   Future<Response?> changeNickname(
-      Map<String, dynamic> userData, Int userIdx) async {
+      Map<String, dynamic> userData, int userIdx) async {
     try {
       Dio _dio = await _getDio(); // 새로운 Dio 객체 생성
       return await _dio.put('/mypage/nickname/:$userIdx', data: userData);
+    } on DioError catch (e) {
+      // DioError 처리
+      return e.response; // DioError가 발생한 경우에도 무조건 리턴
+    }
+  }
+
+  Future<Response?> withdrawal(int userIdx) async {
+    try {
+      Dio _dio = await _getDio(); // 새로운 Dio 객체 생성
+      return await _dio.put('/mypage/withdrawal/:$userIdx');
     } on DioError catch (e) {
       // DioError 처리
       return e.response; // DioError가 발생한 경우에도 무조건 리턴

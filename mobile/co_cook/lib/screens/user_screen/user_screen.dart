@@ -5,8 +5,9 @@ import 'package:co_cook/styles/text_styles.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:co_cook/screens/login_screen/login_screen.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:co_cook/widgets/bottom_nav_bar/bottom_nav_bar.dart';
-import 'package:co_cook/widgets/button/button.dart';
+import 'package:dio/dio.dart'; // Response 가져오기 위함.
+import 'package:co_cook/services/auth_service.dart';
+import 'dart:convert'; // decode 가져오기
 
 class UserScreen extends StatelessWidget {
   const UserScreen({Key? key}) : super(key: key);
@@ -84,7 +85,7 @@ class CustomTextButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextButton(
-      onPressed: () => onPressed,
+      onPressed: onPressed,
       child: Text(
         text,
         style: CustomTextStyles().subtitle1.copyWith(color: color),
@@ -118,4 +119,17 @@ void gotoNicknameChange(BuildContext context) {
   Route nicknameChange =
       MaterialPageRoute(builder: (context) => const NicknameChange());
   Navigator.push(context, nicknameChange);
+}
+
+void withdrawal(BuildContext context) async {
+  // UserIdx 가져오기
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  final String prefsUserData =
+      prefs.getString('userData') ?? ''; // 기본값으로 빈 문자열을 사용합니다.
+  Map<String, dynamic> decodePrefs = jsonDecode(prefsUserData.toString());
+  int userIdx = decodePrefs['user_idx'];
+
+  // api 요청하기
+  AuthService _apiService = AuthService();
+  Response? response = await _apiService.withdrawal(userIdx);
 }

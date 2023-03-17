@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart'; // Response 가져오기
 import 'package:co_cook/services/auth_service.dart';
@@ -128,7 +126,7 @@ class _NicknameChangeState extends State<NicknameChange> {
     final String prefsUserData =
         prefs.getString('userData') ?? ''; // 기본값으로 빈 문자열을 사용합니다.
     Map<String, dynamic> decodePrefs = jsonDecode(prefsUserData.toString());
-    Int userIdx = decodePrefs['user_idx'];
+    int userIdx = decodePrefs['user_idx'];
 
     // API 요청
     AuthService _apiService = AuthService();
