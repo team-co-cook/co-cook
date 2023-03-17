@@ -9,7 +9,7 @@ class RecommendService {
   }
 
   // GET
-  Future<Response?> getTimeRecommend(String apiPath) async {
+  Future<Response?> getCardData(String apiPath) async {
     try {
       Dio _dio = await _getDio(); // 새로운 Dio 객체 생성
       return await _dio.get(apiPath);

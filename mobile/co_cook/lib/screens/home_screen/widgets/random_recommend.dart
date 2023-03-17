@@ -25,28 +25,25 @@ class _RandomRecommendState extends State<RandomRecommend> {
     getCardData("/home/random");
   }
 
-  var dataList = [];
+  List dataList = [];
 
   Future<void> getCardData(String apiPath) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    final String userData = prefs.getString('userData') ?? '';
     // API 요청
     RecommendService _recommendService = RecommendService();
-    Response? response = await _recommendService.getTimeRecommend(apiPath);
+    Response? response = await _recommendService.getCardData(apiPath);
 
     // 디코딩
-    var decodeRes = await jsonDecode(response.toString());
+    Map? decodeRes = await jsonDecode(response.toString());
     if (decodeRes != null) {
       setState(() {
         dataList = decodeRes["data"]["recipes"];
       });
     }
-    ;
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       child: Column(
         children: [
           Container(
@@ -60,12 +57,12 @@ class _RandomRecommendState extends State<RandomRecommend> {
           ),
           ListView.builder(
               shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
+              physics: const NeverScrollableScrollPhysics(),
               itemCount: dataList.length,
-              padding: EdgeInsets.fromLTRB(24.0, 16.0, 24.0, 24.0),
+              padding: const EdgeInsets.fromLTRB(24.0, 16.0, 24.0, 24.0),
               itemBuilder: (BuildContext context, int index) {
                 return Container(
-                  margin: EdgeInsets.only(bottom: 16),
+                  margin: const EdgeInsets.only(bottom: 16),
                   child: ListCard(data: dataList[index]),
                 );
               }),
