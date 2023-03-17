@@ -125,7 +125,7 @@ class _NicknameChangeState extends State<NicknameChange> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     final String prefsUserData =
         prefs.getString('userData') ?? ''; // 기본값으로 빈 문자열을 사용합니다.
-    Map<String, dynamic> decodePrefs = jsonDecode(prefsUserData.toString());
+    Map<String, dynamic> decodePrefs = jsonDecode(prefsUserData);
     int userIdx = decodePrefs['user_idx'];
 
     // API 요청

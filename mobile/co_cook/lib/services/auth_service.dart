@@ -45,7 +45,7 @@ class AuthService {
       Map<String, dynamic> userData, int userIdx) async {
     try {
       Dio _dio = await _getDio(); // 새로운 Dio 객체 생성
-      return await _dio.put('/mypage/nickname/:$userIdx', data: userData);
+      return await _dio.put('/mypage/nickname/$userIdx', data: userData);
     } on DioError catch (e) {
       // DioError 처리
       return e.response; // DioError가 발생한 경우에도 무조건 리턴
@@ -55,7 +55,7 @@ class AuthService {
   Future<Response?> withdrawal(int userIdx) async {
     try {
       Dio _dio = await _getDio(); // 새로운 Dio 객체 생성
-      return await _dio.put('/mypage/withdrawal/:$userIdx');
+      return await _dio.put('/mypage/withdrawal/$userIdx');
     } on DioError catch (e) {
       // DioError 처리
       return e.response; // DioError가 발생한 경우에도 무조건 리턴
