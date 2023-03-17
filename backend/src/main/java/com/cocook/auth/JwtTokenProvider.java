@@ -1,5 +1,7 @@
 package com.cocook.auth;
 
+import com.cocook.entity.User;
+import com.cocook.repository.UserRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
@@ -23,6 +25,7 @@ import java.util.List;
 public class JwtTokenProvider {
 
     private final PrincipalDetailsService principalDetailsService;
+    private final UserRepository userRepository;
 
     @Value("#{jwt['jwt.secret']}")
     private String secretKey;
@@ -60,6 +63,11 @@ public class JwtTokenProvider {
         String userIdx = Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token).getBody().getSubject();
         Long longUserIdx = Long.parseLong(userIdx);
         return longUserIdx;
+    }
+
+    public User getUser(String token) {
+        Long userIdx = getUserIdx(token);
+        return userRepository.findByIdAndIsActiveTrue(userIdx);
     }
 
     public String resolveToken(HttpServletRequest request) {
