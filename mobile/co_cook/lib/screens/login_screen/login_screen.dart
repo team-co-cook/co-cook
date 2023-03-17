@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart'; // Response 가져오기 위함.
-import 'package:co_cook/services/api_service.dart';
+import 'package:co_cook/services/auth_service.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:co_cook/screens/signup_screen/signup_screen.dart';
 import 'package:co_cook/screens/user_screen/user_screen.dart';
@@ -67,7 +67,7 @@ Future<void> signInWithGoogle(BuildContext context) async {
     String userToken = googleSignInAuthentication.accessToken.toString();
 
     // print('유저정보 확인!');
-    ApiService _apiService = ApiService();
+    AuthService _apiService = AuthService();
     Map<String, dynamic> userData = {'access_token': userToken};
     Response? response = await _apiService.loginUser(userData);
     // print('응답: ${response}'); // {"message":"OK","status":200,"data":{"user_idx":null,"email":"xxxx@gmail.com","nickname":null,"jwtToken":null}}
@@ -87,7 +87,7 @@ Future<void> signInWithGoogle(BuildContext context) async {
       // print('로컬에 유저정보 저장!');
       // shared preferences에 저장
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      prefs.setString('userData', response.toString());
+      prefs.setString('userData', decodeRes['data'].toString());
 
       // print('홈으로 이동!');
       Route home = MaterialPageRoute(builder: (context) => const UserScreen());

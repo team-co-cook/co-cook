@@ -1,10 +1,11 @@
+import 'package:co_cook/widgets/nickname_change/nickname_change.dart';
 import 'package:flutter/material.dart';
+import 'package:co_cook/styles/colors.dart';
+import 'package:co_cook/styles/text_styles.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:co_cook/screens/login_screen/login_screen.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:co_cook/widgets/bottom_nav_bar/bottom_nav_bar.dart';
-import 'package:co_cook/styles/colors.dart';
-import 'package:co_cook/styles/text_styles.dart';
 import 'package:co_cook/widgets/button/button.dart';
 
 class UserScreen extends StatelessWidget {
@@ -35,7 +36,7 @@ class UserScreen extends StatelessWidget {
             child: IconButton(
               icon: Icon(Icons.edit, color: CustomColors.monotoneBlack),
               onPressed: () {
-                // Add your onPressed code here!
+                gotoNicknameChange(context);
               },
             ),
           ),
@@ -111,4 +112,10 @@ void logOut({required BuildContext context}) async {
   print('로그인 정보 삭제 완료!');
   Route login = MaterialPageRoute(builder: (context) => const LoginScreen());
   Navigator.pushReplacement(context, login);
+}
+
+void gotoNicknameChange(BuildContext context) {
+  Route nicknameChange =
+      MaterialPageRoute(builder: (context) => const NicknameChange());
+  Navigator.push(context, nicknameChange);
 }
