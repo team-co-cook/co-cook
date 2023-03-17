@@ -1,26 +1,22 @@
-import 'package:co_cook/screens/main_screen/main_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:dio/dio.dart'; // Response 가져오기 위함.
+import 'package:dio/dio.dart'; // Response 가져오기
 import 'package:co_cook/services/auth_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:co_cook/screens/user_screen/user_screen.dart';
 import 'package:co_cook/widgets/text_field/custom_text_field.dart';
-import 'dart:convert';
+import 'dart:convert'; // decode 가져오기
 import 'package:co_cook/styles/colors.dart';
 import 'package:co_cook/styles/text_styles.dart';
 import 'package:co_cook/widgets/button/button.dart';
 
-class SignupScreen extends StatefulWidget {
-  final String email; // 이메일 필드 추가
-  final String token; // 토큰 필드 추가
-
-  const SignupScreen({required this.email, required this.token, super.key});
+class NicknameChange extends StatefulWidget {
+  const NicknameChange({super.key});
 
   @override
-  State<SignupScreen> createState() => _SignupScreenState();
+  State<NicknameChange> createState() => _NicknameChangeState();
 }
 
-class _SignupScreenState extends State<SignupScreen> {
+class _NicknameChangeState extends State<NicknameChange> {
   String? _nickname;
   String? _errorMessage;
   bool _isError = false;
@@ -45,12 +41,25 @@ class _SignupScreenState extends State<SignupScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // 없어질 앱바입니다. 잠시 페이지 모양일 때만, 유지
+      appBar: AppBar(
+        backgroundColor: Colors.transparent, // AppBar 배경색을 투명하게 설정
+        elevation: 0, // 그림자를 제거
+        leading: IconButton(
+          // 왼쪽 상단에 아이콘 버튼 추가
+          icon:
+              Icon(Icons.arrow_back, color: Colors.black), // 뒤로가기 아이콘을 검은색으로 설정
+          onPressed: () {
+            Navigator.pop(context); // 뒤로가기 버튼 클릭 시 이전 페이지로 돌아감
+          },
+        ),
+      ),
       body: GestureDetector(
         onTap: () {
           _dismissKeyboard(context);
         },
         child: Container(
-          color: CustomColors.redLight,
+          color: CustomColors.monotoneLight,
           child: Stack(
             children: [
               Center(
@@ -60,8 +69,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text('사용하실 닉네임을 입력해주세요.',
-                              style: CustomTextStyles().subtitle1),
+                          Text('닉네임 변경', style: CustomTextStyles().title2),
                           const SizedBox(height: 16), // 공백
                           Stack(// 텍스트 필드와 에러 텍스트 위치를 위한 스택
                               children: [
@@ -79,19 +87,11 @@ class _SignupScreenState extends State<SignupScreen> {
                             label: '확인',
                             color: ButtonType.red,
                             onPressed: () {
-                              _signUp(context);
+                              _changeName(context);
                             },
                           ),
                         ]),
                   ),
-                ),
-              ),
-              Positioned(
-                bottom: 30,
-                right: 30,
-                child: Image.asset(
-                  'assets/images/logo/main_logo_red_x1.png',
-                  width: 120,
                 ),
               ),
             ],
@@ -110,8 +110,8 @@ class _SignupScreenState extends State<SignupScreen> {
     });
   }
 
-  // 회원가입 로직
-  Future<void> _signUp(BuildContext context) async {
+  // 닉네임 변경 로직
+  Future<void> _changeName(BuildContext context) async {
     // 유효성 검증
     if (_nickname == null || _nickname == '') {
       setState(() {
@@ -121,19 +121,24 @@ class _SignupScreenState extends State<SignupScreen> {
       return;
     }
 
+    // UserIdx 가져오기
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String prefsUserData =
+        prefs.getString('userData') ?? ''; // 기본값으로 빈 문자열을 사용합니다.
+    Map<String, dynamic> decodePrefs = jsonDecode(prefsUserData);
+    int userIdx = decodePrefs['user_idx'];
+
     // API 요청
     AuthService _apiService = AuthService();
     Map<String, dynamic> userData = {
-      'email': widget.email,
       'nickname': _nickname,
-      'access_token': widget.token
     };
     // print('body: $userData'); // 데이터 확인
-    Response? response = await _apiService.signupUser(userData);
+    Response? response = await _apiService.changeNickname(userData, userIdx);
     // print('응답: $response');
 
     // 디코딩
-    Map<String, dynamic> decodeRes = response?.data;
+    Map<String, dynamic> decodeRes = jsonDecode(response.toString());
 
     // 상태 분기
     if (decodeRes['status'] == 409) {
@@ -148,8 +153,8 @@ class _SignupScreenState extends State<SignupScreen> {
       return;
     } else if (decodeRes['status'] == 200) {
       // shared preferences에 저장
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      prefs.setString('userData', jsonEncode(decodeRes['data']));
+      decodePrefs['user_idx'] = _nickname;
+      prefs.setString('userData', decodePrefs.toString());
       // print('저장 완료');
 
       setState(() {
@@ -157,9 +162,8 @@ class _SignupScreenState extends State<SignupScreen> {
         _isError = false;
       });
 
-      // print('홈으로 이동!');
-      Route home = MaterialPageRoute(builder: (context) => const MainScreen());
-      Navigator.pushReplacement(context, home);
+      // print('닉네임 변경 닫기!');
+      Navigator.pop(context);
 
       return;
     } else {
