@@ -9,10 +9,10 @@ class RecommendService {
   }
 
   // GET
-  Future<Response?> getTimeRecommend() async {
+  Future<Response?> getTimeRecommend(String apiPath) async {
     try {
       Dio _dio = await _getDio(); // 새로운 Dio 객체 생성
-      return await _dio.get('/home/recommend');
+      return await _dio.get(apiPath);
     } on DioError catch (e) {
       // DioError 처리
       print("getTimeRecommend Error : ${e.response}");

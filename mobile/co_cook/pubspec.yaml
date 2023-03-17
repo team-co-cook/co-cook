@@ -69,7 +69,9 @@ flutter:
     - .env.local
 
     # images
-    - assets/images/logo/logo_circle.png
+    - assets/
+    - assets/images/logo/
+    - assets/images/background/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

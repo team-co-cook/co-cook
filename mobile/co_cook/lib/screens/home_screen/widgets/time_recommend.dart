@@ -23,25 +23,23 @@ class _TimeRecommendState extends State<TimeRecommend> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    getTimeRecommendData();
+    getTimeRecommendData("/home/recommend");
   }
 
   var dataList = [];
 
-  Future<void> getTimeRecommendData() async {
+  Future<void> getTimeRecommendData(String apiPath) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     final String userData = prefs.getString('userData') ?? '';
     // API 요청
     RecommendService _recommendService = RecommendService();
-    // print('body: $userData'); // 데이터 확인
-    Response? response = await _recommendService.getTimeRecommend();
-    // print('응답: $response');
+    Response? response = await _recommendService.getTimeRecommend(apiPath);
 
     // 디코딩
     var decodeRes = await jsonDecode(response.toString());
     if (decodeRes != null) {
       setState(() {
-        dataList = decodeRes;
+        dataList = decodeRes["data"]["recipes"];
       });
     }
     ;

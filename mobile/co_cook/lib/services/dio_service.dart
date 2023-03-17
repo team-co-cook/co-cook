@@ -19,6 +19,7 @@ class DioServices {
     if (userData.isNotEmpty) {
       Map<String, dynamic> parsedUserData = json.decode(userData);
       jwtToken = parsedUserData["data"]["jwtToken"] ?? '';
+      print(jwtToken);
     }
 
     BaseOptions _options = BaseOptions(
