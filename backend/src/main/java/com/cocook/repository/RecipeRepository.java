@@ -9,6 +9,7 @@ import java.util.List;
 
 public interface RecipeRepository extends JpaRepository<Recipe, Long> {
 
+    Recipe findRecipeById(Long id);
     List<Recipe> findByTags_Theme_ThemeName(String themeName);
 
     @Query(value = "select * from recipe order by rand() limit 6", nativeQuery = true)

@@ -16,5 +16,6 @@ public class ReviewReqDto {
     @NotBlank(message = "사진을 첨부하세요")
     private String imgPath;
 
-    private Long recipe_idx;
+    private Long recipeIdx;
+    private Integer runningTime;
 }
