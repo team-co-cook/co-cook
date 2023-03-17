@@ -43,7 +43,7 @@ public class Recipe {
 
     private Integer fat;
 
-//    @OneToMany(mappedBy = "recipe")
+    //    @OneToMany(mappedBy = "recipe")
 //    private List<Step> steps = new ArrayList<>();
 //
 //    @OneToMany(mappedBy = "recipe")
