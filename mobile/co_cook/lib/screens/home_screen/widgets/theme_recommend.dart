@@ -15,7 +15,7 @@ class ThemeRecommend extends StatelessWidget {
         child: Column(
           children: [
             Container(
-              margin: EdgeInsets.fromLTRB(24.0, 24.0, 24.0, 16.0),
+              margin: EdgeInsets.fromLTRB(24.0, 32.0, 24.0, 0.0),
               width: double.infinity,
               child: Text("테마별 레시피",
                   textAlign: TextAlign.left,
@@ -24,12 +24,12 @@ class ThemeRecommend extends StatelessWidget {
                       )),
             ),
             SizedBox(
-                height: 120,
+                height: 136,
                 child: ListView.builder(
                     scrollDirection: Axis.horizontal,
                     itemCount: 3,
                     physics: const BouncingScrollPhysics(),
-                    padding: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 0.0),
+                    padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 0.0),
                     itemBuilder: (BuildContext context, int index) {
                       return ThemeRecommendCard(
                         data: {

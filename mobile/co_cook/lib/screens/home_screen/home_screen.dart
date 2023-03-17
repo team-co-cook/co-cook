@@ -57,6 +57,7 @@ class _HomeScreenState extends State<HomeScreen> {
         shadowColor: CustomColors.monotoneLight,
       ),
       body: SingleChildScrollView(
+        physics: BouncingScrollPhysics(),
         child: Column(
           children: [
             TimeRecommend(dataList: timeRecipeList),

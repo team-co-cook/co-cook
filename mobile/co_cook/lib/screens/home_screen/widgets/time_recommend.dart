@@ -21,7 +21,7 @@ class _TimeRecommendState extends State<TimeRecommend> {
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Container(
           width: double.infinity,
-          margin: const EdgeInsets.fromLTRB(24.0, 24.0, 24.0, 16.0),
+          margin: const EdgeInsets.fromLTRB(24.0, 32.0, 24.0, 16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

@@ -8,61 +8,88 @@ class CategoryRecommend extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [CategoryCard()],
+    List<Map> dataList = [
+      {
+        "id": 0,
+        "categoryName": "메인 요리",
+        "imgPath": "https://picsum.photos/200/300"
+      },
+      {
+        "id": 1,
+        "categoryName": "밑반찬",
+        "imgPath": "https://picsum.photos/200/300"
+      },
+      {
+        "id": 2,
+        "categoryName": "간식",
+        "imgPath": "https://picsum.photos/200/300"
+      }
+    ];
+
+    return Container(
+      margin: EdgeInsets.fromLTRB(24.0, 40.0, 24.0, 0.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          CategoryRecommendCard(data: dataList[0], onTap: () => print("0")),
+          CategoryRecommendCard(data: dataList[1], onTap: () => print("1")),
+          CategoryRecommendCard(data: dataList[2], onTap: () => print("2"))
+        ],
+      ),
     );
   }
 }
 
-class CategoryCard extends StatelessWidget {
-  const CategoryCard({
+class CategoryRecommendCard extends StatelessWidget {
+  const CategoryRecommendCard({
     super.key,
+    required this.data,
+    required this.onTap,
   });
+  final Map data;
+  final Function onTap;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => print("인식 연결!!"),
-      child: Stack(children: [
-        Container(
-          width: (MediaQuery.of(context).size.width / 3 - 24), // 부모 요소의 너비를 가져옴
-          height: 128, // 부모 요소의 너비와 같은 값으로 설정
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            image: const DecorationImage(
-              fit: BoxFit.cover,
-              image: AssetImage(
-                  "assets/images/background/search_photo_background.png"),
+        onTap: () => onTap,
+        child: Stack(children: [
+          Container(
+            width: ((MediaQuery.of(context).size.width - 48) / 3 - 8),
+            height: 128,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              image: DecorationImage(
+                fit: BoxFit.cover,
+                image: NetworkImage(data["imgPath"]),
+              ),
+              boxShadow: const [
+                BoxShadow(
+                  color: Colors.black26,
+                  offset: Offset(1, 1),
+                  blurRadius: 6.0,
+                  spreadRadius: 0.0,
+                )
+              ],
             ),
-            boxShadow: const [
-              BoxShadow(
-                color: Colors.black26,
-                offset: Offset(1, 1),
-                blurRadius: 6.0,
-                spreadRadius: 0.0,
-              )
-            ],
           ),
-        ),
-        Positioned(
-            top: 0,
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: Center(
-                child: Text("메인요리",
-                    style: CustomTextStyles().subtitle1.copyWith(
-                        color: CustomColors.monotoneLight,
-                        shadows: const [
-                          BoxShadow(
-                            color: Colors.black26,
-                            offset: Offset(1, 1),
-                            blurRadius: 6.0,
-                            spreadRadius: 0.0,
-                          )
-                        ])))),
-      ]),
-    );
+          Positioned(
+              top: 0,
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: Center(
+                  child: Text(data["categoryName"],
+                      style: CustomTextStyles().subtitle1.copyWith(
+                          color: CustomColors.monotoneLight,
+                          shadows: const [
+                            BoxShadow(
+                              color: Colors.black26,
+                              offset: Offset(1, 1),
+                              blurRadius: 6.0,
+                              spreadRadius: 0.0,
+                            )
+                          ])))),
+        ]));
   }
 }
