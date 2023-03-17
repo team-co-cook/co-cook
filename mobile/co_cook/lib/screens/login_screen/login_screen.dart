@@ -1,14 +1,16 @@
-import 'package:co_cook/screens/main_screen/main_screen.dart';
-import 'package:flutter/material.dart';
-import 'package:dio/dio.dart'; // Response 가져오기 위함.
-import 'package:co_cook/services/api_service.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-import 'package:co_cook/screens/signup_screen/signup_screen.dart';
-import 'package:co_cook/screens/user_screen/user_screen.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
+import 'package:dio/dio.dart'; // Response 가져오기 위함.
+import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+
 import 'package:co_cook/styles/colors.dart';
 import 'package:co_cook/styles/text_styles.dart';
+
+import 'package:co_cook/services/api_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:co_cook/screens/main_screen/main_screen.dart';
+import 'package:co_cook/screens/user_screen/user_screen.dart';
+import 'package:co_cook/screens/signup_screen/signup_screen.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({Key? key}) : super(key: key);

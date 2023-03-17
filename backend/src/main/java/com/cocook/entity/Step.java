@@ -18,7 +18,7 @@ public class Step {
     @Column(name = "step_idx")
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "recipe_idx")
     private Recipe recipe;
 
