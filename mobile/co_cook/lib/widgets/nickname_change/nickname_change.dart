@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart'; // Response 가져오기
 import 'package:co_cook/services/auth_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:co_cook/screens/user_screen/user_screen.dart';
 import 'package:co_cook/widgets/text_field/custom_text_field.dart';
 import 'dart:convert'; // decode 가져오기
 import 'package:co_cook/styles/colors.dart';
@@ -47,8 +46,8 @@ class _NicknameChangeState extends State<NicknameChange> {
         elevation: 0, // 그림자를 제거
         leading: IconButton(
           // 왼쪽 상단에 아이콘 버튼 추가
-          icon:
-              Icon(Icons.arrow_back, color: Colors.black), // 뒤로가기 아이콘을 검은색으로 설정
+          icon: const Icon(Icons.arrow_back,
+              color: Colors.black), // 뒤로가기 아이콘을 검은색으로 설정
           onPressed: () {
             Navigator.pop(context); // 뒤로가기 버튼 클릭 시 이전 페이지로 돌아감
           },
@@ -153,8 +152,9 @@ class _NicknameChangeState extends State<NicknameChange> {
       return;
     } else if (decodeRes['status'] == 200) {
       // shared preferences에 저장
-      decodePrefs['user_idx'] = _nickname;
-      prefs.setString('userData', decodePrefs.toString());
+      decodePrefs['nickname'] = _nickname;
+      // print(jsonEncode(decodePrefs));
+      prefs.setString('userData', jsonEncode(decodePrefs));
       // print('저장 완료');
 
       setState(() {

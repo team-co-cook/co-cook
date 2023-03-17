@@ -59,7 +59,13 @@ class UserScreen extends StatelessWidget {
               CustomTextButton(
                   text: '자주하는 질문', color: CustomColors.monotoneBlack),
               CustomTextButton(text: '고객문의', color: CustomColors.monotoneBlack),
-              CustomTextButton(text: '회원탈퇴', color: CustomColors.redPrimary),
+              CustomTextButton(
+                text: '회원탈퇴',
+                color: CustomColors.redPrimary,
+                onPressed: () {
+                  withdrawal(context);
+                },
+              ),
               CustomTextButton(
                   text: '로그아웃',
                   color: CustomColors.redPrimary,
@@ -126,10 +132,16 @@ void withdrawal(BuildContext context) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   final String prefsUserData =
       prefs.getString('userData') ?? ''; // 기본값으로 빈 문자열을 사용합니다.
-  Map<String, dynamic> decodePrefs = jsonDecode(prefsUserData.toString());
+  Map<String, dynamic> decodePrefs = jsonDecode(prefsUserData);
   int userIdx = decodePrefs['user_idx'];
 
   // api 요청하기
   AuthService _apiService = AuthService();
   Response? response = await _apiService.withdrawal(userIdx);
+
+  if (response?.data['status'] == 204) {
+    // print('로그인으로 이동!');
+    Route login = MaterialPageRoute(builder: (context) => const LoginScreen());
+    Navigator.pushReplacement(context, login);
+  }
 }
