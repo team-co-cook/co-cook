@@ -1,3 +1,4 @@
+import 'package:co_cook/screens/user_screen/user_screen.dart';
 import 'package:flutter/material.dart';
 
 import 'package:co_cook/styles/colors.dart';
@@ -34,9 +35,7 @@ class _MainScreenState extends State<MainScreen> {
         Container(
           child: Text("search"),
         ),
-        Container(
-          child: Text("mypage"),
-        ),
+        UserScreen(),
       ][_currentIndex],
       bottomNavigationBar:
           BottomNavBar(currentIndex: _currentIndex, onTap: _onTap),

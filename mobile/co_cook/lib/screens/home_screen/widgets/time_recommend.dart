@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:card_swiper/card_swiper.dart';
+import 'package:dio/dio.dart'; // Response 가져오기 위함.
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:co_cook/styles/colors.dart';
 import 'package:co_cook/styles/text_styles.dart';
 
 import 'package:co_cook/widgets/card/grid_card.dart';
+import 'package:co_cook/services/recommend_service.dart';
 
 class TimeRecommend extends StatefulWidget {
   const TimeRecommend({super.key, required this.dataList});
@@ -15,6 +19,34 @@ class TimeRecommend extends StatefulWidget {
 }
 
 class _TimeRecommendState extends State<TimeRecommend> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getTimeRecommendData();
+  }
+
+  var dataList = [];
+
+  Future<void> getTimeRecommendData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String userData = prefs.getString('userData') ?? '';
+    // API 요청
+    RecommendService _recommendService = RecommendService();
+    // print('body: $userData'); // 데이터 확인
+    Response? response = await _recommendService.getTimeRecommend();
+    // print('응답: $response');
+
+    // 디코딩
+    var decodeRes = await jsonDecode(response.toString());
+    if (decodeRes != null) {
+      setState(() {
+        dataList = decodeRes;
+      });
+    }
+    ;
+  }
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -44,10 +76,10 @@ class _TimeRecommendState extends State<TimeRecommend> {
           child: Swiper(
             itemBuilder: (BuildContext context, int index) {
               return GridCard(
-                data: widget.dataList[index],
+                data: dataList[index],
               );
             },
-            itemCount: 3,
+            itemCount: dataList.length,
             viewportFraction: 0.65,
             scale: 0.7,
             autoplay: true,
