@@ -73,9 +73,9 @@ class _NicknameChangeState extends State<NicknameChange> {
                           Stack(// 텍스트 필드와 에러 텍스트 위치를 위한 스택
                               children: [
                             CustomTextField(
-                              onChanged: onNicknameChanged,
-                              isError: _isError,
-                            ),
+                                onChanged: onNicknameChanged,
+                                isError: _isError,
+                                maxLength: 16),
                             Positioned(
                                 bottom: 0,
                                 child:

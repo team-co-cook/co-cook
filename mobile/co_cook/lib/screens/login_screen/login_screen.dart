@@ -36,7 +36,7 @@ class LoginScreen extends StatelessWidget {
                   signInWithGoogle(context); // 구글 로그인 리다이렉트
                 },
                 child: Image.asset(
-                  'assets/google_login_btn.png',
+                  'assets/images/button_img/google_login_btn.png',
                   width: 280,
                 ),
               ),
