@@ -27,5 +27,14 @@ public class ListController {
         return ApiResponse.ok(recipeListResDto);
     }
 
+    @GetMapping("/category")
+    public ResponseEntity<ApiResponse<RecipeListResDto>> getRecipesByCategoryName(@RequestHeader("AUTH-TOKEN") String authToken,
+                                                                               @RequestParam String categoryName,
+                                                                               @RequestParam String difficulty,
+                                                                               @RequestParam Integer time) {
+        RecipeListResDto recipeListResDto = listService.getRecipesByCategoryName(authToken, categoryName, difficulty, time);
+        return ApiResponse.ok(recipeListResDto);
+    }
+
 
 }
