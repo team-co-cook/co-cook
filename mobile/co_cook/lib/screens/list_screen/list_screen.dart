@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'dart:convert';
 
-import 'package:co_cook/services/recommend_service.dart';
+import 'package:co_cook/services/list_service.dart';
 
 import 'package:co_cook/styles/colors.dart';
 import 'package:co_cook/styles/text_styles.dart';
@@ -20,26 +20,78 @@ class ListScreen extends StatefulWidget {
 }
 
 class _ListScreenState extends State<ListScreen> {
+  String difficulty = '전체';
+  int time = 0;
+
   @override
   void initState() {
     super.initState();
-    getTimeRecommendData("/home/random");
+    getListData();
   }
 
   List dataList = [];
 
-  Future<void> getTimeRecommendData(String apiPath) async {
+  Future<void> getListData() async {
     // API 요청
-    RecommendService recommendService = RecommendService();
-    Response? response = await recommendService.getCardData(apiPath);
+    ListService listService = ListService();
+    Response? response = await listService.getThemeList(
+        themeName: widget.listName, difficulty: difficulty, time: time);
     if (response?.statusCode == 200) {
       Map? decodeRes = await jsonDecode(response.toString());
       if (decodeRes != null) {
         setState(() {
-          dataList = decodeRes["data"]["recipes"];
+          dataList = decodeRes["data"]["recipeListResDto"];
         });
       }
     }
+  }
+
+  // 난이도와 조리시간에 대한 정보를 배열로 저장
+  List<String> difficulties = ['전체', '쉬움', '보통', '어려움'];
+  List<Map<String, dynamic>> cookingTimes = [
+    {'label': '전체', 'value': 0},
+    {'label': '20분 이내', 'value': 20},
+    {'label': '40분 이내', 'value': 40},
+    {'label': '1시간 이내', 'value': 60},
+  ];
+
+  // 난이도와 조리시간 버튼 생성
+  Row _buildDifficultyButtons() {
+    return Row(
+      children: difficulties.map((diff) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          child: ButtonToggle(
+              label: diff,
+              isToggleOn: difficulty == diff,
+              onPressed: () {
+                setState(() {
+                  difficulty = diff;
+                  getListData();
+                });
+              }),
+        );
+      }).toList(),
+    );
+  }
+
+  Row _buildCookingTimeButtons() {
+    return Row(
+      children: cookingTimes.map((time) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          child: ButtonToggle(
+              label: time['label'],
+              isToggleOn: this.time == time['value'],
+              onPressed: () {
+                setState(() {
+                  this.time = time['value'];
+                  getListData();
+                });
+              }),
+        );
+      }).toList(),
+    );
   }
 
   @override
@@ -104,31 +156,7 @@ class _ListScreenState extends State<ListScreen> {
                             physics: const BouncingScrollPhysics(
                                 parent: AlwaysScrollableScrollPhysics()),
                             scrollDirection: Axis.horizontal,
-                            child: Row(
-                              children: [
-                                SizedBox(width: 8),
-                                ButtonToggle(
-                                    label: '전체',
-                                    isToggleOn: true,
-                                    onPressed: () {}),
-                                SizedBox(width: 8),
-                                ButtonToggle(
-                                    label: '쉬움',
-                                    isToggleOn: false,
-                                    onPressed: () {}),
-                                SizedBox(width: 8),
-                                ButtonToggle(
-                                    label: '보통',
-                                    isToggleOn: false,
-                                    onPressed: () {}),
-                                SizedBox(width: 8),
-                                ButtonToggle(
-                                    label: '어려움',
-                                    isToggleOn: false,
-                                    onPressed: () {}),
-                                SizedBox(width: 8),
-                              ],
-                            ),
+                            child: _buildDifficultyButtons(),
                           ),
                         ),
                       ],
@@ -148,31 +176,7 @@ class _ListScreenState extends State<ListScreen> {
                             physics: const BouncingScrollPhysics(
                                 parent: AlwaysScrollableScrollPhysics()),
                             scrollDirection: Axis.horizontal,
-                            child: Row(
-                              children: [
-                                SizedBox(width: 8),
-                                ButtonToggle(
-                                    label: '전체',
-                                    isToggleOn: true,
-                                    onPressed: () {}),
-                                SizedBox(width: 8),
-                                ButtonToggle(
-                                    label: '20분 이내',
-                                    isToggleOn: false,
-                                    onPressed: () {}),
-                                SizedBox(width: 8),
-                                ButtonToggle(
-                                    label: '40분 이내',
-                                    isToggleOn: false,
-                                    onPressed: () {}),
-                                SizedBox(width: 8),
-                                ButtonToggle(
-                                    label: '1시간 이내',
-                                    isToggleOn: false,
-                                    onPressed: () {}),
-                                SizedBox(width: 8),
-                              ],
-                            ),
+                            child: _buildCookingTimeButtons(),
                           ),
                         ),
                       ],

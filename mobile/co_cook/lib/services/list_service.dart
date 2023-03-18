@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:co_cook/services/dio_service.dart';
 
-class SearchService {
+class ListService {
   // 이 메서드는 각 API 요청 메서드에서 호출됩니다.
   Future<Dio> _getDio() async {
     return await DioServices()
@@ -9,15 +9,19 @@ class SearchService {
   }
 
   // GET
-  // Future<Response?> getUser() async {
-  //   try {
-  //     Dio _dio = await _getDio(); // 새로운 Dio 객체 생성
-  //     return await _dio.get('/account/tmp');
-  //   } on DioError catch (e) {
-  //     // DioError 처리
-  //     return e.response; // DioError가 발생한 경우에도 무조건 리턴
-  //   }
-  // }
+  Future<Response?> getThemeList(
+      {required String themeName,
+      required String difficulty,
+      required int time}) async {
+    try {
+      Dio _dio = await _getDio(); // 새로운 Dio 객체 생성
+      return await _dio.get(
+          '/list/theme?themeName=$themeName&difficulty=$difficulty&time=$time');
+    } on DioError catch (e) {
+      // DioError 처리
+      return e.response; // DioError가 발생한 경우에도 무조건 리턴
+    }
+  }
 
   // POST
   // Future<Response?> loginUser(Map<String, dynamic> userData) async {
