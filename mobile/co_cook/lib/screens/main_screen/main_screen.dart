@@ -1,3 +1,4 @@
+import 'package:co_cook/screens/search_screen/search_screen.dart';
 import 'package:co_cook/screens/user_screen/user_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -32,9 +33,7 @@ class _MainScreenState extends State<MainScreen> {
         Container(
           child: Text("냉털"),
         ),
-        Container(
-          child: Text("search"),
-        ),
+        SearchScreen(),
         UserScreen(),
       ][_currentIndex],
       bottomNavigationBar:
