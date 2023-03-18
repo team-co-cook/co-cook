@@ -5,6 +5,7 @@ import 'package:co_cook/styles/text_styles.dart';
 import 'package:co_cook/widgets/button/bookmark_button.dart';
 
 import 'package:co_cook/utils/bookmark.dart';
+import 'package:zoom_tap_animation/zoom_tap_animation.dart';
 
 class ListCard extends StatefulWidget {
   const ListCard({
@@ -37,7 +38,8 @@ class _ListCardState extends State<ListCard> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return ZoomTapAnimation(
+      end: 0.98,
       onTap: () => print("${widget.data["recipeIdx"]} 클릭"), // 클릭시 이벤트 연결
       child: Container(
           // 전체 컨테이너
@@ -104,8 +106,12 @@ class _ListCardState extends State<ListCard> {
                           ),
                           widget.showImage
                               ? GestureDetector(
-                                  onTap: () => toggleBookmark(context, isAdd,
-                                      toggleIsAdd, widget.data["recipeName"]),
+                                  onTap: () => toggleBookmark(
+                                      context,
+                                      isAdd,
+                                      toggleIsAdd,
+                                      widget.data["recipeIdx"],
+                                      widget.data["recipeName"]),
                                   child: BookmarkButton(isAdd: isAdd))
                               : Container()
                         ],
