@@ -4,6 +4,7 @@ import com.cocook.auth.JwtTokenProvider;
 import com.cocook.dto.list.RecipeDetailResDto;
 import com.cocook.dto.list.RecipeListResDto;
 import com.cocook.entity.Recipe;
+import com.cocook.entity.User;
 import com.cocook.repository.CategoryRepository;
 import com.cocook.repository.FavoriteRepository;
 import com.cocook.repository.RecipeRepository;
@@ -62,6 +63,25 @@ public class ListService {
 
         for (Recipe recipe : foundRecipes) {
             RecipeDetailResDto recipeDetailResDto = getRecipeDetailDtoWithIsFavorite(userIdx, recipe);
+            newRecipes.add(recipeDetailResDto);
+        }
+        return new RecipeListResDto(newRecipes);
+    }
+
+    public RecipeListResDto getRecipesByFavorite(String authToken) {
+        Long userIdx = jwtTokenProvider.getUserIdx(authToken);
+        List<Recipe> foundRecipes = recipeRepository.findRecipesByUserId(userIdx);
+        List<RecipeDetailResDto> newRecipes = new ArrayList<>();
+
+        for (Recipe recipe : foundRecipes) {
+            RecipeDetailResDto recipeDetailResDto =  RecipeDetailResDto.builder()
+                    .recipeName(recipe.getRecipeName())
+                    .recipeDifficulty(recipe.getDifficulty())
+                    .recipeIdx(recipe.getId())
+                    .recipeImgPath(recipe.getImgPath())
+                    .recipeRunningTime(recipe.getRunningTime())
+                    .isFavorite(true)
+                    .build();
             newRecipes.add(recipeDetailResDto);
         }
         return new RecipeListResDto(newRecipes);

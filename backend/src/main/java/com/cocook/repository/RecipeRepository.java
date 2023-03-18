@@ -32,4 +32,7 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
 
     List<Recipe> findByRecipeNameContainingOrderByIdDesc(String keyword);
 
+    @Query("SELECT r FROM Recipe r JOIN r.favorites f WHERE f.user.id = :userId")
+    List<Recipe> findRecipesByUserId(@Param("userId") Long userId);
+
 }

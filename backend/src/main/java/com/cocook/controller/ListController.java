@@ -51,5 +51,10 @@ public class ListController {
         return ApiResponse.ok(recipeListResDto);
     }
 
+    @GetMapping("/favorite")
+    public ResponseEntity<ApiResponse<RecipeListResDto>> getRecipesByFavorite(@RequestHeader("AUTH-TOKEN") String authToken) {
+        RecipeListResDto recipeListResDto = listService.getRecipesByFavorite(authToken);
+        return ApiResponse.ok(recipeListResDto);
+    }
 
 }
