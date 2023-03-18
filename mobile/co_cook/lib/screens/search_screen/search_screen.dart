@@ -1,3 +1,4 @@
+import 'package:co_cook/widgets/card/list_card.dart';
 import 'package:flutter/material.dart';
 
 import 'package:co_cook/styles/colors.dart';
@@ -15,6 +16,7 @@ class SearchScreen extends StatefulWidget {
 class _SearchScreenState extends State<SearchScreen> {
   String? _searchWord;
   final _focusNode = FocusNode(); // 포커싱 여부를 추적하는 클래스 인스턴스
+  int _listCount = 2;
 
   // 위젯이 소멸될 때 호출되는 메서드
   @override
@@ -37,7 +39,7 @@ class _SearchScreenState extends State<SearchScreen> {
     return Scaffold(
         appBar: AppBar(
           backgroundColor: CustomColors.monotoneLight,
-          elevation: 1.0,
+          elevation: 0,
           toolbarHeight: 120,
           title: Padding(
               padding: const EdgeInsets.fromLTRB(0, 60, 0, 0),
@@ -48,18 +50,41 @@ class _SearchScreenState extends State<SearchScreen> {
                 onSubmitted: (p0) {},
               )),
         ),
-        body: Column(
-          children: [
-            GestureDetector(
-              onTap: () async {
-                // CameraScreen으로 이동
-              },
-              child: Image.asset(
-                'assets/images/button_img/CameraSearchLargeX2.png',
-                width: 280,
-              ),
+        body: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Align(
+            alignment: Alignment.topCenter,
+            child: Column(
+              children: [
+                GestureDetector(
+                  onTap: () async {
+                    // CameraScreen으로 이동
+                  },
+                  child: Image.asset(
+                    'assets/images/button_img/CameraSearchLargeX2.png',
+                    // width: 300,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Text('${_listCount}건의 요리를 찾았아요',
+                      style: CustomTextStyles()
+                          .caption
+                          .copyWith(color: CustomColors.monotoneBlack)),
+                ),
+                Expanded(
+                    child: ListView.builder(
+                  itemCount: _listCount,
+                  itemBuilder: (BuildContext context, int index) {
+                    // return ListCard(
+                    //   data: ,
+                    //   showImage: true,
+                    // );
+                  },
+                ))
+              ],
             ),
-          ],
+          ),
         ));
   }
 
