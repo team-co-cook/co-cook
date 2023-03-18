@@ -21,28 +21,24 @@ class TimeRecommend extends StatefulWidget {
 class _TimeRecommendState extends State<TimeRecommend> {
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     getTimeRecommendData("/home/recommend");
   }
 
-  var dataList = [];
+  List dataList = [];
 
   Future<void> getTimeRecommendData(String apiPath) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    final String userData = prefs.getString('userData') ?? '';
     // API 요청
-    RecommendService _recommendService = RecommendService();
-    Response? response = await _recommendService.getTimeRecommend(apiPath);
-
-    // 디코딩
-    var decodeRes = await jsonDecode(response.toString());
-    if (decodeRes != null) {
-      setState(() {
-        dataList = decodeRes["data"]["recipes"];
-      });
+    RecommendService recommendService = RecommendService();
+    Response? response = await recommendService.getCardData(apiPath);
+    if (response?.statusCode == 200) {
+      Map? decodeRes = await jsonDecode(response.toString());
+      if (decodeRes != null) {
+        setState(() {
+          dataList = decodeRes["data"]["recipes"];
+        });
+      }
     }
-    ;
   }
 
   @override
@@ -71,19 +67,23 @@ class _TimeRecommendState extends State<TimeRecommend> {
         ),
         SizedBox(
           height: MediaQuery.of(context).size.width * 0.82,
-          child: Swiper(
-            itemBuilder: (BuildContext context, int index) {
-              return GridCard(
-                data: dataList[index],
-              );
-            },
-            itemCount: dataList.length,
-            viewportFraction: 0.65,
-            scale: 0.7,
-            autoplay: true,
-            autoplayDelay: 7000,
-            duration: 1000,
-          ),
+          child: dataList.isNotEmpty
+              ? Swiper(
+                  itemBuilder: (BuildContext context, int index) {
+                    return GridCard(
+                      data: dataList[index],
+                    );
+                  },
+                  itemCount: dataList.length,
+                  viewportFraction: 0.65,
+                  scale: 0.7,
+                  autoplay: false,
+                  autoplayDelay: 7000,
+                  duration: 1000,
+                )
+              : const Center(
+                  child: CircularProgressIndicator(
+                      color: CustomColors.redPrimary)),
         )
       ]),
     );
