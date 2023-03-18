@@ -8,28 +8,35 @@ class RecommendService {
         .getDioWithHeaders(); // 현재 DB에 있는 정보를 토대로 해더를 추가합니다.
   }
 
-  // GET
+  // GET : Recipe Card Data
   Future<Response?> getCardData(String apiPath) async {
     try {
-      Dio _dio = await _getDio(); // 새로운 Dio 객체 생성
-      return await _dio.get(apiPath);
+      Dio dio = await _getDio(); // 새로운 Dio 객체 생성
+      return await dio.get(apiPath);
     } on DioError catch (e) {
       // DioError 처리
       print("getTimeRecommend Error : ${e.response}");
-      // return e.response; // DioError가 발생한 경우에도 무조건 리턴
+      return e.response; // DioError가 발생한 경우에도 무조건 리턴
     }
   }
 
-  // // POST
-  // Future<Response?> loginUser(Map<String, dynamic> userData) async {
-  //   try {
-  //     Dio _dio = await _getDio(); // 새로운 Dio 객체 생성
-  //     return await _dio.post('/account/check', data: userData);
-  //   } on DioError catch (e) {
-  //     // DioError 처리
-  //     return e.response; // DioError가 발생한 경우에도 무조건 리턴
-  //   }
-  // }
+  // POST : 북마크 추가
+  Future<Response?> postBookmark(int recipeIdx) async {
+    try {
+      Dio dio = await _getDio(); // 새로운 Dio 객체 생성
+      return await dio.post('/favorite', data: {"recipeIdx": recipeIdx});
+    } on DioError catch (e) {
+      // DioError 처리
+      print("getTimeRecommend Error : ${e.response}");
+      return e.response; // DioError가 발생한 경우에도 무조건 리턴
+    }
+  }
+
+  // DELETE : 북마크 제거
+  Future<Response> deleteBookmark(int recipeIdx) async {
+    Dio dio = await _getDio(); // 새로운 Dio 객체 생성
+    return await dio.delete('/favorite/$recipeIdx');
+  }
 
   // PUT
   // Future<Response> putUser(int userId, Map<String, dynamic> userData) async {

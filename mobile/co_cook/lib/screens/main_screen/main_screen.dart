@@ -1,4 +1,5 @@
 import 'package:co_cook/screens/user_screen/user_screen.dart';
+import 'package:co_cook/widgets/sliding_up_panel/sliding_up_panel.dart';
 import 'package:flutter/material.dart';
 
 import 'package:co_cook/styles/colors.dart';
@@ -27,18 +28,30 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: [
-        const HomeScreen(),
+      body: Stack(children: [
         Container(
-          child: Text("냉털"),
+          child: [
+            const HomeScreen(),
+            Container(
+              child: Text("냉털"),
+            ),
+            Container(
+              child: Text("search"),
+            ),
+            UserScreen(),
+          ][_currentIndex],
         ),
-        Container(
-          child: Text("search"),
-        ),
-        UserScreen(),
-      ][_currentIndex],
-      bottomNavigationBar:
-          BottomNavBar(currentIndex: _currentIndex, onTap: _onTap),
+        CustomSlidingUpPanel(
+            body: Container(
+          width: double.infinity,
+          height: 1000,
+          color: Colors.black,
+        ))
+      ]),
+      bottomNavigationBar: BottomNavBar(
+          currentIndex: _currentIndex,
+          onTap: _onTap,
+          panelController: panelController),
     );
   }
 }

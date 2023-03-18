@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:co_cook/styles/colors.dart';
 import 'package:co_cook/styles/text_styles.dart';
+import 'package:zoom_tap_animation/zoom_tap_animation.dart';
 
 class AiRecommend extends StatefulWidget {
   const AiRecommend({super.key});
@@ -72,7 +73,8 @@ class AiRecommendPhotoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return ZoomTapAnimation(
+      end: 0.98,
       onTap: () => print("인식 연결!!"),
       child: Stack(children: [
         Container(
@@ -140,7 +142,8 @@ class AiRecommendVoiceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return ZoomTapAnimation(
+      end: 0.98,
       onTap: () => print("음성인식 연결!!"),
       child: Stack(children: [
         Container(

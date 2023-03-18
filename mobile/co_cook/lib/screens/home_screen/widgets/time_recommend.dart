@@ -21,7 +21,6 @@ class TimeRecommend extends StatefulWidget {
 class _TimeRecommendState extends State<TimeRecommend> {
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     getTimeRecommendData("/home/recommend");
   }
@@ -30,15 +29,15 @@ class _TimeRecommendState extends State<TimeRecommend> {
 
   Future<void> getTimeRecommendData(String apiPath) async {
     // API 요청
-    RecommendService _recommendService = RecommendService();
-    Response? response = await _recommendService.getCardData(apiPath);
-
-    // 디코딩
-    Map? decodeRes = await jsonDecode(response.toString());
-    if (decodeRes != null) {
-      setState(() {
-        dataList = decodeRes["data"]["recipes"];
-      });
+    RecommendService recommendService = RecommendService();
+    Response? response = await recommendService.getCardData(apiPath);
+    if (response?.statusCode == 200) {
+      Map? decodeRes = await jsonDecode(response.toString());
+      if (decodeRes != null) {
+        setState(() {
+          dataList = decodeRes["data"]["recipes"];
+        });
+      }
     }
   }
 
@@ -82,7 +81,9 @@ class _TimeRecommendState extends State<TimeRecommend> {
                   autoplayDelay: 7000,
                   duration: 1000,
                 )
-              : Text("로딩중"),
+              : const Center(
+                  child: CircularProgressIndicator(
+                      color: CustomColors.redPrimary)),
         )
       ]),
     );

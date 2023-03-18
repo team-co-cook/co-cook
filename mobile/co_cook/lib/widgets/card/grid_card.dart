@@ -5,6 +5,7 @@ import 'package:co_cook/styles/text_styles.dart';
 import 'package:co_cook/widgets/button/bookmark_button.dart';
 
 import 'package:co_cook/utils/bookmark.dart';
+import 'package:zoom_tap_animation/zoom_tap_animation.dart';
 
 // 상위 위젯에서 그리드 사용시
 //
@@ -49,7 +50,8 @@ class _GridCardState extends State<GridCard> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return ZoomTapAnimation(
+      end: 0.98,
       onTap: () => print(widget.data["recipeIdx"]),
       child: SizedBox(
         width: double.infinity,
@@ -81,7 +83,11 @@ class _GridCardState extends State<GridCard> {
                   Positioned(
                       right: 16,
                       child: GestureDetector(
-                        onTap: () => toggleBookmark(context, isAdd, toggleIsAdd,
+                        onTap: () => toggleBookmark(
+                            context,
+                            isAdd,
+                            toggleIsAdd,
+                            widget.data["recipeIdx"],
                             widget.data["recipeName"]),
                         child: BookmarkButton(isAdd: isAdd),
                       )),

@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:co_cook/styles/colors.dart';
 import 'package:co_cook/styles/text_styles.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:zoom_tap_animation/zoom_tap_animation.dart';
 
 class CategoryRecommend extends StatefulWidget {
   const CategoryRecommend({super.key});
@@ -18,24 +19,23 @@ class CategoryRecommend extends StatefulWidget {
 class _CategoryRecommendState extends State<CategoryRecommend> {
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    getCardData("/home/category");
+    getTimeRecommendData("/home/category");
   }
 
   List dataList = [];
 
-  Future<void> getCardData(String apiPath) async {
+  Future<void> getTimeRecommendData(String apiPath) async {
     // API 요청
-    RecommendService _recommendService = RecommendService();
-    Response? response = await _recommendService.getCardData(apiPath);
-
-    // 디코딩
-    Map? decodeRes = await jsonDecode(response.toString());
-    if (decodeRes != null) {
-      setState(() {
-        dataList = decodeRes["data"]["categories"];
-      });
+    RecommendService recommendService = RecommendService();
+    Response? response = await recommendService.getCardData(apiPath);
+    if (response?.statusCode == 200) {
+      Map? decodeRes = await jsonDecode(response.toString());
+      if (decodeRes != null) {
+        setState(() {
+          dataList = decodeRes["data"]["categories"];
+        });
+      }
     }
   }
 
@@ -55,7 +55,8 @@ class _CategoryRecommendState extends State<CategoryRecommend> {
                     data: dataList[2], onTap: () => print("2"))
               ],
             )
-          : Text("로딩중"),
+          : const Center(
+              child: CircularProgressIndicator(color: CustomColors.redPrimary)),
     );
   }
 }
@@ -71,7 +72,8 @@ class CategoryRecommendCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return ZoomTapAnimation(
+        end: 0.98,
         onTap: () => onTap,
         child: Stack(children: [
           Container(

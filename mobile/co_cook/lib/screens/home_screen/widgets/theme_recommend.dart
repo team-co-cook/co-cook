@@ -20,24 +20,23 @@ class ThemeRecommend extends StatefulWidget {
 class _ThemeRecommendState extends State<ThemeRecommend> {
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    getCardData("/home/theme");
+    getTimeRecommendData("/home/theme");
   }
 
   List dataList = [];
 
-  Future<void> getCardData(String apiPath) async {
+  Future<void> getTimeRecommendData(String apiPath) async {
     // API 요청
-    RecommendService _recommendService = RecommendService();
-    Response? response = await _recommendService.getCardData(apiPath);
-
-    // 디코딩
-    Map? decodeRes = await jsonDecode(response.toString());
-    if (decodeRes != null) {
-      setState(() {
-        dataList = decodeRes["data"]["themes"];
-      });
+    RecommendService recommendService = RecommendService();
+    Response? response = await recommendService.getCardData(apiPath);
+    if (response?.statusCode == 200) {
+      Map? decodeRes = await jsonDecode(response.toString());
+      if (decodeRes != null) {
+        setState(() {
+          dataList = decodeRes["data"]["themes"];
+        });
+      }
     }
   }
 
@@ -68,7 +67,9 @@ class _ThemeRecommendState extends State<ThemeRecommend> {
                         itemBuilder: (BuildContext context, int index) {
                           return ThemeRecommendCard(data: dataList[index]);
                         })
-                    : Text("로딩중")),
+                    : const Center(
+                        child: CircularProgressIndicator(
+                            color: CustomColors.redPrimary))),
           ],
         ));
   }
