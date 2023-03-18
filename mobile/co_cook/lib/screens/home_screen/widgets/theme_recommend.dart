@@ -1,12 +1,44 @@
+import 'dart:convert';
+
+import 'package:co_cook/services/recommend_service.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
 import 'package:co_cook/styles/colors.dart';
 import 'package:co_cook/styles/text_styles.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'theme_recommend_card.dart';
 
-class ThemeRecommend extends StatelessWidget {
+class ThemeRecommend extends StatefulWidget {
   const ThemeRecommend({super.key});
+
+  @override
+  State<ThemeRecommend> createState() => _ThemeRecommendState();
+}
+
+class _ThemeRecommendState extends State<ThemeRecommend> {
+  @override
+  void initState() {
+    super.initState();
+    getTimeRecommendData("/home/theme");
+  }
+
+  List dataList = [];
+
+  Future<void> getTimeRecommendData(String apiPath) async {
+    // API 요청
+    RecommendService recommendService = RecommendService();
+    Response? response = await recommendService.getCardData(apiPath);
+    if (response?.statusCode == 200) {
+      Map? decodeRes = await jsonDecode(response.toString());
+      if (decodeRes != null) {
+        setState(() {
+          dataList = decodeRes["data"]["themes"];
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,20 +57,19 @@ class ThemeRecommend extends StatelessWidget {
             ),
             SizedBox(
                 height: 136,
-                child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: 3,
-                    physics: const BouncingScrollPhysics(),
-                    padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 0.0),
-                    itemBuilder: (BuildContext context, int index) {
-                      return ThemeRecommendCard(
-                        data: {
-                          "id": 1,
-                          "themeName": "시원한 국물 요리",
-                          "imgPath": "https://picsum.photos/200/300"
-                        },
-                      );
-                    })),
+                child: dataList.isNotEmpty
+                    ? ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: dataList.length,
+                        physics: const BouncingScrollPhysics(),
+                        padding:
+                            const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 0.0),
+                        itemBuilder: (BuildContext context, int index) {
+                          return ThemeRecommendCard(data: dataList[index]);
+                        })
+                    : const Center(
+                        child: CircularProgressIndicator(
+                            color: CustomColors.redPrimary))),
           ],
         ));
   }
