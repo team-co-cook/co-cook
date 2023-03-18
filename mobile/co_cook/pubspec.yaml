@@ -42,6 +42,7 @@ dependencies:
   card_swiper: ^2.0.4
   zoom_tap_animation: ^1.1.0
   sliding_up_panel: ^2.0.0+1
+  transparent_image: ^2.0.1
 
 dev_dependencies:
   flutter_test:

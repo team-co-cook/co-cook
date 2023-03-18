@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:co_cook/styles/colors.dart';
 import 'package:co_cook/styles/text_styles.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:transparent_image/transparent_image.dart';
 import 'package:zoom_tap_animation/zoom_tap_animation.dart';
 
 class CategoryRecommend extends StatefulWidget {
@@ -42,7 +43,7 @@ class _CategoryRecommendState extends State<CategoryRecommend> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.fromLTRB(24.0, 40.0, 24.0, 0.0),
+      margin: const EdgeInsets.fromLTRB(24.0, 32.0, 24.0, 8.0),
       child: dataList.isNotEmpty
           ? Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -81,10 +82,6 @@ class CategoryRecommendCard extends StatelessWidget {
             height: 128,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(16),
-              image: DecorationImage(
-                fit: BoxFit.cover,
-                image: NetworkImage(data["imgPath"]),
-              ),
               boxShadow: const [
                 BoxShadow(
                   color: Colors.black26,
@@ -93,6 +90,14 @@ class CategoryRecommendCard extends StatelessWidget {
                   spreadRadius: 0.0,
                 )
               ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(16.0),
+              child: FadeInImage.memoryNetwork(
+                  fadeInDuration: const Duration(milliseconds: 200),
+                  fit: BoxFit.cover,
+                  placeholder: kTransparentImage,
+                  image: data["imgPath"]),
             ),
           ),
           Positioned(

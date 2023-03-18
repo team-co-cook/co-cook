@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:co_cook/styles/colors.dart';
 import 'package:co_cook/styles/text_styles.dart';
+import 'package:transparent_image/transparent_image.dart';
 import 'package:zoom_tap_animation/zoom_tap_animation.dart';
 
 class ThemeRecommendCard extends StatelessWidget {
@@ -19,10 +20,6 @@ class ThemeRecommendCard extends StatelessWidget {
         Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(60),
-            image: DecorationImage(
-              fit: BoxFit.cover,
-              image: NetworkImage(data["imgPath"]), // 배경 이미지
-            ),
             boxShadow: const [
               BoxShadow(
                 color: Colors.black26,
@@ -35,6 +32,13 @@ class ThemeRecommendCard extends StatelessWidget {
           margin: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 0.0),
           width: 120,
           height: 120,
+          child: ClipOval(
+            child: FadeInImage.memoryNetwork(
+                fadeInDuration: const Duration(milliseconds: 200),
+                fit: BoxFit.cover,
+                placeholder: kTransparentImage,
+                image: data["imgPath"]),
+          ),
         ),
         Positioned(
             top: 28,

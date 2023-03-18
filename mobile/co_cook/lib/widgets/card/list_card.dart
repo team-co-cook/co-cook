@@ -5,6 +5,7 @@ import 'package:co_cook/styles/text_styles.dart';
 import 'package:co_cook/widgets/button/bookmark_button.dart';
 
 import 'package:co_cook/utils/bookmark.dart';
+import 'package:transparent_image/transparent_image.dart';
 import 'package:zoom_tap_animation/zoom_tap_animation.dart';
 
 class ListCard extends StatefulWidget {
@@ -66,15 +67,19 @@ class _ListCardState extends State<ListCard> {
                         return Container(
                           width: constraints.maxHeight, // 부모 요소의 너비를 가져옴
                           height: constraints.maxHeight, // 부모 요소의 너비와 같은 값으로 설정
-                          decoration: BoxDecoration(
-                            borderRadius: const BorderRadius.only(
-                                topLeft: Radius.circular(16.0),
-                                bottomLeft: Radius.circular(16.0)),
-                            image: DecorationImage(
-                              fit: BoxFit.cover,
-                              image: NetworkImage(
-                                  widget.data["recipeImgPath"]), // 배경 이미지
-                            ),
+                          decoration: const BoxDecoration(
+                              borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(16.0),
+                                  bottomLeft: Radius.circular(16.0)),
+                              color: Colors.white),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(16.0),
+                            child: FadeInImage.memoryNetwork(
+                                fadeInDuration:
+                                    const Duration(milliseconds: 200),
+                                fit: BoxFit.cover,
+                                placeholder: kTransparentImage,
+                                image: widget.data["recipeImgPath"]),
                           ),
                         );
                       },
