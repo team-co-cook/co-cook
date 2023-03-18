@@ -30,4 +30,6 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
 
     List<Recipe> findAllByOrderByIdDesc();
 
+    List<Recipe> findByRecipeNameContainingOrderByIdDesc(String keyword);
+
 }

@@ -44,5 +44,12 @@ public class ListController {
         return ApiResponse.ok(recipeListResDto);
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<ApiResponse<RecipeListResDto>> getRecipesByKeyword(@RequestHeader("AUTH-TOKEN") String authToken,
+                                                                       @RequestParam String keyword) {
+        RecipeListResDto recipeListResDto = listService.getRecipesByKeyword(authToken, keyword);
+        return ApiResponse.ok(recipeListResDto);
+    }
+
 
 }

@@ -55,6 +55,18 @@ public class ListService {
         return getRecipesByDifficultyAndTime(foundRecipes, userIdx, difficulty, time);
     }
 
+    public RecipeListResDto getRecipesByKeyword(String authToken, String keyword) {
+        Long userIdx = jwtTokenProvider.getUserIdx(authToken);
+        List<Recipe> foundRecipes = recipeRepository.findByRecipeNameContainingOrderByIdDesc(keyword);
+        List<RecipeDetailResDto> newRecipes = new ArrayList<>();
+
+        for (Recipe recipe : foundRecipes) {
+            RecipeDetailResDto recipeDetailResDto = getRecipeDetailDtoWithIsFavorite(userIdx, recipe);
+            newRecipes.add(recipeDetailResDto);
+        }
+        return new RecipeListResDto(newRecipes);
+    }
+
     private RecipeListResDto getRecipesByDifficultyAndTime(List<Recipe> recipes, Long userIdx, String difficulty, Integer time) {
         List<RecipeDetailResDto> newRecipes = new ArrayList<>();
 
@@ -85,25 +97,28 @@ public class ListService {
             if (time != 0 && recipe.getRunningTime() > time) {
                 continue;
             }
-            boolean isFavorite;
-            if (favoriteRepository.findByUserIdAndRecipeId(userIdx, recipe.getId()) == null) {
-                isFavorite = false;
-            } else {
-                isFavorite = true;
-            }
-            RecipeDetailResDto recipeDetailResDto = RecipeDetailResDto.builder()
-                    .recipeName(recipe.getRecipeName())
-                    .recipeDifficulty(recipe.getDifficulty())
-                    .recipeIdx(recipe.getId())
-                    .recipeImgPath(recipe.getImgPath())
-                    .recipeRunningTime(recipe.getRunningTime())
-                    .isFavorite(isFavorite)
-                    .build();
-
+            RecipeDetailResDto recipeDetailResDto = getRecipeDetailDtoWithIsFavorite(userIdx, recipe);
             newRecipes.add(recipeDetailResDto);
         }
 
         return new RecipeListResDto(newRecipes);
+    }
+
+    private RecipeDetailResDto getRecipeDetailDtoWithIsFavorite(Long userIdx, Recipe recipe) {
+        boolean isFavorite;
+        if (favoriteRepository.findByUserIdAndRecipeId(userIdx, recipe.getId()) == null) {
+            isFavorite = false;
+        } else {
+            isFavorite = true;
+        }
+        return RecipeDetailResDto.builder()
+                .recipeName(recipe.getRecipeName())
+                .recipeDifficulty(recipe.getDifficulty())
+                .recipeIdx(recipe.getId())
+                .recipeImgPath(recipe.getImgPath())
+                .recipeRunningTime(recipe.getRunningTime())
+                .isFavorite(isFavorite)
+                .build();
     }
 
 }
