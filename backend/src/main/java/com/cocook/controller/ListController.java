@@ -36,5 +36,25 @@ public class ListController {
         return ApiResponse.ok(recipeListResDto);
     }
 
+    @GetMapping("/all")
+    public ResponseEntity<ApiResponse<RecipeListResDto>> getAllRecipes(@RequestHeader("AUTH-TOKEN") String authToken,
+                                                                                  @RequestParam String difficulty,
+                                                                                  @RequestParam Integer time) {
+        RecipeListResDto recipeListResDto = listService.getAllRecipes(authToken, difficulty, time);
+        return ApiResponse.ok(recipeListResDto);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<ApiResponse<RecipeListResDto>> getRecipesByKeyword(@RequestHeader("AUTH-TOKEN") String authToken,
+                                                                       @RequestParam String keyword) {
+        RecipeListResDto recipeListResDto = listService.getRecipesByKeyword(authToken, keyword);
+        return ApiResponse.ok(recipeListResDto);
+    }
+
+    @GetMapping("/favorite")
+    public ResponseEntity<ApiResponse<RecipeListResDto>> getRecipesByFavorite(@RequestHeader("AUTH-TOKEN") String authToken) {
+        RecipeListResDto recipeListResDto = listService.getRecipesByFavorite(authToken);
+        return ApiResponse.ok(recipeListResDto);
+    }
 
 }
