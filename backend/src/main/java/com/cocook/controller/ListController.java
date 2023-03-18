@@ -36,5 +36,13 @@ public class ListController {
         return ApiResponse.ok(recipeListResDto);
     }
 
+    @GetMapping("/all")
+    public ResponseEntity<ApiResponse<RecipeListResDto>> getAllRecipes(@RequestHeader("AUTH-TOKEN") String authToken,
+                                                                                  @RequestParam String difficulty,
+                                                                                  @RequestParam Integer time) {
+        RecipeListResDto recipeListResDto = listService.getAllRecipes(authToken, difficulty, time);
+        return ApiResponse.ok(recipeListResDto);
+    }
+
 
 }

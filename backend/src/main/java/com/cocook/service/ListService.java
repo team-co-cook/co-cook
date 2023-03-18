@@ -9,6 +9,7 @@ import com.cocook.repository.FavoriteRepository;
 import com.cocook.repository.RecipeRepository;
 import com.cocook.repository.ThemeRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
@@ -31,7 +32,7 @@ public class ListService {
             throw new EntityNotFoundException("해당 테마가 존재하지 않습니다.");
         }
 
-        List<Recipe> foundRecipes = recipeRepository.findByThemeName(themeName);
+        List<Recipe> foundRecipes = recipeRepository.findByThemeNameOrderByIdDesc(themeName);
 
         return getRecipesByDifficultyAndTime(foundRecipes, userIdx, difficulty, time);
     }
@@ -43,8 +44,14 @@ public class ListService {
             throw new EntityNotFoundException("해당 카테고리가 존재하지 않습니다.");
         }
 
-        List<Recipe> foundRecipes = recipeRepository.findByCategoryCategoryName(categoryName);
+        List<Recipe> foundRecipes = recipeRepository.findByCategoryCategoryNameOrderByIdDesc(categoryName);
 
+        return getRecipesByDifficultyAndTime(foundRecipes, userIdx, difficulty, time);
+    }
+
+    public RecipeListResDto getAllRecipes(String authToken, String difficulty, Integer time) {
+        Long userIdx = jwtTokenProvider.getUserIdx(authToken);
+        List<Recipe> foundRecipes = recipeRepository.findAllByOrderByIdDesc();
         return getRecipesByDifficultyAndTime(foundRecipes, userIdx, difficulty, time);
     }
 
@@ -67,6 +74,8 @@ public class ListService {
                 difficultySet.add("보통");
                 difficultySet.add("어려움");
                 break;
+            default:
+                throw new EntityNotFoundException("난이도는 ['쉬움', '보통', '어려움', '전체']만 가능합니다.");
         }
 
         for (Recipe recipe : recipes) {
