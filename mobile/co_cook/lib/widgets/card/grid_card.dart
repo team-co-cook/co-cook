@@ -1,4 +1,7 @@
+import 'package:co_cook/screens/recipe_detail_screen/recipe_detail_screen.dart';
 import 'package:flutter/material.dart';
+
+import 'package:transparent_image/transparent_image.dart';
 
 import 'package:co_cook/styles/colors.dart';
 import 'package:co_cook/styles/text_styles.dart';
@@ -48,11 +51,16 @@ class _GridCardState extends State<GridCard> {
     });
   }
 
+  void routeScreen(BuildContext context, Widget screen) {
+    Route targetScreen = MaterialPageRoute(builder: (context) => screen);
+    Navigator.push(context, targetScreen);
+  }
+
   @override
   Widget build(BuildContext context) {
     return ZoomTapAnimation(
       end: 0.98,
-      onTap: () => print(widget.data["recipeIdx"]),
+      onTap: () => routeScreen(context, RecipeDetailScreen()),
       child: SizedBox(
         width: double.infinity,
         child: Column(
@@ -65,11 +73,7 @@ class _GridCardState extends State<GridCard> {
                     height: constraints.maxWidth, // 부모 요소의 너비와 같은 값으로 설정
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(16),
-                      image: DecorationImage(
-                        fit: BoxFit.cover,
-                        image: NetworkImage(
-                            widget.data["recipeImgPath"]), // 배경 이미지
-                      ),
+                      color: Colors.white,
                       boxShadow: const [
                         BoxShadow(
                           color: Colors.black26,
@@ -78,6 +82,14 @@ class _GridCardState extends State<GridCard> {
                           spreadRadius: 0.0,
                         )
                       ],
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(16.0),
+                      child: FadeInImage.memoryNetwork(
+                          fadeInDuration: const Duration(milliseconds: 200),
+                          fit: BoxFit.cover,
+                          placeholder: kTransparentImage,
+                          image: widget.data["recipeImgPath"]),
                     ),
                   ),
                   Positioned(

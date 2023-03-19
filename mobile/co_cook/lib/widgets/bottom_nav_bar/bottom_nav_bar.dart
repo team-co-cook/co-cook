@@ -62,7 +62,7 @@ class BottomNavBar extends StatelessWidget {
                     print('co-cook!');
                     panelController.isPanelOpen
                         ? panelController.close()
-                        : panelController.open();
+                        : {panelController.open()};
                   },
                   child: const SizedBox(
                     height: 56,

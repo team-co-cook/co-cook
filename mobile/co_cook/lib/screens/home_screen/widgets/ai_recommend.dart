@@ -16,7 +16,7 @@ class _AiRecommendState extends State<AiRecommend> {
   Widget build(BuildContext context) {
     return SizedBox(
       width: double.infinity,
-      height: MediaQuery.of(context).size.width / 2 + 88,
+      height: MediaQuery.of(context).size.width / 2 + 80,
       child: Stack(children: [
         Positioned(
           right: 0,
@@ -37,7 +37,7 @@ class _AiRecommendState extends State<AiRecommend> {
           child: Column(
             children: [
               Container(
-                margin: const EdgeInsets.fromLTRB(24.0, 40.0, 24.0, 16.0),
+                margin: const EdgeInsets.fromLTRB(24.0, 32.0, 24.0, 16.0),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [

@@ -66,12 +66,15 @@ class _TimeRecommendState extends State<TimeRecommend> {
           ),
         ),
         SizedBox(
-          height: MediaQuery.of(context).size.width * 0.82,
+          height: MediaQuery.of(context).size.width * 0.83,
           child: dataList.isNotEmpty
               ? Swiper(
                   itemBuilder: (BuildContext context, int index) {
-                    return GridCard(
-                      data: dataList[index],
+                    return Container(
+                      margin: EdgeInsets.only(top: 8.0),
+                      child: GridCard(
+                        data: dataList[index],
+                      ),
                     );
                   },
                   itemCount: dataList.length,
