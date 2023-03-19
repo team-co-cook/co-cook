@@ -1,13 +1,15 @@
-import 'package:co_cook/widgets/nickname_change/nickname_change.dart';
+import 'dart:convert'; // decode 가져오기
+import 'package:dio/dio.dart'; // Response 가져오기 위함.
 import 'package:flutter/material.dart';
+
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:co_cook/services/auth_service.dart';
 import 'package:co_cook/styles/colors.dart';
 import 'package:co_cook/styles/text_styles.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:co_cook/screens/login_screen/login_screen.dart';
+
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:dio/dio.dart'; // Response 가져오기 위함.
-import 'package:co_cook/services/auth_service.dart';
-import 'dart:convert'; // decode 가져오기
+import 'package:co_cook/screens/login_screen/login_screen.dart';
+import 'package:co_cook/widgets/nickname_change/nickname_change.dart';
 
 class UserScreen extends StatefulWidget {
   const UserScreen({Key? key}) : super(key: key);
