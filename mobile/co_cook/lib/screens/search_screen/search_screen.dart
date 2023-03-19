@@ -61,66 +61,69 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          backgroundColor: CustomColors.monotoneLight,
-          elevation: 0,
-          toolbarHeight: 120,
-          title: Padding(
-              padding: const EdgeInsets.fromLTRB(0, 60, 0, 0),
-              child: CustomTextField(
-                onChanged: onWordChanged,
-                isFocus: false,
-                isSearch: true,
-                onSubmitted: (p0) {},
-              )),
-        ),
-        body: Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: SingleChildScrollView(
-            physics:
-                BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
-            child: Align(
-              alignment: Alignment.topCenter,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  GestureDetector(
-                    onTap: () async {
-                      // CameraScreen으로 이동
-                    },
-                    child: Image.asset(
-                      'assets/images/button_img/CameraSearchLargeX2.png',
+    return GestureDetector(
+      onTap: () => _dismissKeyboard(context),
+      child: Scaffold(
+          appBar: AppBar(
+            backgroundColor: CustomColors.monotoneLight,
+            elevation: 0,
+            toolbarHeight: 120,
+            title: Padding(
+                padding: const EdgeInsets.fromLTRB(0, 60, 0, 0),
+                child: CustomTextField(
+                  onChanged: onWordChanged,
+                  isFocus: false,
+                  isSearch: true,
+                  onSubmitted: (p0) {},
+                )),
+          ),
+          body: Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(
+                  parent: AlwaysScrollableScrollPhysics()),
+              child: Align(
+                alignment: Alignment.topCenter,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    GestureDetector(
+                      onTap: () async {
+                        // CameraScreen으로 이동
+                      },
+                      child: Image.asset(
+                        'assets/images/button_img/CameraSearchLargeX2.png',
+                      ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Text('${dataList.length}건의 요리를 찾았아요',
-                        style: CustomTextStyles()
-                            .caption
-                            .copyWith(color: CustomColors.monotoneBlack)),
-                  ),
-                  dataList.isNotEmpty
-                      ? ListView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: dataList.length,
-                          padding:
-                              const EdgeInsets.fromLTRB(8.0, 16.0, 8.0, 24.0),
-                          itemBuilder: (BuildContext context, int index) {
-                            return Container(
-                              margin: const EdgeInsets.only(bottom: 16),
-                              child: ListCard(data: dataList[index]),
-                            );
-                          })
-                      : const Center(
-                          child: CircularProgressIndicator(
-                              color: CustomColors.redPrimary))
-                ],
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Text('${dataList.length}건의 요리를 찾았아요',
+                          style: CustomTextStyles()
+                              .caption
+                              .copyWith(color: CustomColors.monotoneBlack)),
+                    ),
+                    dataList.isNotEmpty
+                        ? ListView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: dataList.length,
+                            padding:
+                                const EdgeInsets.fromLTRB(8.0, 16.0, 8.0, 24.0),
+                            itemBuilder: (BuildContext context, int index) {
+                              return Container(
+                                margin: const EdgeInsets.only(bottom: 16),
+                                child: ListCard(data: dataList[index]),
+                              );
+                            })
+                        : const Center(
+                            child: CircularProgressIndicator(
+                                color: CustomColors.redPrimary))
+                  ],
+                ),
               ),
             ),
-          ),
-        ));
+          )),
+    );
   }
 
   // 커스텀 텍스트 필드에 내려주기 위한 onChange-setState 함수
