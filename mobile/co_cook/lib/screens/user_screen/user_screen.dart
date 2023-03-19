@@ -121,12 +121,14 @@ void logOut({required BuildContext context}) async {
   Navigator.pushReplacement(context, login);
 }
 
+// 닉네임 변경 페이지로 이동
 void gotoNicknameChange(BuildContext context) {
   Route nicknameChange =
       MaterialPageRoute(builder: (context) => const NicknameChange());
   Navigator.push(context, nicknameChange);
 }
 
+// 회원탈퇴
 void withdrawal(BuildContext context) async {
   // UserIdx 가져오기
   SharedPreferences prefs = await SharedPreferences.getInstance();

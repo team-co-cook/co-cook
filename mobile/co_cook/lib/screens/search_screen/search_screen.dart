@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'dart:convert';
 
-import 'package:co_cook/services/recommend_service.dart';
+import 'package:co_cook/services/search_service.dart';
 
 import 'package:co_cook/styles/colors.dart';
 import 'package:co_cook/styles/text_styles.dart';
@@ -21,23 +21,18 @@ class _SearchScreenState extends State<SearchScreen> {
   String? _searchWord;
   final _focusNode = FocusNode(); // 포커싱 여부를 추적하는 클래스 인스턴스
 
-  @override
-  void initState() {
-    super.initState();
-    getTimeRecommendData("/home/random");
-  }
-
   List dataList = [];
 
-  Future<void> getTimeRecommendData(String apiPath) async {
+  Future<void> getSearchData(String keyword) async {
     // API 요청
-    RecommendService recommendService = RecommendService();
-    Response? response = await recommendService.getCardData(apiPath);
+    SearchService searchService = SearchService();
+    Response? response = await searchService.getSearchList(keyword: keyword);
     if (response?.statusCode == 200) {
       Map? decodeRes = await jsonDecode(response.toString());
+      print(decodeRes);
       if (decodeRes != null) {
         setState(() {
-          dataList = decodeRes["data"]["recipes"];
+          dataList = decodeRes["data"]["recipeListResDto"];
         });
       }
     }
@@ -74,7 +69,9 @@ class _SearchScreenState extends State<SearchScreen> {
                   onChanged: onWordChanged,
                   isFocus: false,
                   isSearch: true,
-                  onSubmitted: (p0) {},
+                  onSubmitted: (value) {
+                    getSearchData(value);
+                  },
                 )),
           ),
           body: Padding(
