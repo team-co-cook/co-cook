@@ -9,8 +9,35 @@ import 'package:dio/dio.dart'; // Response 가져오기 위함.
 import 'package:co_cook/services/auth_service.dart';
 import 'dart:convert'; // decode 가져오기
 
-class UserScreen extends StatelessWidget {
+class UserScreen extends StatefulWidget {
   const UserScreen({Key? key}) : super(key: key);
+
+  @override
+  State<UserScreen> createState() => _UserScreenState();
+}
+
+class _UserScreenState extends State<UserScreen> {
+  String _nickname = 'username';
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchNickname();
+  }
+
+  Future<void> _fetchNickname() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String prefsUserData =
+        prefs.getString('userData') ?? ''; // 기본값으로 빈 문자열을 사용합니다.
+    Map<String, dynamic> decodePrefs = jsonDecode(prefsUserData);
+    String? nickname = decodePrefs['nickname'];
+
+    if (nickname != null) {
+      setState(() {
+        _nickname = nickname;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +51,7 @@ class UserScreen extends StatelessWidget {
           child: Align(
             alignment: Alignment.centerLeft,
             child: Text(
-              '나는윤성운',
+              _nickname,
               style: const CustomTextStyles()
                   .title1
                   .copyWith(color: CustomColors.monotoneBlack),
