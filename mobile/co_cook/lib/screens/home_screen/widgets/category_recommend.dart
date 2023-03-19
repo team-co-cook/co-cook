@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:co_cook/screens/list_screen/list_screen.dart';
 import 'package:co_cook/services/recommend_service.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -47,12 +48,9 @@ class _CategoryRecommendState extends State<CategoryRecommend> {
           ? Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                CategoryRecommendCard(
-                    data: dataList[0], onTap: () => print("0")),
-                CategoryRecommendCard(
-                    data: dataList[1], onTap: () => print("1")),
-                CategoryRecommendCard(
-                    data: dataList[2], onTap: () => print("2"))
+                CategoryRecommendCard(data: dataList[0]),
+                CategoryRecommendCard(data: dataList[1]),
+                CategoryRecommendCard(data: dataList[2])
               ],
             )
           : const Center(
@@ -65,53 +63,61 @@ class CategoryRecommendCard extends StatelessWidget {
   const CategoryRecommendCard({
     super.key,
     required this.data,
-    required this.onTap,
   });
   final Map data;
-  final Function onTap;
 
   @override
   Widget build(BuildContext context) {
-    return ZoomTapAnimation(
-        end: 0.98,
-        onTap: () => onTap,
-        child: Stack(children: [
-          Container(
-            width: ((MediaQuery.of(context).size.width - 48) / 3 - 8),
-            height: 128,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16),
-              image: DecorationImage(
-                fit: BoxFit.cover,
-                image: NetworkImage(data["imgPath"]),
+    return GestureDetector(
+      onTap: () {
+        gotoList(context, data['categoryName'], data["imgPath"]);
+      },
+      child: ZoomTapAnimation(
+          end: 0.98,
+          child: Stack(children: [
+            Container(
+              width: ((MediaQuery.of(context).size.width - 48) / 3 - 8),
+              height: 128,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16),
+                image: DecorationImage(
+                  fit: BoxFit.cover,
+                  image: NetworkImage(data["imgPath"]),
+                ),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Colors.black26,
+                    offset: Offset(1, 1),
+                    blurRadius: 6.0,
+                    spreadRadius: 0.0,
+                  )
+                ],
               ),
-              boxShadow: const [
-                BoxShadow(
-                  color: Colors.black26,
-                  offset: Offset(1, 1),
-                  blurRadius: 6.0,
-                  spreadRadius: 0.0,
-                )
-              ],
             ),
-          ),
-          Positioned(
-              top: 0,
-              bottom: 0,
-              left: 0,
-              right: 0,
-              child: Center(
-                  child: Text(data["categoryName"],
-                      style: CustomTextStyles().subtitle1.copyWith(
-                          color: CustomColors.monotoneLight,
-                          shadows: const [
-                            BoxShadow(
-                              color: Colors.black26,
-                              offset: Offset(1, 1),
-                              blurRadius: 6.0,
-                              spreadRadius: 0.0,
-                            )
-                          ])))),
-        ]));
+            Positioned(
+                top: 0,
+                bottom: 0,
+                left: 0,
+                right: 0,
+                child: Center(
+                    child: Text(data["categoryName"],
+                        style: CustomTextStyles().subtitle1.copyWith(
+                            color: CustomColors.monotoneLight,
+                            shadows: const [
+                              BoxShadow(
+                                color: Colors.black26,
+                                offset: Offset(1, 1),
+                                blurRadius: 6.0,
+                                spreadRadius: 0.0,
+                              )
+                            ])))),
+          ])),
+    );
   }
+}
+
+void gotoList(BuildContext context, String listName, String imgPath) {
+  Route themeScreen = MaterialPageRoute(
+      builder: (context) => ListScreen(listName: listName, imgPath: imgPath));
+  Navigator.push(context, themeScreen);
 }

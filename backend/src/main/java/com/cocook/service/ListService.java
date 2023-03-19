@@ -4,11 +4,13 @@ import com.cocook.auth.JwtTokenProvider;
 import com.cocook.dto.list.RecipeDetailResDto;
 import com.cocook.dto.list.RecipeListResDto;
 import com.cocook.entity.Recipe;
+import com.cocook.entity.User;
 import com.cocook.repository.CategoryRepository;
 import com.cocook.repository.FavoriteRepository;
 import com.cocook.repository.RecipeRepository;
 import com.cocook.repository.ThemeRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
@@ -31,7 +33,7 @@ public class ListService {
             throw new EntityNotFoundException("해당 테마가 존재하지 않습니다.");
         }
 
-        List<Recipe> foundRecipes = recipeRepository.findByThemeName(themeName);
+        List<Recipe> foundRecipes = recipeRepository.findByThemeNameOrderByIdDesc(themeName);
 
         return getRecipesByDifficultyAndTime(foundRecipes, userIdx, difficulty, time);
     }
@@ -43,9 +45,46 @@ public class ListService {
             throw new EntityNotFoundException("해당 카테고리가 존재하지 않습니다.");
         }
 
-        List<Recipe> foundRecipes = recipeRepository.findByCategoryCategoryName(categoryName);
+        List<Recipe> foundRecipes = recipeRepository.findByCategoryCategoryNameOrderByIdDesc(categoryName);
 
         return getRecipesByDifficultyAndTime(foundRecipes, userIdx, difficulty, time);
+    }
+
+    public RecipeListResDto getAllRecipes(String authToken, String difficulty, Integer time) {
+        Long userIdx = jwtTokenProvider.getUserIdx(authToken);
+        List<Recipe> foundRecipes = recipeRepository.findAllByOrderByIdDesc();
+        return getRecipesByDifficultyAndTime(foundRecipes, userIdx, difficulty, time);
+    }
+
+    public RecipeListResDto getRecipesByKeyword(String authToken, String keyword) {
+        Long userIdx = jwtTokenProvider.getUserIdx(authToken);
+        List<Recipe> foundRecipes = recipeRepository.findByRecipeNameContainingOrderByIdDesc(keyword);
+        List<RecipeDetailResDto> newRecipes = new ArrayList<>();
+
+        for (Recipe recipe : foundRecipes) {
+            RecipeDetailResDto recipeDetailResDto = getRecipeDetailDtoWithIsFavorite(userIdx, recipe);
+            newRecipes.add(recipeDetailResDto);
+        }
+        return new RecipeListResDto(newRecipes);
+    }
+
+    public RecipeListResDto getRecipesByFavorite(String authToken) {
+        Long userIdx = jwtTokenProvider.getUserIdx(authToken);
+        List<Recipe> foundRecipes = recipeRepository.findRecipesByUserId(userIdx);
+        List<RecipeDetailResDto> newRecipes = new ArrayList<>();
+
+        for (Recipe recipe : foundRecipes) {
+            RecipeDetailResDto recipeDetailResDto =  RecipeDetailResDto.builder()
+                    .recipeName(recipe.getRecipeName())
+                    .recipeDifficulty(recipe.getDifficulty())
+                    .recipeIdx(recipe.getId())
+                    .recipeImgPath(recipe.getImgPath())
+                    .recipeRunningTime(recipe.getRunningTime())
+                    .isFavorite(true)
+                    .build();
+            newRecipes.add(recipeDetailResDto);
+        }
+        return new RecipeListResDto(newRecipes);
     }
 
     private RecipeListResDto getRecipesByDifficultyAndTime(List<Recipe> recipes, Long userIdx, String difficulty, Integer time) {
@@ -67,6 +106,8 @@ public class ListService {
                 difficultySet.add("보통");
                 difficultySet.add("어려움");
                 break;
+            default:
+                throw new EntityNotFoundException("난이도는 ['쉬움', '보통', '어려움', '전체']만 가능합니다.");
         }
 
         for (Recipe recipe : recipes) {
@@ -76,25 +117,28 @@ public class ListService {
             if (time != 0 && recipe.getRunningTime() > time) {
                 continue;
             }
-            boolean isFavorite;
-            if (favoriteRepository.findByUserIdAndRecipeId(userIdx, recipe.getId()) == null) {
-                isFavorite = false;
-            } else {
-                isFavorite = true;
-            }
-            RecipeDetailResDto recipeDetailResDto = RecipeDetailResDto.builder()
-                    .recipeName(recipe.getRecipeName())
-                    .recipeDifficulty(recipe.getDifficulty())
-                    .recipeIdx(recipe.getId())
-                    .recipeImgPath(recipe.getImgPath())
-                    .recipeRunningTime(recipe.getRunningTime())
-                    .isFavorite(isFavorite)
-                    .build();
-
+            RecipeDetailResDto recipeDetailResDto = getRecipeDetailDtoWithIsFavorite(userIdx, recipe);
             newRecipes.add(recipeDetailResDto);
         }
 
         return new RecipeListResDto(newRecipes);
+    }
+
+    private RecipeDetailResDto getRecipeDetailDtoWithIsFavorite(Long userIdx, Recipe recipe) {
+        boolean isFavorite;
+        if (favoriteRepository.findByUserIdAndRecipeId(userIdx, recipe.getId()) == null) {
+            isFavorite = false;
+        } else {
+            isFavorite = true;
+        }
+        return RecipeDetailResDto.builder()
+                .recipeName(recipe.getRecipeName())
+                .recipeDifficulty(recipe.getDifficulty())
+                .recipeIdx(recipe.getId())
+                .recipeImgPath(recipe.getImgPath())
+                .recipeRunningTime(recipe.getRunningTime())
+                .isFavorite(isFavorite)
+                .build();
     }
 
 }
