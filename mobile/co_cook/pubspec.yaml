@@ -43,6 +43,7 @@ dependencies:
   zoom_tap_animation: ^1.1.0
   sliding_up_panel: ^2.0.0+1
   transparent_image: ^2.0.1
+  sticky_headers: ^0.3.0+2
 
 dev_dependencies:
   flutter_test:
