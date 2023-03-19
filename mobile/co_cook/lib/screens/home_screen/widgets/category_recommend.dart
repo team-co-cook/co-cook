@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:co_cook/screens/list_screen/list_screen.dart';
+import 'package:co_cook/services/list_service.dart';
 import 'package:co_cook/services/recommend_service.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -121,6 +122,10 @@ class CategoryRecommendCard extends StatelessWidget {
 
 void gotoList(BuildContext context, String listName, String imgPath) {
   Route themeScreen = MaterialPageRoute(
-      builder: (context) => ListScreen(listName: listName, imgPath: imgPath));
+      builder: (context) => ListScreen(
+            listName: listName,
+            imgPath: imgPath,
+            dataFetcher: ListService().getCategoryDataFetcher(listName),
+          ));
   Navigator.push(context, themeScreen);
 }

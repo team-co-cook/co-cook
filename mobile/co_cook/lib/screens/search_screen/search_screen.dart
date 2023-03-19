@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'dart:convert';
 
-import 'package:co_cook/services/recommend_service.dart';
+import 'package:co_cook/services/search_service.dart';
 
 import 'package:co_cook/styles/colors.dart';
 import 'package:co_cook/styles/text_styles.dart';
@@ -21,23 +21,18 @@ class _SearchScreenState extends State<SearchScreen> {
   String? _searchWord;
   final _focusNode = FocusNode(); // 포커싱 여부를 추적하는 클래스 인스턴스
 
-  @override
-  void initState() {
-    super.initState();
-    getTimeRecommendData("/home/random");
-  }
-
   List dataList = [];
 
-  Future<void> getTimeRecommendData(String apiPath) async {
+  Future<void> getSearchData(String keyword) async {
     // API 요청
-    RecommendService recommendService = RecommendService();
-    Response? response = await recommendService.getCardData(apiPath);
+    SearchService searchService = SearchService();
+    Response? response = await searchService.getSearchList(keyword: keyword);
     if (response?.statusCode == 200) {
       Map? decodeRes = await jsonDecode(response.toString());
+      print(decodeRes);
       if (decodeRes != null) {
         setState(() {
-          dataList = decodeRes["data"]["recipes"];
+          dataList = decodeRes["data"]["recipeListResDto"];
         });
       }
     }
@@ -61,66 +56,71 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          backgroundColor: CustomColors.monotoneLight,
-          elevation: 0,
-          toolbarHeight: 120,
-          title: Padding(
-              padding: const EdgeInsets.fromLTRB(0, 60, 0, 0),
-              child: CustomTextField(
-                onChanged: onWordChanged,
-                isFocus: false,
-                isSearch: true,
-                onSubmitted: (p0) {},
-              )),
-        ),
-        body: Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: SingleChildScrollView(
-            physics:
-                BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
-            child: Align(
-              alignment: Alignment.topCenter,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  GestureDetector(
-                    onTap: () async {
-                      // CameraScreen으로 이동
-                    },
-                    child: Image.asset(
-                      'assets/images/button_img/CameraSearchLargeX2.png',
+    return GestureDetector(
+      onTap: () => _dismissKeyboard(context),
+      child: Scaffold(
+          appBar: AppBar(
+            backgroundColor: CustomColors.monotoneLight,
+            elevation: 0,
+            toolbarHeight: 120,
+            title: Padding(
+                padding: const EdgeInsets.fromLTRB(0, 60, 0, 0),
+                child: CustomTextField(
+                  onChanged: onWordChanged,
+                  isFocus: false,
+                  isSearch: true,
+                  onSubmitted: (value) {
+                    getSearchData(value);
+                  },
+                )),
+          ),
+          body: Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(
+                  parent: AlwaysScrollableScrollPhysics()),
+              child: Align(
+                alignment: Alignment.topCenter,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    GestureDetector(
+                      onTap: () async {
+                        // CameraScreen으로 이동
+                      },
+                      child: Image.asset(
+                        'assets/images/button_img/CameraSearchLargeX2.png',
+                      ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Text('${dataList.length}건의 요리를 찾았아요',
-                        style: CustomTextStyles()
-                            .caption
-                            .copyWith(color: CustomColors.monotoneBlack)),
-                  ),
-                  dataList.isNotEmpty
-                      ? ListView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: dataList.length,
-                          padding:
-                              const EdgeInsets.fromLTRB(8.0, 16.0, 8.0, 24.0),
-                          itemBuilder: (BuildContext context, int index) {
-                            return Container(
-                              margin: const EdgeInsets.only(bottom: 16),
-                              child: ListCard(data: dataList[index]),
-                            );
-                          })
-                      : const Center(
-                          child: CircularProgressIndicator(
-                              color: CustomColors.redPrimary))
-                ],
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Text('${dataList.length}건의 요리를 찾았아요',
+                          style: CustomTextStyles()
+                              .caption
+                              .copyWith(color: CustomColors.monotoneBlack)),
+                    ),
+                    dataList.isNotEmpty
+                        ? ListView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: dataList.length,
+                            padding:
+                                const EdgeInsets.fromLTRB(8.0, 16.0, 8.0, 24.0),
+                            itemBuilder: (BuildContext context, int index) {
+                              return Container(
+                                margin: const EdgeInsets.only(bottom: 16),
+                                child: ListCard(data: dataList[index]),
+                              );
+                            })
+                        : const Center(
+                            child: CircularProgressIndicator(
+                                color: CustomColors.redPrimary))
+                  ],
+                ),
               ),
             ),
-          ),
-        ));
+          )),
+    );
   }
 
   // 커스텀 텍스트 필드에 내려주기 위한 onChange-setState 함수
