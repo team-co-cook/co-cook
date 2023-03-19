@@ -25,6 +25,7 @@ class _UserScreenState extends State<UserScreen> {
     _fetchNickname();
   }
 
+  // 닉네임 가져오기
   Future<void> _fetchNickname() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     final String prefsUserData =
@@ -37,6 +38,14 @@ class _UserScreenState extends State<UserScreen> {
         _nickname = nickname;
       });
     }
+  }
+
+  // 닉네임 변경 페이지로 이동
+  Future<void> gotoNicknameChange(BuildContext context) async {
+    Route nicknameChange =
+        MaterialPageRoute(builder: (context) => const NicknameChange());
+    await Navigator.push(context, nicknameChange);
+    _fetchNickname(); // 닉네임 변경 후 업데이트
   }
 
   @override
@@ -146,13 +155,6 @@ void logOut({required BuildContext context}) async {
   print('로그인 정보 삭제 완료!');
   Route login = MaterialPageRoute(builder: (context) => const LoginScreen());
   Navigator.pushReplacement(context, login);
-}
-
-// 닉네임 변경 페이지로 이동
-void gotoNicknameChange(BuildContext context) {
-  Route nicknameChange =
-      MaterialPageRoute(builder: (context) => const NicknameChange());
-  Navigator.push(context, nicknameChange);
 }
 
 // 회원탈퇴
