@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:co_cook/screens/list_screen/list_screen.dart';
 import 'package:co_cook/services/recommend_service.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -48,12 +49,9 @@ class _CategoryRecommendState extends State<CategoryRecommend> {
           ? Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                CategoryRecommendCard(
-                    data: dataList[0], onTap: () => print("0")),
-                CategoryRecommendCard(
-                    data: dataList[1], onTap: () => print("1")),
-                CategoryRecommendCard(
-                    data: dataList[2], onTap: () => print("2"))
+                CategoryRecommendCard(data: dataList[0]),
+                CategoryRecommendCard(data: dataList[1]),
+                CategoryRecommendCard(data: dataList[2])
               ],
             )
           : const Center(
@@ -66,16 +64,16 @@ class CategoryRecommendCard extends StatelessWidget {
   const CategoryRecommendCard({
     super.key,
     required this.data,
-    required this.onTap,
   });
   final Map data;
-  final Function onTap;
 
   @override
   Widget build(BuildContext context) {
     return ZoomTapAnimation(
         end: 0.98,
-        onTap: () => onTap,
+        onTap: () {
+          gotoList(context, data['categoryName'], data["imgPath"]);
+        },
         child: Stack(children: [
           Container(
             width: ((MediaQuery.of(context).size.width - 48) / 3 - 8),
@@ -119,4 +117,10 @@ class CategoryRecommendCard extends StatelessWidget {
                           ])))),
         ]));
   }
+}
+
+void gotoList(BuildContext context, String listName, String imgPath) {
+  Route themeScreen = MaterialPageRoute(
+      builder: (context) => ListScreen(listName: listName, imgPath: imgPath));
+  Navigator.push(context, themeScreen);
 }

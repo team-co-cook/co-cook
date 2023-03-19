@@ -1,9 +1,13 @@
-import 'package:co_cook/widgets/card/list_card.dart';
 import 'package:flutter/material.dart';
+import 'package:dio/dio.dart';
+import 'dart:convert';
+
+import 'package:co_cook/services/recommend_service.dart';
 
 import 'package:co_cook/styles/colors.dart';
 import 'package:co_cook/styles/text_styles.dart';
 
+import 'package:co_cook/widgets/card/list_card.dart';
 import 'package:co_cook/widgets/text_field/custom_text_field.dart';
 
 class SearchScreen extends StatefulWidget {
@@ -16,7 +20,28 @@ class SearchScreen extends StatefulWidget {
 class _SearchScreenState extends State<SearchScreen> {
   String? _searchWord;
   final _focusNode = FocusNode(); // 포커싱 여부를 추적하는 클래스 인스턴스
-  int _listCount = 2;
+
+  @override
+  void initState() {
+    super.initState();
+    getTimeRecommendData("/home/random");
+  }
+
+  List dataList = [];
+
+  Future<void> getTimeRecommendData(String apiPath) async {
+    // API 요청
+    RecommendService recommendService = RecommendService();
+    Response? response = await recommendService.getCardData(apiPath);
+    if (response?.statusCode == 200) {
+      Map? decodeRes = await jsonDecode(response.toString());
+      if (decodeRes != null) {
+        setState(() {
+          dataList = decodeRes["data"]["recipes"];
+        });
+      }
+    }
+  }
 
   // 위젯이 소멸될 때 호출되는 메서드
   @override
@@ -52,37 +77,47 @@ class _SearchScreenState extends State<SearchScreen> {
         ),
         body: Padding(
           padding: const EdgeInsets.all(12.0),
-          child: Align(
-            alignment: Alignment.topCenter,
-            child: Column(
-              children: [
-                GestureDetector(
-                  onTap: () async {
-                    // CameraScreen으로 이동
-                  },
-                  child: Image.asset(
-                    'assets/images/button_img/CameraSearchLargeX2.png',
-                    // width: 300,
+          child: SingleChildScrollView(
+            physics:
+                BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+            child: Align(
+              alignment: Alignment.topCenter,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  GestureDetector(
+                    onTap: () async {
+                      // CameraScreen으로 이동
+                    },
+                    child: Image.asset(
+                      'assets/images/button_img/CameraSearchLargeX2.png',
+                    ),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Text('${_listCount}건의 요리를 찾았아요',
-                      style: CustomTextStyles()
-                          .caption
-                          .copyWith(color: CustomColors.monotoneBlack)),
-                ),
-                Expanded(
-                    child: ListView.builder(
-                  itemCount: _listCount,
-                  itemBuilder: (BuildContext context, int index) {
-                    // return ListCard(
-                    //   data: ,
-                    //   showImage: true,
-                    // );
-                  },
-                ))
-              ],
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Text('${dataList.length}건의 요리를 찾았아요',
+                        style: CustomTextStyles()
+                            .caption
+                            .copyWith(color: CustomColors.monotoneBlack)),
+                  ),
+                  dataList.isNotEmpty
+                      ? ListView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: dataList.length,
+                          padding:
+                              const EdgeInsets.fromLTRB(8.0, 16.0, 8.0, 24.0),
+                          itemBuilder: (BuildContext context, int index) {
+                            return Container(
+                              margin: const EdgeInsets.only(bottom: 16),
+                              child: ListCard(data: dataList[index]),
+                            );
+                          })
+                      : const Center(
+                          child: CircularProgressIndicator(
+                              color: CustomColors.redPrimary))
+                ],
+              ),
             ),
           ),
         ));

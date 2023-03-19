@@ -73,7 +73,9 @@ class _ListCardState extends State<ListCard> {
                                   bottomLeft: Radius.circular(16.0)),
                               color: Colors.white),
                           child: ClipRRect(
-                            borderRadius: BorderRadius.circular(16.0),
+                            borderRadius: const BorderRadius.only(
+                                topLeft: Radius.circular(16.0),
+                                bottomLeft: Radius.circular(16.0)),
                             child: FadeInImage.memoryNetwork(
                                 fadeInDuration:
                                     const Duration(milliseconds: 200),

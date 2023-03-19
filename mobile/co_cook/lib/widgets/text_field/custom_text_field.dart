@@ -53,6 +53,7 @@ class CustomTextField extends StatelessWidget {
             borderSide:
                 const BorderSide(color: CustomColors.redPrimary, width: 4.0),
           ),
+          hintText: isSearch ? '검색어를 입력해주세요' : null,
         ),
       ),
     );

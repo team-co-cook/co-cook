@@ -24,8 +24,15 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
                 "JOIN theme th ON t.theme_idx = th.theme_idx " +
                 "WHERE th.theme_name = :themeName " +
                 "ORDER BY r.recipe_idx DESC;", nativeQuery = true)
-    List<Recipe> findByThemeName(@Param("themeName") String themeName);
+    List<Recipe> findByThemeNameOrderByIdDesc(@Param("themeName") String themeName);
 
-    List<Recipe> findByCategoryCategoryName(String categoryName);
+    List<Recipe> findByCategoryCategoryNameOrderByIdDesc(String categoryName);
+
+    List<Recipe> findAllByOrderByIdDesc();
+
+    List<Recipe> findByRecipeNameContainingOrderByIdDesc(String keyword);
+
+    @Query("SELECT r FROM Recipe r JOIN r.favorites f WHERE f.user.id = :userId")
+    List<Recipe> findRecipesByUserId(@Param("userId") Long userId);
 
 }
