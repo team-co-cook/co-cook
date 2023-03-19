@@ -2,18 +2,25 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'dart:convert';
 
-import 'package:co_cook/services/list_service.dart';
-
 import 'package:co_cook/styles/colors.dart';
 import 'package:co_cook/styles/text_styles.dart';
 
 import 'package:co_cook/widgets/button/toggle_button.dart';
 import 'package:co_cook/widgets/card/list_card.dart';
 
+// 이전 화면에서 호출 api 작성해서 전달하기 위한 함수 타입 선언.
+typedef Future<Response?> DataFetcher(
+    {required String difficulty, required int time});
+
 class ListScreen extends StatefulWidget {
-  const ListScreen({super.key, required this.listName, required this.imgPath});
+  const ListScreen(
+      {super.key,
+      required this.listName,
+      required this.imgPath,
+      required this.dataFetcher});
   final listName;
   final imgPath;
+  final DataFetcher dataFetcher;
 
   @override
   State<ListScreen> createState() => _ListScreenState();
@@ -32,10 +39,8 @@ class _ListScreenState extends State<ListScreen> {
   List dataList = [];
 
   Future<void> getListData() async {
-    // API 요청
-    ListService listService = ListService();
-    Response? response = await listService.getThemeList(
-        themeName: widget.listName, difficulty: difficulty, time: time);
+    Response? response =
+        await widget.dataFetcher(difficulty: difficulty, time: time);
     if (response?.statusCode == 200) {
       Map? decodeRes = await jsonDecode(response.toString());
       if (decodeRes != null) {
@@ -55,7 +60,7 @@ class _ListScreenState extends State<ListScreen> {
     {'label': '1시간 이내', 'value': 60},
   ];
 
-  // 난이도와 조리시간 버튼 생성
+  // 난이도 버튼 생성
   Row _buildDifficultyButtons() {
     return Row(
       children: difficulties.map((diff) {
@@ -75,6 +80,7 @@ class _ListScreenState extends State<ListScreen> {
     );
   }
 
+  // 시간 버튼 생성
   Row _buildCookingTimeButtons() {
     return Row(
       children: cookingTimes.map((time) {

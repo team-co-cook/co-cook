@@ -1,3 +1,4 @@
+import 'package:co_cook/services/list_service.dart';
 import 'package:flutter/material.dart';
 import 'package:zoom_tap_animation/zoom_tap_animation.dart';
 
@@ -65,6 +66,10 @@ class ThemeRecommendCard extends StatelessWidget {
 
 void gotoList(BuildContext context, String listName, String imgPath) {
   Route themeScreen = MaterialPageRoute(
-      builder: (context) => ListScreen(listName: listName, imgPath: imgPath));
+      builder: (context) => ListScreen(
+            listName: listName,
+            imgPath: imgPath,
+            dataFetcher: ListService().getThemeDataFetcher(listName),
+          ));
   Navigator.push(context, themeScreen);
 }
