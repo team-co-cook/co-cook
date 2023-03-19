@@ -47,7 +47,7 @@ class _ThemeRecommendState extends State<ThemeRecommend> {
         child: Column(
           children: [
             Container(
-              margin: EdgeInsets.fromLTRB(24.0, 32.0, 24.0, 0.0),
+              margin: EdgeInsets.fromLTRB(24.0, 40.0, 24.0, 0.0),
               width: double.infinity,
               child: Text("테마별 레시피",
                   textAlign: TextAlign.left,
@@ -56,14 +56,14 @@ class _ThemeRecommendState extends State<ThemeRecommend> {
                       )),
             ),
             SizedBox(
-                height: 136,
+                height: 156,
                 child: dataList.isNotEmpty
                     ? ListView.builder(
                         scrollDirection: Axis.horizontal,
                         itemCount: dataList.length,
                         physics: const BouncingScrollPhysics(),
                         padding:
-                            const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 0.0),
+                            const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 16.0),
                         itemBuilder: (BuildContext context, int index) {
                           return ThemeRecommendCard(data: dataList[index]);
                         })
