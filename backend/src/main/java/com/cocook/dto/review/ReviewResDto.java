@@ -8,6 +8,9 @@ import javax.validation.constraints.NotBlank;
 @Data
 @AllArgsConstructor
 public class ReviewResDto {
+    private Long reviewIdx;
+
+    private String userNickname;
 
     private String content;
 

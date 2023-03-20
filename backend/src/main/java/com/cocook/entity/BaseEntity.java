@@ -19,16 +19,16 @@ import java.time.LocalDateTime;
 @EntityListeners(AuditingEntityListener.class)
 public class BaseEntity {
 
-    @CreatedBy
-    @Column(updatable = false)
-    private Long createdBy;
+//    @CreatedBy
+//    @Column(updatable = false)
+//    private Long createdBy;
 
     @CreatedDate
     @Column(updatable = false)
     private LocalDateTime createdDate;
 
-    @LastModifiedBy
-    private Long lastModifiedBy;
+//    @LastModifiedBy
+//    private Long lastModifiedBy;
 
     @LastModifiedDate
     private LocalDateTime lastModifiedDate;
