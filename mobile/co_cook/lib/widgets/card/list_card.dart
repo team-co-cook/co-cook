@@ -7,6 +7,7 @@ import 'package:co_cook/widgets/button/bookmark_button.dart';
 import 'package:co_cook/utils/bookmark.dart';
 import 'package:transparent_image/transparent_image.dart';
 import 'package:zoom_tap_animation/zoom_tap_animation.dart';
+import 'package:co_cook/screens/recipe_detail_screen/recipe_detail_screen.dart';
 
 class ListCard extends StatefulWidget {
   const ListCard({
@@ -37,11 +38,16 @@ class _ListCardState extends State<ListCard> {
     });
   }
 
+  void routeScreen(BuildContext context, Widget screen) {
+    Route targetScreen = MaterialPageRoute(builder: (context) => screen);
+    Navigator.push(context, targetScreen);
+  }
+
   @override
   Widget build(BuildContext context) {
     return ZoomTapAnimation(
       end: 0.98,
-      onTap: () => print("${widget.data["recipeIdx"]} 클릭"), // 클릭시 이벤트 연결
+      onTap: () => routeScreen(context, RecipeDetailScreen()), // 클릭시 이벤트 연결
       child: Container(
           // 전체 컨테이너
           decoration: BoxDecoration(
