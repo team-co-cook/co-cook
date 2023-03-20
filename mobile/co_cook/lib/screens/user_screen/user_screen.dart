@@ -57,9 +57,9 @@ class _UserScreenState extends State<UserScreen> {
         appBar: AppBar(
           backgroundColor: CustomColors.monotoneLight,
           elevation: 0.5,
-          toolbarHeight: 120,
+          toolbarHeight: 80,
           title: Padding(
-            padding: const EdgeInsets.fromLTRB(10, 60, 0, 0),
+            padding: const EdgeInsets.fromLTRB(10, 10, 0, 0),
             child: Align(
               alignment: Alignment.centerLeft,
               child: Text(
@@ -72,7 +72,7 @@ class _UserScreenState extends State<UserScreen> {
           ),
           actions: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(0, 60, 10, 0),
+              padding: const EdgeInsets.fromLTRB(0, 10, 10, 0),
               child: IconButton(
                 icon: Icon(Icons.edit, color: CustomColors.monotoneBlack),
                 onPressed: () {

@@ -1,11 +1,14 @@
+import 'dart:io';
 import 'dart:convert'; // decode 가져오기
-import 'package:co_cook/widgets/button/button.dart';
+import 'package:co_cook/screens/photo_card_screen/photo_card_screen.dart';
 import 'package:dio/dio.dart'; // Response 가져오기 위함.
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 import 'package:co_cook/styles/colors.dart';
 import 'package:co_cook/styles/text_styles.dart';
 
+import 'package:co_cook/widgets/button/button.dart';
 import 'package:co_cook/widgets/text_field/custom_text_field.dart';
 
 class ReviewScreen extends StatefulWidget {
@@ -20,6 +23,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
   bool _isError = false;
   String _errorMessage = '';
   final _focusNode = FocusNode(); // 포커싱 여부를 추적하는 클래스 인스턴스
+  XFile? _image; // 이미지를 저장
 
   @override
   void initState() {
@@ -51,6 +55,25 @@ class _ReviewScreenState extends State<ReviewScreen> {
     });
   }
 
+  Future<void> _pickImage() async {
+    final ImagePicker _picker = ImagePicker();
+    final XFile? image = await _picker.pickImage(source: ImageSource.camera);
+
+    if (image != null) {
+      setState(() {
+        _image = image;
+      });
+    } else {
+      print('이미지 선택이 취소되었습니다.');
+    }
+  }
+
+  void _deleteImage() {
+    setState(() {
+      _image = null;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(children: [
@@ -62,9 +85,9 @@ class _ReviewScreenState extends State<ReviewScreen> {
           appBar: AppBar(
             backgroundColor: CustomColors.greenPrimary,
             elevation: 0.5,
-            toolbarHeight: 120,
+            toolbarHeight: 60,
             title: Padding(
-              padding: const EdgeInsets.fromLTRB(0, 60, 0, 0),
+              padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
               child: Align(
                 alignment: Alignment.center,
                 child: Text(
@@ -93,19 +116,45 @@ class _ReviewScreenState extends State<ReviewScreen> {
                     SizedBox(height: 16),
                     LayoutBuilder(builder: (context, constraints) {
                       return GestureDetector(
-                        onTap: () {},
-                        child: Container(
-                          width: constraints.maxWidth,
-                          height: constraints.maxWidth * 0.7,
-                          decoration: BoxDecoration(
-                              color: CustomColors.monotoneLight,
-                              borderRadius: BorderRadius.circular(16),
-                              border: Border.all(
+                        onTap: _pickImage,
+                        child: Stack(
+                          children: [
+                            Container(
+                              width: constraints.maxWidth,
+                              height: constraints.maxWidth * 0.7,
+                              decoration: BoxDecoration(
+                                color: CustomColors.monotoneLight,
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(
                                   color: CustomColors.monotoneLightGray,
-                                  width: 1)),
-                          alignment: Alignment.center,
-                          child: Icon(Icons.add_a_photo,
-                              size: 20, color: CustomColors.monotoneGray),
+                                  width: 1,
+                                ),
+                              ),
+                              child: _image == null
+                                  ? Icon(Icons.add_a_photo,
+                                      size: 20,
+                                      color: CustomColors.monotoneGray)
+                                  : ClipRRect(
+                                      borderRadius: BorderRadius.circular(16),
+                                      child: Image.file(
+                                        File(_image!.path),
+                                        fit: BoxFit.cover,
+                                        width: constraints.maxWidth,
+                                        height: constraints.maxWidth * 0.7,
+                                      ),
+                                    ),
+                            ),
+                            if (_image != null)
+                              Positioned(
+                                top: 0,
+                                right: 0,
+                                child: IconButton(
+                                  icon: Icon(Icons.cancel,
+                                      color: CustomColors.monotoneLight),
+                                  onPressed: _deleteImage,
+                                ),
+                              ),
+                          ],
                         ),
                       );
                     }),
@@ -116,13 +165,29 @@ class _ReviewScreenState extends State<ReviewScreen> {
                           color: CustomColors.monotoneBlack, height: 1.5),
                     ),
                     SizedBox(height: 16),
-                    CustomTextField(onChanged: onTextChanged),
+                    CustomTextField(onChanged: onTextChanged, isFocus: false),
                     SizedBox(height: 8),
                     Text(
                       '예시\n  ·  난이도가 적절한 좋은 레시피에요!\n  ·  생각보다 너무 쉬웠어요.\n  ·  시간이 예상보다 오래 걸렸어요.',
                       style: CustomTextStyles().caption.copyWith(
                           color: CustomColors.monotoneGray, height: 1.5),
                     ),
+                    SizedBox(height: 24),
+                    Center(
+                      child: CommonButton(
+                          label: '저장',
+                          color: ButtonType.red,
+                          onPressed: () {
+                            gotoPhotoCard(context, _text, _image!);
+                          }),
+                    ),
+                    SizedBox(height: 8),
+                    Center(
+                      child: CommonButton(
+                          label: '취소',
+                          color: ButtonType.none,
+                          onPressed: () {}),
+                    )
                   ],
                 ),
               ),
@@ -132,4 +197,15 @@ class _ReviewScreenState extends State<ReviewScreen> {
       ),
     ]);
   }
+}
+
+void gotoPhotoCard(BuildContext context, String _text, XFile _image) {
+  Route photoCardScreen = MaterialPageRoute(
+      builder: (context) => PhotoCardScreen(
+            text: _text,
+            image: _image,
+            time: DateTime.parse('2022-03-08 10:00:00'),
+            cookName: '부대찌개',
+          ));
+  Navigator.push(context, photoCardScreen);
 }
