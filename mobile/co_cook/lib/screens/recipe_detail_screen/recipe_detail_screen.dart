@@ -10,6 +10,7 @@ import 'package:co_cook/screens/recipe_detail_screen/widgets/recipe_detail_info.
 import 'package:co_cook/screens/recipe_detail_screen/widgets/ai_recipe_start_button.dart';
 import 'package:co_cook/screens/recipe_detail_screen/widgets/recipe_detail_recipe_tab.dart';
 import 'package:co_cook/screens/recipe_detail_screen/widgets/recipe_detail_screen_appbar.dart';
+import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 class RecipeDetailScreen extends StatefulWidget {
   const RecipeDetailScreen({super.key});
@@ -20,7 +21,10 @@ class RecipeDetailScreen extends StatefulWidget {
 
 class _RecipeDetailScreenState extends State<RecipeDetailScreen>
     with TickerProviderStateMixin {
+  final PanelController _panelController =
+      PanelController(); // 새 PanelController 추가
   late ScrollController _scrollController;
+
   double _scrollControllerOffset = 0.0;
   _scrollListener() {
     setState(() {
@@ -38,7 +42,6 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen>
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _scrollController = ScrollController();
     _scrollController.addListener(_scrollListener);
@@ -47,8 +50,16 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen>
   }
 
   @override
+  void dispose() {
+    _tabController.dispose();
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: CustomColors.redLight,
       body: Stack(children: [
         SingleChildScrollView(
           physics: BouncingScrollPhysics(),
@@ -86,7 +97,9 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen>
                   child: [
                     RecipeDetailInfoTab(),
                     RecipeDetailRecipeTab(),
-                    RecipeDetailCommentTab()
+                    RecipeDetailCommentTab(
+                      panelController: _panelController,
+                    )
                   ][_tabControllerIndex]),
             ),
           ),
@@ -96,7 +109,9 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen>
           maxAppBarHeight: 280,
           minAppBarHeight: 64,
         ),
-        Positioned(child: CustomSlidingUpPanel(body: Text("댓글내용")))
+        Positioned(
+            child: CustomSlidingUpPanel(
+                body: Text("댓글내용"), panelController: _panelController))
       ]),
     );
   }
@@ -104,20 +119,26 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen>
 
 class RecipeDetailCommentTab extends StatelessWidget {
   const RecipeDetailCommentTab({
-    super.key,
-  });
+    Key? key,
+    required this.panelController, // 추가된 코드
+  }) : super(key: key);
+
+  final PanelController panelController;
 
   @override
   Widget build(BuildContext context) {
-    return Stack(children: [
-      ListView.builder(
-        shrinkWrap: true,
-        padding: EdgeInsets.fromLTRB(24.0, 24.0, 24.0, 24.0),
-        physics: NeverScrollableScrollPhysics(),
-        itemCount: 5,
-        itemBuilder: (context, index) =>
-            RecipeComment(panelController: panelController),
-      ),
-    ]);
+    return Container(
+      color: CustomColors.monotoneLight,
+      child: Stack(children: [
+        ListView.builder(
+          shrinkWrap: true,
+          padding: EdgeInsets.fromLTRB(24.0, 24.0, 24.0, 24.0),
+          physics: NeverScrollableScrollPhysics(),
+          itemCount: 5,
+          itemBuilder: (context, index) =>
+              RecipeComment(panelController: panelController),
+        ),
+      ]),
+    );
   }
 }
