@@ -3,11 +3,12 @@ import 'package:co_cook/styles/text_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
-final PanelController panelController = PanelController();
-
 class CustomSlidingUpPanel extends StatelessWidget {
-  const CustomSlidingUpPanel({super.key, required this.body});
+  const CustomSlidingUpPanel(
+      {Key? key, required this.body, required this.panelController})
+      : super(key: key);
   final Widget body; // 판넬 안에 담길 내용
+  final PanelController panelController; // 판넬 컨트롤러
 
   @override
   Widget build(BuildContext context) {

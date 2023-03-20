@@ -55,7 +55,7 @@ class _UserScreenState extends State<UserScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: CustomColors.monotoneLight,
-        elevation: 1.0,
+        elevation: 0.5,
         toolbarHeight: 120,
         title: Padding(
           padding: const EdgeInsets.fromLTRB(10, 60, 0, 0),

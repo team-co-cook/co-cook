@@ -45,13 +45,13 @@ class CustomTextField extends StatelessWidget {
               const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(20.0),
-            borderSide:
-                const BorderSide(color: CustomColors.redPrimary, width: 4.0),
+            borderSide: const BorderSide(
+                color: CustomColors.monotoneLightGray, width: 1.0),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(20.0),
-            borderSide:
-                const BorderSide(color: CustomColors.redPrimary, width: 4.0),
+            borderSide: const BorderSide(
+                color: CustomColors.monotoneLightGray, width: 1.0),
           ),
           hintText: isSearch ? '검색어를 입력해주세요' : null,
         ),

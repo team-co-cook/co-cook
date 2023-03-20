@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class CustomColors {
   const CustomColors();
 
-  static const Color redLight = Color(0xfff2e4d9);
+  static const Color redLight = Color(0xfff4f4f4);
   static const Color redTertiary = Color(0xfff3b5a8);
   static const Color redSecondary = Color(0xffd95b4f);
   static const Color redPrimary = Color(0xffd91604);
