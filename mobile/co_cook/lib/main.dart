@@ -1,3 +1,4 @@
+import 'package:co_cook/screens/review_screen/review_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
@@ -15,7 +16,8 @@ class Main extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
-      home: SplashScreen(),
+      // home: SplashScreen(),
+      home: ReviewScreen(),
     );
   }
 }
