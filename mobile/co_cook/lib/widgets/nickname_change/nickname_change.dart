@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
+import 'dart:convert'; // decode 가져오기
 import 'package:dio/dio.dart'; // Response 가져오기
+import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:co_cook/services/auth_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:co_cook/widgets/text_field/custom_text_field.dart';
-import 'dart:convert'; // decode 가져오기
 import 'package:co_cook/styles/colors.dart';
 import 'package:co_cook/styles/text_styles.dart';
 import 'package:co_cook/widgets/button/button.dart';
 
 class NicknameChange extends StatefulWidget {
-  const NicknameChange({super.key});
+  const NicknameChange({super.key, required this.panelController});
+  final PanelController panelController;
 
   @override
   State<NicknameChange> createState() => _NicknameChangeState();
@@ -40,19 +42,6 @@ class _NicknameChangeState extends State<NicknameChange> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // 없어질 앱바입니다. 잠시 페이지 모양일 때만, 유지
-      appBar: AppBar(
-        backgroundColor: Colors.transparent, // AppBar 배경색을 투명하게 설정
-        elevation: 0, // 그림자를 제거
-        leading: IconButton(
-          // 왼쪽 상단에 아이콘 버튼 추가
-          icon: const Icon(Icons.arrow_back,
-              color: Colors.black), // 뒤로가기 아이콘을 검은색으로 설정
-          onPressed: () {
-            Navigator.pop(context); // 뒤로가기 버튼 클릭 시 이전 페이지로 돌아감
-          },
-        ),
-      ),
       body: GestureDetector(
         onTap: () {
           _dismissKeyboard(context);
@@ -73,9 +62,11 @@ class _NicknameChangeState extends State<NicknameChange> {
                           Stack(// 텍스트 필드와 에러 텍스트 위치를 위한 스택
                               children: [
                             CustomTextField(
-                                onChanged: onNicknameChanged,
-                                isError: _isError,
-                                maxLength: 16),
+                              onChanged: onNicknameChanged,
+                              isError: _isError,
+                              maxLength: 16,
+                              isFocus: false,
+                            ),
                             Positioned(
                                 bottom: 0,
                                 child:
@@ -163,7 +154,7 @@ class _NicknameChangeState extends State<NicknameChange> {
       });
 
       // print('닉네임 변경 닫기!');
-      Navigator.pop(context);
+      widget.panelController.close();
 
       return;
     } else {
