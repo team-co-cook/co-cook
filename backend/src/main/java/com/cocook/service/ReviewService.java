@@ -52,6 +52,6 @@ public class ReviewService {
         review.setUser(user);
         review.setRecipe(recipe);
         Review newReview = reviewRepository.save(review);
-        return new ReviewResDto(newReview.getId(), user.getNickname(), newReview.getContent(), newReview.getImgPath(), newReview.getLikeCnt(), newReview.getCommentCnt(), newReview.getRunningTime());
+        return new ReviewResDto(newReview.getId(), newReview.getCreatedDate(), user.getNickname(), newReview.getContent(), newReview.getImgPath(), newReview.getLikeCnt(), newReview.getCommentCnt(), newReview.getRunningTime());
     }
 }

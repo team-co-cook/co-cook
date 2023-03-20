@@ -152,13 +152,13 @@ public class RecipeService {
         }
         List<ReviewResDto> recipeReviews = new ArrayList<>();
         for (Review review : userReview) {
-            ReviewResDto recipeReview = new ReviewResDto(review.getId(), user.getNickname(), review.getContent(), review.getImgPath(),
+            ReviewResDto recipeReview = new ReviewResDto(review.getId(), review.getCreatedDate(), user.getNickname(), review.getContent(), review.getImgPath(),
                     review.getLikeCnt(), review.getCommentCnt(), review.getRunningTime());
             recipeReviews.add(recipeReview);
         }
         for (Review review : otherReview) {
             String userNickname = review.getUser().getNickname();
-            ReviewResDto recipeReview = new ReviewResDto(review.getId(), userNickname, review.getContent(), review.getImgPath(),
+            ReviewResDto recipeReview = new ReviewResDto(review.getId(), review.getCreatedDate(), userNickname, review.getContent(), review.getImgPath(),
                     review.getLikeCnt(), review.getCommentCnt(), review.getRunningTime());
             recipeReviews.add(recipeReview);
         }
