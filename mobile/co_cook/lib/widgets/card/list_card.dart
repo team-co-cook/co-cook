@@ -55,7 +55,7 @@ class _ListCardState extends State<ListCard> {
             color: CustomColors.monotoneLight,
             boxShadow: const [
               BoxShadow(
-                color: Colors.black26,
+                color: Color.fromARGB(8, 0, 0, 0),
                 offset: Offset(1, 1),
                 blurRadius: 6.0,
                 spreadRadius: 0.0,

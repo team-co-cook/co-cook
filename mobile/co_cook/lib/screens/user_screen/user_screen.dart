@@ -1,6 +1,8 @@
 import 'dart:convert'; // decode 가져오기
+import 'package:co_cook/widgets/sliding_up_panel/sliding_up_panel.dart';
 import 'package:dio/dio.dart'; // Response 가져오기 위함.
 import 'package:flutter/material.dart';
+import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:co_cook/services/auth_service.dart';
@@ -20,6 +22,7 @@ class UserScreen extends StatefulWidget {
 
 class _UserScreenState extends State<UserScreen> {
   String _nickname = 'username';
+  final PanelController _nickPanelController = PanelController();
 
   @override
   void initState() {
@@ -42,79 +45,86 @@ class _UserScreenState extends State<UserScreen> {
     }
   }
 
-  // 닉네임 변경 페이지로 이동
+  // 닉네임 변경 패널 열기
   Future<void> gotoNicknameChange(BuildContext context) async {
-    Route nicknameChange =
-        MaterialPageRoute(builder: (context) => const NicknameChange());
-    await Navigator.push(context, nicknameChange);
-    _fetchNickname(); // 닉네임 변경 후 업데이트
+    _nickPanelController.open(); // 패널 열기
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: CustomColors.monotoneLight,
-        elevation: 1.0,
-        toolbarHeight: 120,
-        title: Padding(
-          padding: const EdgeInsets.fromLTRB(10, 60, 0, 0),
-          child: Align(
-            alignment: Alignment.centerLeft,
-            child: Text(
-              _nickname,
-              style: const CustomTextStyles()
-                  .title1
-                  .copyWith(color: CustomColors.monotoneBlack),
+    return Stack(children: [
+      Scaffold(
+        appBar: AppBar(
+          backgroundColor: CustomColors.monotoneLight,
+          elevation: 0.5,
+          toolbarHeight: 120,
+          title: Padding(
+            padding: const EdgeInsets.fromLTRB(10, 60, 0, 0),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                _nickname,
+                style: const CustomTextStyles()
+                    .title1
+                    .copyWith(color: CustomColors.monotoneBlack),
+              ),
             ),
           ),
-        ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(0, 60, 10, 0),
-            child: IconButton(
-              icon: Icon(Icons.edit, color: CustomColors.monotoneBlack),
-              onPressed: () {
-                gotoNicknameChange(context);
-              },
-            ),
-          ),
-        ],
-      ),
-      body: Container(
-        child: Padding(
-          padding: EdgeInsets.fromLTRB(20, 20, 0, 0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              CustomTextButton(
-                  text: '내가 작성한 한줄평', color: CustomColors.monotoneBlack),
-              CustomTextButton(text: '이용약관', color: CustomColors.monotoneBlack),
-              CustomTextButton(
-                  text: '개인정보처리방침', color: CustomColors.monotoneBlack),
-              CustomTextButton(text: '공지사항', color: CustomColors.monotoneBlack),
-              CustomTextButton(
-                  text: '자주하는 질문', color: CustomColors.monotoneBlack),
-              CustomTextButton(text: '고객문의', color: CustomColors.monotoneBlack),
-              CustomTextButton(
-                text: '회원탈퇴',
-                color: CustomColors.redPrimary,
+          actions: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(0, 60, 10, 0),
+              child: IconButton(
+                icon: Icon(Icons.edit, color: CustomColors.monotoneBlack),
                 onPressed: () {
-                  withdrawal(context);
+                  gotoNicknameChange(context);
                 },
               ),
-              CustomTextButton(
-                  text: '로그아웃',
+            ),
+          ],
+        ),
+        body: Container(
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(20, 20, 0, 0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                CustomTextButton(
+                    text: '내가 작성한 한줄평', color: CustomColors.monotoneBlack),
+                CustomTextButton(
+                    text: '이용약관', color: CustomColors.monotoneBlack),
+                CustomTextButton(
+                    text: '개인정보처리방침', color: CustomColors.monotoneBlack),
+                CustomTextButton(
+                    text: '공지사항', color: CustomColors.monotoneBlack),
+                CustomTextButton(
+                    text: '자주하는 질문', color: CustomColors.monotoneBlack),
+                CustomTextButton(
+                    text: '고객문의', color: CustomColors.monotoneBlack),
+                CustomTextButton(
+                  text: '회원탈퇴',
                   color: CustomColors.redPrimary,
                   onPressed: () {
-                    logOut(context: context);
-                  }),
-            ],
+                    withdrawal(context);
+                  },
+                ),
+                CustomTextButton(
+                    text: '로그아웃',
+                    color: CustomColors.redPrimary,
+                    onPressed: () {
+                      logOut(context: context);
+                    }),
+              ],
+            ),
           ),
         ),
       ),
-    );
+      CustomSlidingUpPanel(
+        body: NicknameChange(panelController: _nickPanelController),
+        panelController: _nickPanelController,
+        onPanelclosed: _fetchNickname,
+      )
+    ]);
   }
 }
 

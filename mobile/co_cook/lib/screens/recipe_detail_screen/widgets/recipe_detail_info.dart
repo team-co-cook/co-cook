@@ -14,61 +14,76 @@ class RecipeDetailInfoTab extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                margin: EdgeInsets.only(top: 8),
-                child: Text("재료",
-                    style: CustomTextStyles().subtitle1.copyWith(
-                          color: CustomColors.monotoneBlack,
-                        )),
-              ),
-              Expanded(
-                child: Container(
-                  margin: EdgeInsets.only(left: 24),
-                  child: DataTable(
-                    headingRowHeight: 32,
-                    dataRowHeight: 32,
-                    showBottomBorder: true,
-                    dividerThickness: 2.0,
-                    columns: <DataColumn>[
-                      DataColumn(
-                          label: Expanded(
-                              child: Text("재료명",
-                                  textAlign: TextAlign.left,
-                                  style: CustomTextStyles().caption.copyWith(
-                                        color: CustomColors.monotoneGray,
-                                      )))),
-                      DataColumn(
-                          label: Expanded(
-                              child: Text("용량",
-                                  textAlign: TextAlign.right,
-                                  style: CustomTextStyles().caption.copyWith(
-                                        color: CustomColors.monotoneGray,
-                                      ))))
-                    ],
-                    rows: [
-                      DataRow(cells: [
-                        DataCell(Container(
-                            width: double.infinity,
-                            child: Text("대파",
-                                style: CustomTextStyles().subtitle2.copyWith(
-                                      color: CustomColors.monotoneBlack,
-                                    )))),
-                        DataCell(Container(
-                            alignment: Alignment.centerRight,
-                            width: double.infinity,
-                            child: Text("2",
-                                style: CustomTextStyles().subtitle2.copyWith(
-                                      color: CustomColors.monotoneGray,
-                                    )))),
-                      ]),
-                    ],
+          Container(
+            decoration: BoxDecoration(
+              color: CustomColors.monotoneLight,
+              borderRadius: BorderRadius.circular(16.0),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    margin: EdgeInsets.only(top: 8),
+                    child: Text("재료",
+                        style: CustomTextStyles().subtitle1.copyWith(
+                              color: CustomColors.monotoneBlack,
+                            )),
                   ),
-                ),
-              )
-            ],
+                  Expanded(
+                    child: Container(
+                      margin: EdgeInsets.only(left: 24),
+                      child: DataTable(
+                        headingRowHeight: 32,
+                        dataRowHeight: 32,
+                        showBottomBorder: true,
+                        dividerThickness: 2.0,
+                        columns: <DataColumn>[
+                          DataColumn(
+                              label: Expanded(
+                                  child: Text("재료명",
+                                      textAlign: TextAlign.left,
+                                      style: CustomTextStyles()
+                                          .caption
+                                          .copyWith(
+                                            color: CustomColors.monotoneGray,
+                                          )))),
+                          DataColumn(
+                              label: Expanded(
+                                  child: Text("용량",
+                                      textAlign: TextAlign.right,
+                                      style: CustomTextStyles()
+                                          .caption
+                                          .copyWith(
+                                            color: CustomColors.monotoneGray,
+                                          ))))
+                        ],
+                        rows: [
+                          DataRow(cells: [
+                            DataCell(Container(
+                                width: double.infinity,
+                                child: Text("대파",
+                                    style:
+                                        CustomTextStyles().subtitle2.copyWith(
+                                              color: CustomColors.monotoneBlack,
+                                            )))),
+                            DataCell(Container(
+                                alignment: Alignment.centerRight,
+                                width: double.infinity,
+                                child: Text("2",
+                                    style:
+                                        CustomTextStyles().subtitle2.copyWith(
+                                              color: CustomColors.monotoneGray,
+                                            )))),
+                          ]),
+                        ],
+                      ),
+                    ),
+                  )
+                ],
+              ),
+            ),
           ),
           Container(
             margin: EdgeInsets.only(top: 40),
@@ -122,7 +137,7 @@ class RecipeDetailInfoCard extends StatelessWidget {
       width: (MediaQuery.sizeOf(context).width - 48) / 4 - 8,
       height: 80,
       decoration: BoxDecoration(
-          color: CustomColors.monotoneLightGray,
+          color: CustomColors.monotoneLight,
           borderRadius: BorderRadius.circular(16.0)),
       child:
           Column(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
