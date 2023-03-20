@@ -7,5 +7,5 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface ReviewRepository extends JpaRepository<Review, Long> {
-    List<Review> findReviewsByRecipeIdOrderByReviewIdDesc(Long recipeIdx);
+    List<Review> findReviewsByRecipeIdOrderByIdDesc(Long recipeIdx);
 }

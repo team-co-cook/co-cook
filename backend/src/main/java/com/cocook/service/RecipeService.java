@@ -136,7 +136,7 @@ public class RecipeService {
 
     public ReviewListResDto getRecipeReview(Long recipeIdx, String authToken) {
         User user = jwtTokenProvider.getUser(authToken);
-        List<Review> reviewList = reviewRepository.findReviewsByRecipeIdOrderByReviewIdDesc(recipeIdx);
+        List<Review> reviewList = reviewRepository.findReviewsByRecipeIdOrderByIdDesc(recipeIdx);
         for (Review review : reviewList) {
             System.out.println(review.getId());
         }
