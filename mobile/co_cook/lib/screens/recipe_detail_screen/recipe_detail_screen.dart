@@ -1,8 +1,12 @@
+import 'package:co_cook/screens/cook_screen/cook_screen.dart';
+import 'package:co_cook/screens/cook_screen/widgets/cook_screen_request_rotate.dart';
 import 'package:co_cook/widgets/comment/recipe_comment.dart';
 import 'package:co_cook/widgets/sliding_up_panel/sliding_up_panel.dart';
 import 'package:flutter/material.dart';
 import 'package:co_cook/styles/colors.dart';
 import 'package:co_cook/styles/text_styles.dart';
+
+import 'package:co_cook/utils/route.dart';
 
 import 'package:sticky_headers/sticky_headers.dart';
 import 'package:zoom_tap_animation/zoom_tap_animation.dart';
@@ -65,7 +69,7 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen>
                 child: Column(
                   children: [
                     ZoomTapAnimation(
-                        onTap: () => print(_tabController.index),
+                        onTap: () => pushScreen(context, CookScreen()),
                         end: 0.98,
                         child: AiRecipeStartButton()),
                     TabBar(
