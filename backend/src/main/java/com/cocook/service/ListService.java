@@ -57,6 +57,9 @@ public class ListService {
     }
 
     public RecipeListResDto getRecipesByKeyword(String authToken, String keyword) {
+        if (keyword.trim().isEmpty()) {
+            throw new EntityNotFoundException("키워드를 입력해주세요.");
+        }
         Long userIdx = jwtTokenProvider.getUserIdx(authToken);
         List<Recipe> foundRecipes = recipeRepository.findByRecipeNameContainingOrderByIdDesc(keyword);
         List<RecipeDetailResDto> newRecipes = new ArrayList<>();
