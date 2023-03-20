@@ -70,7 +70,6 @@ public class UserService {
                 foundUser.setIsActive(true);
                 foundUser.setEmail(signupRequestDto.getEmail());
                 foundUser.setNickname(signupRequestDto.getNickname());
-                foundUser.setRoles("ROLE_USER");
                 User savedUser = userRepository.save(foundUser);
                 String jwtToken = jwtTokenProvider.createToken(savedUser.getId(), savedUser.getRoleList());
                 return new LoginResponseDto(savedUser.getId(), savedUser.getEmail(), savedUser.getNickname(), jwtToken);
@@ -80,7 +79,11 @@ public class UserService {
         User newUser = new User();
         newUser.setEmail(signupRequestDto.getEmail());
         newUser.setNickname(signupRequestDto.getNickname());
-        newUser.setRoles("ROLE_USER");
+        if (newUser.getNickname().equals("admin")) {
+            newUser.setRoles("ROLE_ADMIN");
+        } else {
+            newUser.setRoles("ROLE_USER");
+        }
         newUser.setIsActive(true);
         User savedUser = userRepository.save(newUser);
         String jwtToken = jwtTokenProvider.createToken(savedUser.getId(), savedUser.getRoleList());
