@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 import 'package:co_cook/styles/colors.dart';
+import 'package:zoom_tap_animation/zoom_tap_animation.dart';
 // import 'package:co_cook/styles/text_styles.dart';
+import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 import 'bottom_nav_bar_icon.dart';
 
@@ -10,9 +12,11 @@ class BottomNavBar extends StatelessWidget {
     Key? key,
     required this.currentIndex,
     required this.onTap,
+    required this.panelController,
   }) : super(key: key);
   final int currentIndex;
   final ValueChanged<int> onTap;
+  final PanelController panelController;
 
   @override
   Widget build(BuildContext context) {
@@ -52,14 +56,13 @@ class BottomNavBar extends StatelessWidget {
                 currentIndex: currentIndex,
               ),
               // co-cook 바로실행 아이콘
-              GestureDetector(
-                  onTapDown: (TapDownDetails tapDownDetails) {
-                    // 아이콘 탭 다운시 실행할 함수
-                    print('co-cook down');
-                  },
+              ZoomTapAnimation(
                   onTap: () {
                     // 아이콘 탭 동작시 실행할 함수
                     print('co-cook!');
+                    panelController.isPanelOpen
+                        ? panelController.close()
+                        : {panelController.open()};
                   },
                   child: const SizedBox(
                     height: 56,

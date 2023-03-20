@@ -15,10 +15,12 @@ class DioServices {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     final String userData = prefs.getString('userData') ?? '';
     String jwtToken = '';
+    print(userData);
 
     if (userData.isNotEmpty) {
-      Map<String, dynamic> parsedUserData = json.decode(userData);
-      jwtToken = parsedUserData['jwtToken'] ?? '';
+      Map<String, dynamic> parsedUserData = jsonDecode(userData);
+      jwtToken = parsedUserData["jwtToken"] ?? '';
+      print(jwtToken);
     }
 
     BaseOptions _options = BaseOptions(
@@ -27,7 +29,7 @@ class DioServices {
       receiveTimeout: const Duration(seconds: 5),
       sendTimeout: const Duration(seconds: 5),
       headers: {
-        if (jwtToken.isNotEmpty) 'Authorization': 'Bearer $jwtToken',
+        if (jwtToken.isNotEmpty) 'AUTH-TOKEN': jwtToken,
       },
     );
 

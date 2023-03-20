@@ -39,6 +39,11 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
   flutter_dotenv: ^5.0.2
+  card_swiper: ^2.0.4
+  zoom_tap_animation: ^1.1.0
+  sliding_up_panel: ^2.0.0+1
+  transparent_image: ^2.0.1
+  sticky_headers: ^0.3.0+2
 
 dev_dependencies:
   flutter_test:
@@ -57,7 +62,6 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
-
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
@@ -69,7 +73,10 @@ flutter:
     - .env.local
 
     # images
+    - assets/
     - assets/images/logo/
+    - assets/images/background/
+    - assets/images/button_img/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

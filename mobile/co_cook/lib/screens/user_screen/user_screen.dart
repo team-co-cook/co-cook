@@ -1,14 +1,54 @@
+import 'dart:convert'; // decode 가져오기
+import 'package:dio/dio.dart'; // Response 가져오기 위함.
 import 'package:flutter/material.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:co_cook/screens/login_screen/login_screen.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-import 'package:co_cook/widgets/bottom_nav_bar/bottom_nav_bar.dart';
+import 'package:co_cook/services/auth_service.dart';
 import 'package:co_cook/styles/colors.dart';
 import 'package:co_cook/styles/text_styles.dart';
-import 'package:co_cook/widgets/button/button.dart';
 
-class UserScreen extends StatelessWidget {
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:co_cook/screens/login_screen/login_screen.dart';
+import 'package:co_cook/widgets/nickname_change/nickname_change.dart';
+
+class UserScreen extends StatefulWidget {
   const UserScreen({Key? key}) : super(key: key);
+
+  @override
+  State<UserScreen> createState() => _UserScreenState();
+}
+
+class _UserScreenState extends State<UserScreen> {
+  String _nickname = 'username';
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchNickname();
+  }
+
+  // 닉네임 가져오기
+  Future<void> _fetchNickname() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String prefsUserData =
+        prefs.getString('userData') ?? ''; // 기본값으로 빈 문자열을 사용합니다.
+    Map<String, dynamic> decodePrefs = jsonDecode(prefsUserData);
+    String? nickname = decodePrefs['nickname'];
+
+    if (nickname != null) {
+      setState(() {
+        _nickname = nickname;
+      });
+    }
+  }
+
+  // 닉네임 변경 페이지로 이동
+  Future<void> gotoNicknameChange(BuildContext context) async {
+    Route nicknameChange =
+        MaterialPageRoute(builder: (context) => const NicknameChange());
+    await Navigator.push(context, nicknameChange);
+    _fetchNickname(); // 닉네임 변경 후 업데이트
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +62,7 @@ class UserScreen extends StatelessWidget {
           child: Align(
             alignment: Alignment.centerLeft,
             child: Text(
-              '나는윤성운',
+              _nickname,
               style: const CustomTextStyles()
                   .title1
                   .copyWith(color: CustomColors.monotoneBlack),
@@ -35,7 +75,7 @@ class UserScreen extends StatelessWidget {
             child: IconButton(
               icon: Icon(Icons.edit, color: CustomColors.monotoneBlack),
               onPressed: () {
-                // Add your onPressed code here!
+                gotoNicknameChange(context);
               },
             ),
           ),
@@ -57,7 +97,13 @@ class UserScreen extends StatelessWidget {
               CustomTextButton(
                   text: '자주하는 질문', color: CustomColors.monotoneBlack),
               CustomTextButton(text: '고객문의', color: CustomColors.monotoneBlack),
-              CustomTextButton(text: '회원탈퇴', color: CustomColors.redPrimary),
+              CustomTextButton(
+                text: '회원탈퇴',
+                color: CustomColors.redPrimary,
+                onPressed: () {
+                  withdrawal(context);
+                },
+              ),
               CustomTextButton(
                   text: '로그아웃',
                   color: CustomColors.redPrimary,
@@ -83,7 +129,7 @@ class CustomTextButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextButton(
-      onPressed: () => onPressed,
+      onPressed: onPressed,
       child: Text(
         text,
         style: CustomTextStyles().subtitle1.copyWith(color: color),
@@ -111,4 +157,24 @@ void logOut({required BuildContext context}) async {
   print('로그인 정보 삭제 완료!');
   Route login = MaterialPageRoute(builder: (context) => const LoginScreen());
   Navigator.pushReplacement(context, login);
+}
+
+// 회원탈퇴
+void withdrawal(BuildContext context) async {
+  // UserIdx 가져오기
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  final String prefsUserData =
+      prefs.getString('userData') ?? ''; // 기본값으로 빈 문자열을 사용합니다.
+  Map<String, dynamic> decodePrefs = jsonDecode(prefsUserData);
+  int userIdx = decodePrefs['user_idx'];
+
+  // api 요청하기
+  AuthService _apiService = AuthService();
+  Response? response = await _apiService.withdrawal(userIdx);
+
+  if (response?.data['status'] == 204) {
+    // print('로그인으로 이동!');
+    Route login = MaterialPageRoute(builder: (context) => const LoginScreen());
+    Navigator.pushReplacement(context, login);
+  }
 }
