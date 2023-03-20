@@ -23,7 +23,7 @@ public class User extends BaseEntity {
     private Long id;
     private String email;
     private String nickname;
-    private String roles; // USER, ADMIN
+    private String roles; // ROLE_USER, ROLE_ADMIN
     private Boolean isActive;
 
     public List<String> getRoleList() {

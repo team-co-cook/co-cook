@@ -12,6 +12,8 @@ import java.util.List;
 @AllArgsConstructor
 public class RecommendResDto {
 
+    private String currentTime;
+
     private List<RecipeListResDto> recipes;
 
 }
