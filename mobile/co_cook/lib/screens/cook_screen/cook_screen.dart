@@ -8,6 +8,7 @@ import 'package:co_cook/styles/colors.dart';
 import 'package:co_cook/styles/text_styles.dart';
 import 'package:flutter/services.dart';
 import 'package:sensors_plus/sensors_plus.dart';
+import 'widgets/cook_screen_sound_meter.dart';
 
 class CookScreen extends StatefulWidget {
   const CookScreen({super.key});
@@ -89,7 +90,7 @@ class _CookScreenState extends State<CookScreen> {
                           style: const CustomTextStyles().subtitle1.copyWith(
                                 color: CustomColors.monotoneBlack,
                               )),
-                      CookScreenSoundMeter(),
+                      CookScreenRecoder(),
                       CommonButton(
                           label: "종료",
                           color: ButtonType.red,
@@ -102,54 +103,5 @@ class _CookScreenState extends State<CookScreen> {
               ),
             ),
             body: CookScreenBody());
-  }
-}
-
-class CookScreenSoundMeter extends StatelessWidget {
-  const CookScreenSoundMeter({super.key, this.size = 8});
-  final double size;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: size * 4 + 24,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Container(
-            width: size,
-            height: size,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(size / 2),
-              color: CustomColors.redSecondary,
-            ),
-          ),
-          Container(
-            width: size,
-            height: size,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(size / 2),
-              color: CustomColors.redSecondary,
-            ),
-          ),
-          Container(
-            width: size,
-            height: size,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(size / 2),
-              color: CustomColors.redSecondary,
-            ),
-          ),
-          Container(
-            width: size,
-            height: size,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(size / 2),
-              color: CustomColors.redSecondary,
-            ),
-          ),
-        ],
-      ),
-    );
   }
 }
