@@ -57,9 +57,9 @@ class _UserScreenState extends State<UserScreen> {
         appBar: AppBar(
           backgroundColor: CustomColors.monotoneLight,
           elevation: 0.5,
-          toolbarHeight: 80,
+          toolbarHeight: 100,
           title: Padding(
-            padding: const EdgeInsets.fromLTRB(10, 10, 0, 0),
+            padding: const EdgeInsets.fromLTRB(10, 30, 0, 0),
             child: Align(
               alignment: Alignment.centerLeft,
               child: Text(

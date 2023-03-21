@@ -67,9 +67,9 @@ class _SearchScreenState extends State<SearchScreen> {
         appBar: AppBar(
           backgroundColor: CustomColors.monotoneLight,
           elevation: 0.5,
-          toolbarHeight: 80,
+          toolbarHeight: 100,
           title: Padding(
-              padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+              padding: const EdgeInsets.fromLTRB(0, 30, 0, 10),
               child: CustomTextField(
                 onChanged: onWordChanged,
                 isFocus: false,

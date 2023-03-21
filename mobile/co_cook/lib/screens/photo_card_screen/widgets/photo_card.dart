@@ -42,7 +42,7 @@ class PhotoCard extends StatelessWidget {
                           File(widget.image.path),
                           fit: BoxFit.cover,
                           width: constraints.maxWidth,
-                          height: constraints.maxWidth * 0.7,
+                          height: constraints.maxWidth,
                         ),
                       ),
                       SizedBox(height: 16),

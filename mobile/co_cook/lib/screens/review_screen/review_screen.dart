@@ -85,9 +85,9 @@ class _ReviewScreenState extends State<ReviewScreen> {
           appBar: AppBar(
             backgroundColor: CustomColors.greenPrimary,
             elevation: 0.5,
-            toolbarHeight: 60,
+            toolbarHeight: 80,
             title: Padding(
-              padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
+              padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
               child: Align(
                 alignment: Alignment.center,
                 child: Text(
@@ -165,7 +165,10 @@ class _ReviewScreenState extends State<ReviewScreen> {
                           color: CustomColors.monotoneBlack, height: 1.5),
                     ),
                     SizedBox(height: 16),
-                    CustomTextField(onChanged: onTextChanged, isFocus: false),
+                    CustomTextField(
+                        onChanged: onTextChanged,
+                        isFocus: false,
+                        isFormat: false),
                     SizedBox(height: 8),
                     Text(
                       '예시\n  ·  난이도가 적절한 좋은 레시피에요!\n  ·  생각보다 너무 쉬웠어요.\n  ·  시간이 예상보다 오래 걸렸어요.',
