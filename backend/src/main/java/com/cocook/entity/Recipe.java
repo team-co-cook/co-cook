@@ -50,6 +50,9 @@ public class Recipe extends BaseEntity {
 //    private List<Amount> amounts = new ArrayList<>();
 //
     @OneToMany(mappedBy = "recipe", fetch = FetchType.LAZY)
+    private List<Review> reviews = new ArrayList<>();
+
+    @OneToMany(mappedBy = "recipe", fetch = FetchType.LAZY)
     private List<Tag> tags = new ArrayList<>();
 
     @OneToMany(mappedBy = "recipe", fetch = FetchType.LAZY)
