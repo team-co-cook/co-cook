@@ -19,6 +19,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:co_cook/styles/colors.dart';
 import 'package:co_cook/styles/text_styles.dart';
 
+import 'package:co_cook/widgets/save_complete/save_complete.dart';
 import 'package:co_cook/screens/photo_card_screen/widgets/photo_card.dart';
 
 class PhotoCardScreen extends StatefulWidget {
@@ -103,6 +104,11 @@ class _PhotoCardScreenState extends State<PhotoCardScreen> {
     });
   }
 
+  void saveComplete() async {
+    await savePicture();
+    SaveComplete.show(context);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -169,7 +175,7 @@ class _PhotoCardScreenState extends State<PhotoCardScreen> {
                 Column(
                   children: [
                     ElevatedButton(
-                      onPressed: savePicture,
+                      onPressed: saveComplete,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white, // 버튼 색상
                         shape: CircleBorder(),
