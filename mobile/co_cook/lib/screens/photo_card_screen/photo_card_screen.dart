@@ -6,12 +6,15 @@ import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:image_picker/image_picker.dart';
 // 사진 저장용
+import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'package:flutter/rendering.dart';
-import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:flutter/services.dart';
-import 'package:permission_handler/permission_handler.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as p;
+import 'package:gallery_saver/gallery_saver.dart';
+import 'package:share_plus/share_plus.dart';
 
 import 'package:co_cook/styles/colors.dart';
 import 'package:co_cook/styles/text_styles.dart';
@@ -63,32 +66,41 @@ class _PhotoCardScreenState extends State<PhotoCardScreen> {
     return '조리시간 ${hours.toString().padLeft(2, '0')}분 ${minutes.toString().padLeft(2, '0')}초';
   }
 
-  GlobalKey globalKey = GlobalKey();
+  final GlobalKey globalKey = GlobalKey();
 
-  Future<void> _saveToGallery() async {
-    // 권한 요청
-    final status = await Permission.photos.request();
-    if (status.isDenied || status.isPermanentlyDenied) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('갤러리 접근 권한이 필요합니다.')));
-      return;
-    }
-
+  Future<String> capturePicture() async {
     RenderRepaintBoundary boundary =
         globalKey.currentContext!.findRenderObject()! as RenderRepaintBoundary;
-    ui.Image image = await boundary.toImage(pixelRatio: 3.0);
+    ui.Image image = await boundary.toImage();
     ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
     Uint8List pngBytes = byteData!.buffer.asUint8List();
 
-    // 이미지 저장
-    final result = await ImageGallerySaver.saveImage(pngBytes);
-    if (result['isSuccess'] == true) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('갤러리에 저장되었습니다.')));
-    } else {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('갤러리 저장에 실패했습니다.')));
-    }
+    // 이미지를 임시 파일로 저장
+    final tempDir = await getTemporaryDirectory();
+    final fileName = DateTime.now().millisecondsSinceEpoch.toString();
+    final tempPath = '${tempDir.path}/$fileName.png';
+    File imgFile = File(tempPath);
+    await imgFile.writeAsBytes(pngBytes);
+
+    return tempPath;
+  }
+
+  Future<void> sharePicture() async {
+    String imagePath = await capturePicture();
+    // 이미지를 공유
+    await Share.shareFiles([imagePath], text: '포토카드를 확인해보세요!');
+  }
+
+  Future<void> savePicture() async {
+    String imagePath = await capturePicture();
+    // 갤러리에 저장
+    GallerySaver.saveImage(imagePath).then((bool? success) {
+      if (success == true) {
+        print("이미지가 갤러리에 저장되었습니다.");
+      } else {
+        print("이미지 저장 실패");
+      }
+    });
   }
 
   @override
@@ -100,6 +112,22 @@ class _PhotoCardScreenState extends State<PhotoCardScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(right: 20),
+                  child: IconButton(
+                      onPressed: () {},
+                      icon: Icon(
+                        Icons.close,
+                        color: CustomColors.monotoneLight, // 아이콘 색상
+                        size: 40,
+                      )),
+                ),
+              ],
+            ),
+            SizedBox(height: 40),
             RepaintBoundary(
               key: globalKey,
               child: PhotoCard(
@@ -108,35 +136,63 @@ class _PhotoCardScreenState extends State<PhotoCardScreen> {
                 timeString: timeString,
               ),
             ),
-            SizedBox(height: 20), // 원하는 간격 조절
-            ElevatedButton(
-              onPressed: _saveToGallery,
-              style: ElevatedButton.styleFrom(
-                primary: Colors.white, // 버튼 색상
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30), // 버튼 모서리 둥글게
-                ),
-              ),
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
+            SizedBox(height: 60), // 원하는 간격 조절
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Column(
                   children: [
-                    Icon(
-                      Icons.share,
-                      color: CustomColors.monotoneBlack, // 아이콘 색상
-                    ),
-                    SizedBox(width: 10),
-                    Text(
-                      '공유하기',
-                      style: TextStyle(
-                        color: CustomColors.monotoneBlack, // 텍스트 색상
-                        fontSize: 16,
+                    ElevatedButton(
+                      onPressed: sharePicture,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white, // 버튼 색상
+                        shape: CircleBorder(),
                       ),
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(11, 10, 11, 12),
+                        child: Icon(
+                          Icons.ios_share,
+                          color: CustomColors.monotoneBlack, // 아이콘 색상
+                          size: 24,
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8),
+                      child: Text('공유',
+                          style: CustomTextStyles()
+                              .button
+                              .copyWith(color: CustomColors.monotoneLight)),
                     ),
                   ],
                 ),
-              ),
+                Column(
+                  children: [
+                    ElevatedButton(
+                      onPressed: savePicture,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white, // 버튼 색상
+                        shape: CircleBorder(),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(11, 10, 11, 12),
+                        child: Icon(
+                          Icons.save_alt,
+                          color: CustomColors.monotoneBlack, // 아이콘 색상
+                          size: 24,
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8),
+                      child: Text('저장',
+                          style: CustomTextStyles()
+                              .button
+                              .copyWith(color: CustomColors.monotoneLight)),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ],
         ),

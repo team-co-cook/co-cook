@@ -30,7 +30,7 @@ class PhotoCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(16),
             ),
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(20),
               child: LayoutBuilder(
                 builder: (context, constraints) {
                   return Column(
@@ -45,13 +45,14 @@ class PhotoCard extends StatelessWidget {
                           height: constraints.maxWidth,
                         ),
                       ),
-                      SizedBox(height: 16),
+                      SizedBox(height: 24),
                       Text(
                         widget.cookName,
                         style: CustomTextStyles()
                             .title1
                             .copyWith(color: CustomColors.monotoneBlack),
                       ),
+                      SizedBox(height: 8),
                       Text(
                         cookingTimeString,
                         style: CustomTextStyles().caption.copyWith(
@@ -62,7 +63,7 @@ class PhotoCard extends StatelessWidget {
                         style: CustomTextStyles().caption.copyWith(
                             color: CustomColors.monotoneBlack, height: 1.5),
                       ),
-                      SizedBox(height: 16),
+                      SizedBox(height: 24),
                       Text(
                         widget.text,
                         style: CustomTextStyles()
