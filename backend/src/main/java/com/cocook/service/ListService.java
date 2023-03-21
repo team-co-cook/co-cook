@@ -3,6 +3,8 @@ package com.cocook.service;
 import com.cocook.auth.JwtTokenProvider;
 import com.cocook.dto.list.RecipeDetailResDto;
 import com.cocook.dto.list.RecipeListResDto;
+import com.cocook.dto.list.RecipeWithIngredientResDto;
+import com.cocook.dto.list.RecipeWithIngredientsProjection;
 import com.cocook.entity.Recipe;
 import com.cocook.entity.User;
 import com.cocook.repository.CategoryRepository;
@@ -88,6 +90,12 @@ public class ListService {
             newRecipes.add(recipeDetailResDto);
         }
         return new RecipeListResDto(newRecipes);
+    }
+
+    public List<RecipeWithIngredientsProjection> getRecipesByIngredients(String authToken, List<String> ingredientNames) {
+        Long userIdx = jwtTokenProvider.getUserIdx(authToken);
+        List<RecipeWithIngredientsProjection> recipeWithIngredientResDtos = recipeRepository.findRecipesByIngredients(ingredientNames, userIdx);
+        return recipeWithIngredientResDtos;
     }
 
     private RecipeListResDto getRecipesByDifficultyAndTime(List<Recipe> recipes, Long userIdx, String difficulty, Integer time) {
