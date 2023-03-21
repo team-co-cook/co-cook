@@ -60,7 +60,8 @@ class _GridCardState extends State<GridCard> {
   Widget build(BuildContext context) {
     return ZoomTapAnimation(
       end: 0.98,
-      onTap: () => routeScreen(context, RecipeDetailScreen()),
+      onTap: () => routeScreen(
+          context, RecipeDetailScreen(recipeIdx: widget.data['recipeIdx'])),
       child: SizedBox(
         width: double.infinity,
         child: Column(
