@@ -2,9 +2,7 @@ package com.cocook.service;
 
 import com.cocook.auth.JwtTokenProvider;
 import com.cocook.dto.db.*;
-import com.cocook.dto.recipe.RecipeInfoResDto;
-import com.cocook.dto.recipe.RecipeStepDetailResDto;
-import com.cocook.dto.recipe.RecipeStepResDto;
+import com.cocook.dto.recipe.*;
 import com.cocook.dto.review.ReviewListResDto;
 import com.cocook.dto.review.ReviewResDto;
 import com.cocook.entity.*;
@@ -28,6 +26,7 @@ public class RecipeService {
     private final ThemeRepository themeRepository;
     private final FavoriteRepository favoriteRepository;
     private final ReviewRepository reviewRepository;
+    private final AmountRepository amountRepository;
     private final TagService tagService;
     private final StepService stepService;
     private final IngredientService ingredientService;
@@ -39,13 +38,14 @@ public class RecipeService {
     public RecipeService(RecipeRepository recipeRepository, CategoryRepository categoryRepository, IngredientRepository ingredientRepository,
                          StepRepository stepRepository, ThemeRepository themeRepository, TagService tagService, StepService stepService,
                          IngredientService ingredientService, AmountService amountService, S3Uploader s3Uploader, FavoriteRepository favoriteRepository,
-                         JwtTokenProvider jwtTokenProvider, ReviewRepository reviewRepository) {
+                         JwtTokenProvider jwtTokenProvider, ReviewRepository reviewRepository, AmountRepository amountRepository) {
         this.recipeRepository = recipeRepository;
         this.categoryRepository = categoryRepository;
         this.ingredientRepository = ingredientRepository;
         this.stepRepository = stepRepository;
         this.themeRepository = themeRepository;
         this.reviewRepository = reviewRepository;
+        this.amountRepository = amountRepository;
         this.tagService = tagService;
         this.stepService = stepService;
         this.ingredientService = ingredientService;
@@ -100,22 +100,33 @@ public class RecipeService {
     public RecipeInfoResDto getRecipeInfo(Long recipeIdx, String authToken) {
         Long userIdx = jwtTokenProvider.getUserIdx(authToken);
         Recipe recipe = recipeRepository.findRecipeById(recipeIdx);
-        List<Ingredient> ingredients = ingredientRepository.findIngredientsByRecipeIdx(recipeIdx);
         Favorite favorite = favoriteRepository.findByUserIdAndRecipeId(userIdx, recipeIdx);
         boolean isFavorite = favorite != null;
-        RecipeInfoResDto recipeInfoResDto = RecipeInfoResDto.builder()
+        return RecipeInfoResDto.builder()
                 .recipeName(recipe.getRecipeName())
                 .recipeImgPath(recipe.getImgPath())
                 .recipeDifficulty(recipe.getDifficulty())
                 .recipeRunningTime(recipe.getRunningTime())
-                .isFavorite(isFavorite)
+                .isFavorite(isFavorite).build();
+    }
+
+    public RecipeDetailResDto getRecipeDetail(Long recipeIdx) {
+        Recipe recipe = recipeRepository.findRecipeById(recipeIdx);
+        List<Ingredient> ingredients = ingredientRepository.findIngredientsByRecipeIdx(recipeIdx);
+        List<IngredientDto> ingredientDtos = new ArrayList<>();
+        for (Ingredient ingredient : ingredients) {
+            Amount amount = amountRepository.findAmountByRecipeIdAndIngredientId(recipeIdx, ingredient.getId());
+            String recipeAmount = amount.getContent();
+            IngredientDto ingredientDto = new IngredientDto(ingredient.getIngredientName(), recipeAmount);
+            ingredientDtos.add(ingredientDto);
+        }
+        return RecipeDetailResDto.builder()
                 .calorie(recipe.getCalorie())
                 .serving(recipe.getServing())
                 .carb(recipe.getCarb())
                 .protein(recipe.getProtein())
                 .fat(recipe.getFat())
-                .ingredients(ingredients).build();
-        return recipeInfoResDto;
+                .ingredients(ingredientDtos).build();
     }
 
     public RecipeStepResDto getRecipeStep(Long recipeIdx) {
@@ -137,9 +148,6 @@ public class RecipeService {
     public ReviewListResDto getRecipeReview(Long recipeIdx, String authToken) {
         User user = jwtTokenProvider.getUser(authToken);
         List<Review> reviewList = reviewRepository.findReviewsByRecipeIdOrderByIdDesc(recipeIdx);
-        for (Review review : reviewList) {
-            System.out.println(review.getId());
-        }
         List<Review> userReview = new ArrayList<>();
         List<Review> otherReview = new ArrayList<>();
 

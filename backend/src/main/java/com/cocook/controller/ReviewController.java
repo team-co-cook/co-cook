@@ -49,4 +49,18 @@ public class ReviewController {
         reviewService.deleteReview(reviewIdx, authToken);
         return ApiResponse.ok(null);
     }
+
+    @PostMapping(value = "/like/{review_idx}")
+    public ResponseEntity<ApiResponse<Object>> likeReview(@RequestHeader("AUTH-TOKEN") String authToken,
+                                                          @PathVariable("review_idx") Long reviewIdx) {
+        reviewService.addLike(reviewIdx, authToken);
+        return ApiResponse.ok(null);
+    }
+
+    @DeleteMapping(value = "/like/{review_idx}")
+    public ResponseEntity<ApiResponse<Object>> deleteLike(@RequestHeader("AUTH-TOKEN") String authToken,
+                                                            @PathVariable("review_idx") Long reviewIdx) {
+        reviewService.deleteLike(reviewIdx, authToken);
+        return ApiResponse.ok(null);
+    }
 }

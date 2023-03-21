@@ -1,12 +1,14 @@
 package com.cocook.controller;
 
 import com.cocook.dto.ApiResponse;
+import com.cocook.dto.recipe.RecipeDetailResDto;
 import com.cocook.dto.recipe.RecipeInfoResDto;
 import com.cocook.dto.recipe.RecipeStepResDto;
 import com.cocook.dto.review.ReviewListResDto;
 import com.cocook.service.RecipeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -21,8 +23,14 @@ public class RecipeController {
     public ResponseEntity<ApiResponse<RecipeInfoResDto>> getRecipeInfo(@RequestHeader("AUTH-TOKEN") String authToken,
                                                                        @PathVariable Long recipe_idx) {
         RecipeInfoResDto recipeInfoResDto = recipeService.getRecipeInfo(recipe_idx, authToken);
-        System.out.println(recipeInfoResDto);
         return ApiResponse.ok(recipeInfoResDto);
+    }
+
+    @GetMapping("/detail/{recipe_idx}")
+    public ResponseEntity<ApiResponse<RecipeDetailResDto>> getRecipeDetail(@RequestHeader("AUTH-TOKEN") String authToken,
+                                                                           @PathVariable("recipe_idx") Long recipeIdx) {
+        RecipeDetailResDto recipeDetailResDto = recipeService.getRecipeDetail(recipeIdx);
+        return ApiResponse.ok(recipeDetailResDto);
     }
 
     @GetMapping("/step/{recipe_idx}")

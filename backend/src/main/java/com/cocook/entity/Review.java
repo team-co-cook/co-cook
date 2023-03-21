@@ -44,17 +44,10 @@ public class Review extends BaseEntity {
 
     private Integer reportCnt;
 
-    @OneToMany(mappedBy = "review", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "review", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     private List<Comment> comments = new ArrayList<>();
 
-    @OneToMany(mappedBy = "review", fetch = FetchType.LAZY)
-    private List<Like> likes = new ArrayList<>();
-
-    @CreatedBy
-    @Column(updatable = false)
-    private Long createdBy;
-
-    @LastModifiedBy
-    private Long lastModifiedBy;
+    @OneToMany(mappedBy = "review", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    private List<LikeReview> likeReviews = new ArrayList<>();
 
 }

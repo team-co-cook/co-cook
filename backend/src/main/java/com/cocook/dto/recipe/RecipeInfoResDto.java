@@ -20,14 +20,5 @@ public class RecipeInfoResDto {
     private Integer recipeRunningTime;
 
     private Boolean isFavorite;
-    List<Ingredient> ingredients;
 
-    private Integer serving;
-    private Integer calorie;
-
-    private Integer carb;
-
-    private Integer protein;
-
-    private Integer fat;
 }
