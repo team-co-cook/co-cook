@@ -10,10 +10,13 @@ import com.cocook.repository.RecipeRepository;
 import com.cocook.repository.ReviewRepository;
 import com.cocook.util.S3Uploader;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.persistence.EntityNotFoundException;
 import java.io.IOException;
+import java.util.Optional;
 
 @Service
 public class ReviewService {
@@ -53,5 +56,19 @@ public class ReviewService {
         review.setRecipe(recipe);
         Review newReview = reviewRepository.save(review);
         return new ReviewResDto(newReview.getId(), newReview.getCreatedDate(), user.getNickname(), newReview.getContent(), newReview.getImgPath(), newReview.getLikeCnt(), newReview.getCommentCnt(), newReview.getRunningTime());
+    }
+
+    public void deleteReview(Long reviewIdx, String authToken) {
+        Optional<Review> review = reviewRepository.findById(reviewIdx);
+        User user = jwtTokenProvider.getUser(authToken);
+        if (review.isPresent()) {
+            if (review.get().getUser() == user) {
+                reviewRepository.delete(review.get());
+            } else {
+                throw new AuthenticationServiceException(user.getNickname()+"님이 작성한 리뷰가 아닙니다.");
+            }
+        } else {
+            throw new EntityNotFoundException("해당 리뷰가 존재하지 않습니다.");
+        }
     }
 }

@@ -29,16 +29,24 @@ public class ReviewController {
         this.objectMapper = objectMapper;
     }
 
-    @PostMapping(value = "/", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PostMapping(value = "", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<ApiResponse<ReviewResDto>> makeReview(@RequestHeader("AUTH-TOKEN") String authToken,
                                                                 @RequestParam("reviewDetail") String reviewDetail,
                                                                 @RequestPart("reviewImg") MultipartFile reviewImg) {
         try {
             ReviewReqDto reviewReqDto = objectMapper.readValue(reviewDetail, ReviewReqDto.class);
+            System.out.println(reviewReqDto);
             ReviewResDto reviewResDto = reviewService.makeReview(authToken, reviewReqDto, reviewImg);
             return ApiResponse.ok(reviewResDto);
         } catch (IOException e) {
             throw new RuntimeException("유효하지 않습니다.");
         }
+    }
+
+    @DeleteMapping(value = "/{review_idx}")
+    public ResponseEntity<ApiResponse<Object>> deleteReview(@RequestHeader("AUTH-TOKEN") String authToken,
+                                                    @PathVariable("review_idx") Long reviewIdx) {
+        reviewService.deleteReview(reviewIdx, authToken);
+        return ApiResponse.ok(null);
     }
 }
