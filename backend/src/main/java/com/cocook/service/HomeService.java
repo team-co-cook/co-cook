@@ -56,7 +56,7 @@ public class HomeService {
         List<Recipe> foundRecipes = recipeRepository.findRandom5RecipesByThemeName(themeName);
         List<RecipeListResDto> resultRecipes = addRecipeToRecipeListResDto(foundRecipes, userIdx);
 
-        return new RecommendResDto(resultRecipes);
+        return new RecommendResDto(themeName, resultRecipes);
     }
 
     public ThemeResDto getThemes() {

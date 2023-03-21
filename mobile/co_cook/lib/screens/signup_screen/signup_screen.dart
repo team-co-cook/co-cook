@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart'; // Response 가져오기 위함.
 import 'package:co_cook/services/auth_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:co_cook/screens/user_screen/user_screen.dart';
 import 'package:co_cook/widgets/text_field/custom_text_field.dart';
 import 'dart:convert';
 import 'package:co_cook/styles/colors.dart';
