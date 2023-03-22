@@ -20,7 +20,6 @@ class CustomSlidingUpPanel extends StatelessWidget {
       controller: panelController,
       onPanelClosed: () {
         FocusScope.of(context).unfocus(); // 패널이 닫힐 때 포커스 해제
-        onPanelclosed();
       },
       backdropEnabled: true,
       borderRadius: const BorderRadius.only(

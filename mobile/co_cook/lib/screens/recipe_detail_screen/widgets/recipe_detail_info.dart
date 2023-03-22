@@ -40,7 +40,7 @@ class _RecipeDetailInfoTabState extends State<RecipeDetailInfoTab> {
 
   @override
   Widget build(BuildContext context) {
-    return data == null
+    return data.isEmpty
         ? Center(
             child: CircularProgressIndicator(color: CustomColors.redPrimary))
         : Container(

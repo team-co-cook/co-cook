@@ -14,6 +14,7 @@ import 'package:co_cook/screens/recipe_detail_screen/widgets/recipe_detail_info.
 import 'package:co_cook/screens/recipe_detail_screen/widgets/ai_recipe_start_button.dart';
 import 'package:co_cook/screens/recipe_detail_screen/widgets/recipe_detail_recipe_tab.dart';
 import 'package:co_cook/screens/recipe_detail_screen/widgets/recipe_detail_screen_appbar.dart';
+import 'package:co_cook/screens/recipe_detail_screen/widgets/recipe_detail_review.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 class RecipeDetailScreen extends StatefulWidget {
@@ -98,11 +99,13 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen>
                 ),
               ),
               content: Container(
+                  constraints: BoxConstraints(
+                      minHeight: MediaQuery.of(context).size.height - 160),
                   width: double.infinity,
                   child: [
                     RecipeDetailInfoTab(recipeIdx: widget.recipeIdx),
                     RecipeDetailRecipeTab(recipeIdx: widget.recipeIdx),
-                    RecipeDetailCommentTab(
+                    RecipeDetailReviewTab(
                         panelController: _panelController,
                         recipeIdx: widget.recipeIdx)
                   ][_tabControllerIndex]),
@@ -118,37 +121,6 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen>
         Positioned(
             child: CustomSlidingUpPanel(
                 body: Text("댓글내용"), panelController: _panelController))
-      ]),
-    );
-  }
-}
-
-class RecipeDetailCommentTab extends StatefulWidget {
-  const RecipeDetailCommentTab(
-      {Key? key, required this.panelController, required this.recipeIdx})
-      : super(key: key);
-
-  final PanelController panelController;
-  final int recipeIdx;
-
-  @override
-  State<RecipeDetailCommentTab> createState() => _RecipeDetailCommentTabState();
-}
-
-class _RecipeDetailCommentTabState extends State<RecipeDetailCommentTab> {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: CustomColors.monotoneLight,
-      child: Stack(children: [
-        ListView.builder(
-          shrinkWrap: true,
-          padding: EdgeInsets.fromLTRB(24.0, 24.0, 24.0, 24.0),
-          physics: NeverScrollableScrollPhysics(),
-          itemCount: 5,
-          itemBuilder: (context, index) =>
-              RecipeComment(panelController: widget.panelController),
-        ),
       ]),
     );
   }

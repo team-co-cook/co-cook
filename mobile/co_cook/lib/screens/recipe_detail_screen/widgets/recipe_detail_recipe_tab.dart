@@ -28,6 +28,7 @@ class _RecipeDetailRecipeTabState extends State<RecipeDetailRecipeTab> {
     DetailService searchService = DetailService();
     Response? response =
         await searchService.getDetailStep(recipeIdx: recipeIdx);
+    print(response!.data['data']);
     if (response?.statusCode == 200) {
       if (response != null) {
         setState(() {
@@ -39,50 +40,56 @@ class _RecipeDetailRecipeTabState extends State<RecipeDetailRecipeTab> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: CustomColors.monotoneLight,
-      child: ListView.builder(
-          shrinkWrap: true,
-          padding: EdgeInsets.fromLTRB(8.0, 24.0, 24.0, 24.0),
-          physics: NeverScrollableScrollPhysics(),
-          itemCount: 5,
-          itemBuilder: (context, index) => Container(
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                        padding: EdgeInsets.all(8),
-                        child: Text(
-                          "1",
-                          style: CustomTextStyles()
-                              .subtitle2
-                              .copyWith(color: CustomColors.monotoneBlack),
-                        )),
-                    Expanded(
-                      child: Column(
+    return data.isEmpty
+        ? Center(
+            child: CircularProgressIndicator(color: CustomColors.redPrimary))
+        : Container(
+            color: CustomColors.monotoneLight,
+            child: ListView.builder(
+                shrinkWrap: true,
+                padding: EdgeInsets.fromLTRB(8.0, 24.0, 24.0, 24.0),
+                physics: NeverScrollableScrollPhysics(),
+                itemCount: data['steps'].length,
+                itemBuilder: (context, index) => Container(
+                      child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Container(
-                            width: double.infinity,
-                            height: 250,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(16.0),
-                              color: Colors.amber,
+                              padding: EdgeInsets.all(8),
+                              child: Text(
+                                '${data['steps'][index]['currentStep']}',
+                                style: CustomTextStyles().subtitle2.copyWith(
+                                    color: CustomColors.monotoneBlack),
+                              )),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                AspectRatio(
+                                  aspectRatio: 16 / 10, // 비율 설정
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(16.0),
+                                    child: Image.network(
+                                      data['steps'][index]
+                                          ['imgPath'], // 이미지 URL
+                                      fit: BoxFit.cover, // 이미지를 박스 크기에 맞게 조정
+                                    ),
+                                  ),
+                                ),
+                                Container(
+                                    margin: EdgeInsets.only(top: 8, bottom: 32),
+                                    child: Text(
+                                      data['steps'][index]['content'],
+                                      style: CustomTextStyles().body1.copyWith(
+                                          color: CustomColors.monotoneBlack,
+                                          height: 1.5),
+                                    ))
+                              ],
                             ),
                           ),
-                          Container(
-                              margin: EdgeInsets.only(top: 8, bottom: 32),
-                              child: Text(
-                                "먼저 재료를 준비합니다.",
-                                style: CustomTextStyles().body1.copyWith(
-                                    color: CustomColors.monotoneBlack),
-                              ))
                         ],
                       ),
-                    ),
-                  ],
-                ),
-              )),
-    );
+                    )),
+          );
   }
 }
