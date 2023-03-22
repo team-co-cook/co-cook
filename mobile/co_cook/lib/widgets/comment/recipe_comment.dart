@@ -10,30 +10,25 @@ import 'package:co_cook/services/detail_service.dart';
 
 class RecipeComment extends StatefulWidget {
   const RecipeComment(
-      {super.key, required this.review, required this.panelController});
+      {super.key,
+      required this.review,
+      required this.panelController,
+      this.reGet});
   final Map review;
   final panelController;
+  final reGet;
 
   @override
   State<RecipeComment> createState() => _RecipeCommentState();
 }
 
 class _RecipeCommentState extends State<RecipeComment> {
-  bool _isLike = false;
   bool _myComment = false;
 
   @override
   void initState() {
     super.initState();
-    setIsLike();
-  }
-
-  void setIsLike() {
-    if (widget.review['liked']) {
-      setState(() {
-        _isLike = true;
-      });
-    }
+    getUserIdx();
   }
 
   Future<void> getUserIdx() async {
@@ -57,9 +52,7 @@ class _RecipeCommentState extends State<RecipeComment> {
         await searchService.likeDetailReview(reviewIdx: reviewIdx);
     if (response?.statusCode == 200) {
       if (response != null) {
-        setState(() {
-          _isLike = !_isLike;
-        });
+        widget.reGet();
       }
     }
   }
@@ -72,7 +65,20 @@ class _RecipeCommentState extends State<RecipeComment> {
     if (response?.statusCode == 200) {
       if (response != null) {
         setState(() {
-          _isLike = !_isLike;
+          widget.reGet();
+        });
+      }
+    }
+  }
+
+  Future<void> deleteReview(int reviewIdx) async {
+    // API 요청
+    DetailService searchService = DetailService();
+    Response? response = await searchService.deleteReview(reviewIdx: reviewIdx);
+    if (response?.statusCode == 200) {
+      if (response != null) {
+        setState(() {
+          widget.reGet();
         });
       }
     }
@@ -98,14 +104,38 @@ class _RecipeCommentState extends State<RecipeComment> {
                     .subtitle1
                     .copyWith(color: CustomColors.monotoneBlack),
               ),
-              GestureDetector(
-                onTap: () => print("more"),
-                child: Container(
-                    width: 40,
-                    height: 40,
-                    child: const Icon(Icons.more_horiz,
-                        color: CustomColors.monotoneBlack)),
-              ),
+              Theme(
+                data: ThemeData(
+                  splashFactory: NoSplash.splashFactory, // 스플래시 효과를 제거합니다.
+                  highlightColor: Colors.transparent, // 하이라이트 효과를 제거합니다.
+                ),
+                child: PopupMenuButton<int>(
+                  itemBuilder: (BuildContext context) => [
+                    if (_myComment)
+                      PopupMenuItem<int>(
+                        value: 1,
+                        child: Text("삭제"),
+                      ),
+                    PopupMenuItem<int>(
+                      value: 2,
+                      child: Text("신고"),
+                    ),
+                  ],
+                  onSelected: (int value) {
+                    switch (value) {
+                      case 1:
+                        print("삭제 버튼을 클릭했습니다.");
+                        deleteReview(widget.review['reviewIdx']);
+                        break;
+                      case 2:
+                        print("신고 버튼을 클릭했습니다.");
+                        break;
+                    }
+                  },
+                  icon: const Icon(Icons.more_horiz,
+                      color: CustomColors.monotoneBlack),
+                ),
+              )
             ],
           ),
           AspectRatio(
@@ -140,7 +170,7 @@ class _RecipeCommentState extends State<RecipeComment> {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               GestureDetector(
-                onTap: _isLike
+                onTap: widget.review['liked']
                     ? () {
                         dislikeDetailReview(widget.review['reviewIdx']);
                       }
@@ -152,9 +182,11 @@ class _RecipeCommentState extends State<RecipeComment> {
                   child: Row(
                     children: [
                       Icon(
-                        _isLike ? Icons.thumb_up : Icons.thumb_up_outlined,
+                        widget.review['liked']
+                            ? Icons.thumb_up
+                            : Icons.thumb_up_outlined,
                         size: 16,
-                        color: _isLike
+                        color: widget.review['liked']
                             ? CustomColors.redPrimary
                             : CustomColors.monotoneBlack,
                       ),

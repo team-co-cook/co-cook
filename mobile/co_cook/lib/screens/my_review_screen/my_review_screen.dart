@@ -9,8 +9,8 @@ import 'package:co_cook/widgets/comment/recipe_comment.dart';
 
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
-class RecipeDetailReviewTab extends StatefulWidget {
-  const RecipeDetailReviewTab(
+class MyReviewScreen extends StatefulWidget {
+  const MyReviewScreen(
       {Key? key, required this.panelController, required this.recipeIdx})
       : super(key: key);
 
@@ -18,10 +18,10 @@ class RecipeDetailReviewTab extends StatefulWidget {
   final int recipeIdx;
 
   @override
-  State<RecipeDetailReviewTab> createState() => _RecipeDetailReviewTabState();
+  State<MyReviewScreen> createState() => _MyReviewScreenState();
 }
 
-class _RecipeDetailReviewTabState extends State<RecipeDetailReviewTab> {
+class _MyReviewScreenState extends State<MyReviewScreen> {
   List listData = [];
 
   @override

@@ -130,7 +130,7 @@ class _UserScreenState extends State<UserScreen> {
       CustomSlidingUpPanel(
         body: NicknameChange(panelController: _nickPanelController),
         panelController: _nickPanelController,
-        onPanelclosed: _fetchNickname,
+        onPanelClosed: _fetchNickname,
       )
     ]);
   }
