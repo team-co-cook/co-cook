@@ -3,7 +3,7 @@ package com.cocook.controller;
 import com.cocook.dto.ApiResponse;
 import com.cocook.dto.list.RecipeListResDto;
 import com.cocook.dto.list.RecipeWithIngredientResDto;
-import com.cocook.dto.list.RecipeWithIngredientsProjection;
+import com.cocook.dto.list.RecipesContainingIngredientsCnt;
 import com.cocook.service.ListService;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -69,10 +69,9 @@ public class ListController {
     }
 
     @GetMapping("/ingredients")
-    public ResponseEntity<ApiResponse<List<RecipeWithIngredientsProjection>>> getRecipesByIngredients(@RequestHeader("AUTH-TOKEN") String authToken,
+    public ResponseEntity<ApiResponse<List<RecipeWithIngredientResDto>>> getRecipesByIngredients(@RequestHeader("AUTH-TOKEN") String authToken,
                                                                                                       @RequestParam List<String> ingredients) {
         return ApiResponse.ok(listService.getRecipesByIngredients(authToken, ingredients));
-
     }
 
 }

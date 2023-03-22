@@ -1,6 +1,6 @@
 package com.cocook.dto.list;
 
-public interface RecipeWithIngredientsProjection {
+public interface RecipesContainingIngredientsCnt {
 
     Long getRecipeIdx();
 

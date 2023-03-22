@@ -1,7 +1,6 @@
 package com.cocook.repository;
 
-import com.cocook.dto.list.RecipeWithIngredientResDto;
-import com.cocook.dto.list.RecipeWithIngredientsProjection;
+import com.cocook.dto.list.RecipesContainingIngredientsCnt;
 import com.cocook.entity.Recipe;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -46,17 +45,14 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
             "JOIN amount a ON a.recipe_idx = r.recipe_idx " +
             "JOIN ingredient i on i.ingredient_idx = a.ingredient_idx " +
             "WHERE i.ingredient_name IN (:ingredientNames) " +
-            "GROUP BY r.recipe_idx;", nativeQuery = true)
-//    @Query(value = "SELECT r.id, r.recipeName, r.imgPath," +
-//            " r.difficulty, r.runningTime, " +
-//            "EXISTS(SELECT 1 FROM Favorite WHERE user.id = :userIdx AND recipe.id = r.id) as isFavorite, " +
-//            "(SELECT COUNT(*) from Amount a WHERE a.recipe = r) AS totalIngredientCnt, " +
-//            "COUNT(*) AS includingIngredientCnt FROM Recipe r " +
-//            "JOIN Amount a ON a.recipe = r " +
-//            "JOIN Ingredient i on i = a.ingredient " +
-//            "WHERE i.ingredientName IN (:ingredientNames) " +
-//            "GROUP BY r.id")
-    List<RecipeWithIngredientsProjection> findRecipesByIngredients(@Param("ingredientNames") List<String> ingredientNames,
+            "GROUP BY r.recipe_idx " +
+            "ORDER BY includingIngredientCnt DESC;", nativeQuery = true)
+    List<RecipesContainingIngredientsCnt> findRecipesByIngredients(@Param("ingredientNames") List<String> ingredientNames,
                                                                    @Param("userIdx") Long userIdx);
+
+    @Query(value = "SELECT DISTINCT * FROM recipe r JOIN amount a ON a.recipe_idx = r.recipe_idx " +
+            "JOIN ingredient i ON i.ingredient_idx = a.ingredient_idx " +
+            "WHERE i.ingredient_name IN (:ingredientNames);", nativeQuery = true)
+    List<Recipe> findByIngredients(@Param("ingredientNames") List<String> ingredientNames);
 
 }

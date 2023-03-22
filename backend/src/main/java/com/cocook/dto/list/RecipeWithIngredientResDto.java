@@ -1,13 +1,11 @@
 package com.cocook.dto.list;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class RecipeWithIngredientResDto {
 
     private Long recipeIdx;
@@ -20,7 +18,7 @@ public class RecipeWithIngredientResDto {
 
     private Integer recipeRunningTime;
 
-    private Integer isFavorite;
+    private Boolean isFavorite;
 
     private Integer totalIngredientCnt;
 
