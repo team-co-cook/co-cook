@@ -8,11 +8,13 @@ class CustomSlidingUpPanel extends StatelessWidget {
       {Key? key,
       required this.body,
       required this.panelController,
-      this.onPanelclosed})
+      this.onPanelClosed,
+      this.onPanelOpened})
       : super(key: key);
   final Widget body; // 판넬 안에 담길 내용
   final PanelController panelController; // 판넬 컨트롤러
-  final onPanelclosed;
+  final onPanelClosed;
+  final VoidCallback? onPanelOpened;
 
   @override
   Widget build(BuildContext context) {
@@ -21,6 +23,7 @@ class CustomSlidingUpPanel extends StatelessWidget {
       onPanelClosed: () {
         FocusScope.of(context).unfocus(); // 패널이 닫힐 때 포커스 해제
       },
+      onPanelOpened: onPanelOpened,
       backdropEnabled: true,
       borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(16.0), topRight: Radius.circular(16.0)),

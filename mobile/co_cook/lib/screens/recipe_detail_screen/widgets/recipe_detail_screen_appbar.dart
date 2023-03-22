@@ -4,6 +4,7 @@ import 'dart:convert';
 
 import 'package:co_cook/styles/colors.dart';
 import 'package:co_cook/styles/text_styles.dart';
+import 'package:co_cook/utils/bookmark.dart';
 
 import 'package:co_cook/services/detail_service.dart';
 import 'package:co_cook/widgets/button/bookmark_button.dart';
@@ -42,6 +43,7 @@ class _RecipeDetailScreenAppBarState extends State<RecipeDetailScreenAppBar> {
     DetailService searchService = DetailService();
     Response? response =
         await searchService.getDetailBasic(recipeIdx: recipeIdx);
+    print(response!.data['data']);
     if (response?.statusCode == 200) {
       if (response != null) {
         setState(() {
@@ -154,7 +156,13 @@ class _RecipeDetailScreenAppBarState extends State<RecipeDetailScreenAppBar> {
                                 ),
                               ],
                             ),
-                            BookmarkButton(isAdd: data['isFavorite'])
+                            GestureDetector(
+                              onTap: () => toggleBookmark(
+                                  context, data['isFavorite'], () {
+                                getDetailBasic(widget.recipeIdx);
+                              }, widget.recipeIdx, data["recipeName"]),
+                              child: BookmarkButton(isAdd: data['isFavorite']),
+                            ),
                           ],
                         ),
                       )

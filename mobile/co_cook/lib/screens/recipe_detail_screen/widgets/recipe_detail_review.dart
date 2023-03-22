@@ -45,6 +45,10 @@ class _RecipeDetailReviewTabState extends State<RecipeDetailReviewTab> {
     }
   }
 
+  void reGet() {
+    getDetailReview(widget.recipeIdx);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -56,7 +60,9 @@ class _RecipeDetailReviewTabState extends State<RecipeDetailReviewTab> {
           physics: NeverScrollableScrollPhysics(),
           itemCount: listData.length,
           itemBuilder: (context, index) => RecipeComment(
-              panelController: widget.panelController, review: listData[index]),
+              panelController: widget.panelController,
+              review: listData[index],
+              reGet: reGet),
         ),
       ]),
     );
