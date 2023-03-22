@@ -65,16 +65,18 @@ class _CookScreenSoundMeterState extends State<CookScreenSoundMeter> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          soundMeterdot(Duration(milliseconds: widget.isSpeak ? 200 : 600)),
-          soundMeterdot(Duration(milliseconds: widget.isSpeak ? 50 : 700)),
-          soundMeterdot(Duration(milliseconds: widget.isSpeak ? 100 : 800)),
-          soundMeterdot(Duration(milliseconds: widget.isSpeak ? 300 : 900))
+          soundMeterdot(
+              Duration(milliseconds: widget.isSpeak ? 200 : 700), 0.6),
+          soundMeterdot(Duration(milliseconds: widget.isSpeak ? 50 : 800), 0.9),
+          soundMeterdot(Duration(milliseconds: widget.isSpeak ? 100 : 900), 1),
+          soundMeterdot(
+              Duration(milliseconds: widget.isSpeak ? 300 : 1000), 0.7)
         ],
       ),
     );
   }
 
-  Widget soundMeterdot(Duration duration) {
+  Widget soundMeterdot(Duration duration, double heightWeight) {
     return AnimatedContainer(
       duration: duration,
       curve: Curves.easeInOutQuad,
@@ -82,9 +84,12 @@ class _CookScreenSoundMeterState extends State<CookScreenSoundMeter> {
           .transform,
       alignment: Alignment.center,
       width: widget.dotSize,
-      height: widget.dotSize + (widget.volume / 100 * widget.size),
+      height:
+          widget.dotSize + ((widget.volume * heightWeight) / 100 * widget.size),
       decoration: BoxDecoration(
-          color: CustomColors.redPrimary,
+          color: widget.isSpeak
+              ? CustomColors.redPrimary
+              : CustomColors.monotoneLightGray,
           borderRadius: BorderRadius.circular(4)),
     );
   }
