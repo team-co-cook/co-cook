@@ -1,3 +1,4 @@
+import 'package:co_cook/screens/recipe_detail_screen/recipe_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert'; // decode 가져오기
 import 'package:dio/dio.dart';
@@ -138,13 +139,18 @@ class _RecipeCommentState extends State<RecipeComment> {
               )
             ],
           ),
-          AspectRatio(
-            aspectRatio: 16 / 10, // 비율 설정
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(16.0),
-              child: Image.network(
-                widget.review['imgPath'], // 이미지 URL
-                fit: BoxFit.cover, // 이미지를 박스 크기에 맞게 조정
+          GestureDetector(
+            onTap: () {
+              gotoRecipeDetail(context, widget.review['recipeIdx']);
+            },
+            child: AspectRatio(
+              aspectRatio: 16 / 10, // 비율 설정
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(16.0),
+                child: Image.network(
+                  widget.review['imgPath'], // 이미지 URL
+                  fit: BoxFit.cover, // 이미지를 박스 크기에 맞게 조정
+                ),
               ),
             ),
           ),
@@ -159,20 +165,25 @@ class _RecipeCommentState extends State<RecipeComment> {
                           .overline
                           .copyWith(color: CustomColors.monotoneBlack),
                     )),
-          Container(
-              margin: const EdgeInsets.fromLTRB(0.0, 8.0, 0.0, 0.0),
-              alignment: Alignment.centerLeft,
-              child: Text(
-                widget.review['content'],
-                style: const CustomTextStyles()
-                    .body1
-                    .copyWith(color: CustomColors.monotoneBlack),
-              )),
+          GestureDetector(
+            onTap: () {
+              gotoRecipeDetail(context, widget.review['recipeIdx']);
+            },
+            child: Container(
+                margin: const EdgeInsets.fromLTRB(0.0, 8.0, 0.0, 0.0),
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  widget.review['content'],
+                  style: const CustomTextStyles()
+                      .body1
+                      .copyWith(color: CustomColors.monotoneBlack),
+                )),
+          ),
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               GestureDetector(
-                onTap: widget.review['liked']
+                onTap: widget.review['isLiked']
                     ? () {
                         dislikeDetailReview(widget.review['reviewIdx']);
                       }
@@ -184,11 +195,11 @@ class _RecipeCommentState extends State<RecipeComment> {
                   child: Row(
                     children: [
                       Icon(
-                        widget.review['liked']
+                        widget.review['isLiked']
                             ? Icons.thumb_up
                             : Icons.thumb_up_outlined,
                         size: 16,
-                        color: widget.review['liked']
+                        color: widget.review['isLiked']
                             ? CustomColors.redPrimary
                             : CustomColors.monotoneBlack,
                       ),
@@ -238,4 +249,11 @@ class _RecipeCommentState extends State<RecipeComment> {
       ),
     );
   }
+}
+
+// 내가 찜한 목록으로 이동
+void gotoRecipeDetail(BuildContext context, int recipeIdx) {
+  Route RecipeScreen = MaterialPageRoute(
+      builder: (context) => RecipeDetailScreen(recipeIdx: recipeIdx));
+  Navigator.push(context, RecipeScreen);
 }
