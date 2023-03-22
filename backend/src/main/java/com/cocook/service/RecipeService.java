@@ -162,7 +162,7 @@ public class RecipeService {
         }
         List<ReviewResDto> recipeReviews = new ArrayList<>();
         for (Review review : userReview) {
-            LikeReview foundLiked = likeRepository.findByUserIdAndReviewId(review.getUser().getId(), review.getId());
+            LikeReview foundLiked = likeRepository.findByUserIdAndReviewId(user.getId(), review.getId());
             boolean isLiked = false;
             if (foundLiked != null) { isLiked = true; }
             ReviewResDto recipeReview = new ReviewResDto(review.getId(), user.getId(), review.getCreatedDate(), user.getNickname(), review.getContent(), review.getImgPath(),
@@ -175,7 +175,7 @@ public class RecipeService {
                 userNickname = "알 수 없음";
             }
             Long userIdx = review.getUser().getId();
-            LikeReview foundLiked = likeRepository.findByUserIdAndReviewId(userIdx, review.getId());
+            LikeReview foundLiked = likeRepository.findByUserIdAndReviewId(user.getId(), review.getId());
             boolean isLiked = false;
             if (foundLiked != null) { isLiked = true; }
             ReviewResDto recipeReview = new ReviewResDto(review.getId(), userIdx, review.getCreatedDate(), userNickname, review.getContent(), review.getImgPath(),
