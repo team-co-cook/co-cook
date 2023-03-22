@@ -132,8 +132,11 @@ class _SearchScreenState extends State<SearchScreen> {
                             child: Column(
                               children: [
                                 SizedBox(height: 100),
-                                Text('이렇게 검색해보세요.'),
-                                SizedBox(height: 32.0),
+                                Text('이렇게 검색해보세요.',
+                                    style: CustomTextStyles().body1.copyWith(
+                                          color: CustomColors.monotoneGray,
+                                        )),
+                                SizedBox(height: 16.0),
                                 Column(
                                   children: exampleWord
                                       .map((e) => CommonButton(
