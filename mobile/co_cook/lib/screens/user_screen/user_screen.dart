@@ -102,7 +102,7 @@ class _UserScreenState extends State<UserScreen> {
                   text: '내가 작성한 한줄평',
                   color: CustomColors.monotoneBlack,
                   onPressed: () {
-                    // gotoMyReview(context);
+                    gotoMyReview(context);
                   },
                 ),
                 CustomTextButton(
@@ -210,8 +210,8 @@ void gotoFavorite(BuildContext context) {
 }
 
 // 내가 찜한 목록으로 이동
-// void gotoMyReview(BuildContext context) {
-//   Route myReviewScreen =
-//       MaterialPageRoute(builder: (context) => MyReviewScreen());
-//   Navigator.push(context, myReviewScreen);
-// }
+void gotoMyReview(BuildContext context) {
+  Route myReviewScreen =
+      MaterialPageRoute(builder: (context) => MyReviewScreen());
+  Navigator.push(context, myReviewScreen);
+}
