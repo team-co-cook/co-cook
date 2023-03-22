@@ -47,7 +47,10 @@ class _ListCardState extends State<ListCard> {
   Widget build(BuildContext context) {
     return ZoomTapAnimation(
       end: 0.98,
-      onTap: () => routeScreen(context, RecipeDetailScreen()), // 클릭시 이벤트 연결
+      onTap: () => routeScreen(
+          context,
+          RecipeDetailScreen(
+              recipeIdx: widget.data['recipeIdx'])), // 클릭시 이벤트 연결
       child: Container(
           // 전체 컨테이너
           decoration: BoxDecoration(

@@ -1,19 +1,32 @@
+import 'package:co_cook/screens/cook_screen/cook_screen.dart';
+import 'package:co_cook/screens/cook_screen/widgets/cook_screen_request_rotate.dart';
 import 'package:co_cook/widgets/comment/recipe_comment.dart';
 import 'package:co_cook/widgets/sliding_up_panel/sliding_up_panel.dart';
 import 'package:flutter/material.dart';
+import 'package:dio/dio.dart';
+import 'dart:convert';
+
 import 'package:co_cook/styles/colors.dart';
 import 'package:co_cook/styles/text_styles.dart';
 
+import 'package:co_cook/utils/route.dart';
+
 import 'package:sticky_headers/sticky_headers.dart';
 import 'package:zoom_tap_animation/zoom_tap_animation.dart';
+import 'package:co_cook/services/detail_service.dart';
+
+import 'package:co_cook/widgets/comment/recipe_comment.dart';
+import 'package:co_cook/widgets/sliding_up_panel/sliding_up_panel.dart';
 import 'package:co_cook/screens/recipe_detail_screen/widgets/recipe_detail_info.dart';
 import 'package:co_cook/screens/recipe_detail_screen/widgets/ai_recipe_start_button.dart';
 import 'package:co_cook/screens/recipe_detail_screen/widgets/recipe_detail_recipe_tab.dart';
 import 'package:co_cook/screens/recipe_detail_screen/widgets/recipe_detail_screen_appbar.dart';
+import 'package:co_cook/screens/recipe_detail_screen/widgets/recipe_detail_review.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 class RecipeDetailScreen extends StatefulWidget {
-  const RecipeDetailScreen({super.key});
+  const RecipeDetailScreen({super.key, required this.recipeIdx});
+  final int recipeIdx;
 
   @override
   State<RecipeDetailScreen> createState() => _RecipeDetailScreenState();
@@ -76,7 +89,7 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen>
                 child: Column(
                   children: [
                     ZoomTapAnimation(
-                        onTap: () => print(_tabController.index),
+                        onTap: () => pushScreen(context, CookScreen()),
                         end: 0.98,
                         child: AiRecipeStartButton()),
                     TabBar(
@@ -93,18 +106,21 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen>
                 ),
               ),
               content: Container(
+                  constraints: BoxConstraints(
+                      minHeight: MediaQuery.of(context).size.height - 160),
                   width: double.infinity,
                   child: [
-                    RecipeDetailInfoTab(),
-                    RecipeDetailRecipeTab(),
-                    RecipeDetailCommentTab(
-                      panelController: _panelController,
-                    )
+                    RecipeDetailInfoTab(recipeIdx: widget.recipeIdx),
+                    RecipeDetailRecipeTab(recipeIdx: widget.recipeIdx),
+                    RecipeDetailReviewTab(
+                        panelController: _panelController,
+                        recipeIdx: widget.recipeIdx)
                   ][_tabControllerIndex]),
             ),
           ),
         ),
         RecipeDetailScreenAppBar(
+          recipeIdx: widget.recipeIdx,
           scrollControllerOffset: _scrollControllerOffset,
           maxAppBarHeight: 280,
           minAppBarHeight: 64,
@@ -112,32 +128,6 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen>
         Positioned(
             child: CustomSlidingUpPanel(
                 body: Text("댓글내용"), panelController: _panelController))
-      ]),
-    );
-  }
-}
-
-class RecipeDetailCommentTab extends StatelessWidget {
-  const RecipeDetailCommentTab({
-    Key? key,
-    required this.panelController, // 추가된 코드
-  }) : super(key: key);
-
-  final PanelController panelController;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: CustomColors.monotoneLight,
-      child: Stack(children: [
-        ListView.builder(
-          shrinkWrap: true,
-          padding: EdgeInsets.fromLTRB(24.0, 24.0, 24.0, 24.0),
-          physics: NeverScrollableScrollPhysics(),
-          itemCount: 5,
-          itemBuilder: (context, index) =>
-              RecipeComment(panelController: panelController),
-        ),
       ]),
     );
   }

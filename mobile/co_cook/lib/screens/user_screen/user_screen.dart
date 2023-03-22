@@ -1,4 +1,5 @@
 import 'dart:convert'; // decode 가져오기
+import 'package:co_cook/screens/favorite_screen/favorite_screen.dart';
 import 'package:co_cook/widgets/sliding_up_panel/sliding_up_panel.dart';
 import 'package:dio/dio.dart'; // Response 가져오기 위함.
 import 'package:flutter/material.dart';
@@ -57,9 +58,9 @@ class _UserScreenState extends State<UserScreen> {
         appBar: AppBar(
           backgroundColor: CustomColors.monotoneLight,
           elevation: 0.5,
-          toolbarHeight: 120,
+          toolbarHeight: 100,
           title: Padding(
-            padding: const EdgeInsets.fromLTRB(10, 60, 0, 0),
+            padding: const EdgeInsets.fromLTRB(10, 30, 0, 0),
             child: Align(
               alignment: Alignment.centerLeft,
               child: Text(
@@ -72,7 +73,7 @@ class _UserScreenState extends State<UserScreen> {
           ),
           actions: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(0, 60, 10, 0),
+              padding: const EdgeInsets.fromLTRB(0, 10, 10, 0),
               child: IconButton(
                 icon: Icon(Icons.edit, color: CustomColors.monotoneBlack),
                 onPressed: () {
@@ -89,6 +90,13 @@ class _UserScreenState extends State<UserScreen> {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                CustomTextButton(
+                  text: '내가 찜한 레시피',
+                  color: CustomColors.monotoneBlack,
+                  onPressed: () {
+                    gotoFavorite(context);
+                  },
+                ),
                 CustomTextButton(
                     text: '내가 작성한 한줄평', color: CustomColors.monotoneBlack),
                 CustomTextButton(
@@ -187,4 +195,10 @@ void withdrawal(BuildContext context) async {
     Route login = MaterialPageRoute(builder: (context) => const LoginScreen());
     Navigator.pushReplacement(context, login);
   }
+}
+
+// 내가 찜한 목록으로 이동
+void gotoFavorite(BuildContext context) {
+  Route themeScreen = MaterialPageRoute(builder: (context) => FavoriteScreen());
+  Navigator.push(context, themeScreen);
 }
