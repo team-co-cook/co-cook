@@ -16,7 +16,7 @@ class CookScreenTimer extends StatefulWidget {
 
 class _CookScreenTimerState extends State<CookScreenTimer> {
   late int _currentSeconds;
-  late Timer _timer;
+  late Timer? _timer;
   bool _isPlay = false;
 
   @override
@@ -27,7 +27,7 @@ class _CookScreenTimerState extends State<CookScreenTimer> {
 
   @override
   void dispose() {
-    _timer.cancel();
+    _endTimer();
     super.dispose();
   }
 
@@ -43,9 +43,9 @@ class _CookScreenTimerState extends State<CookScreenTimer> {
   }
 
   void _endTimer() {
-    if (_isPlay) {
+    if (_isPlay && mounted) {
       print("타이머 종료");
-      _timer.cancel();
+      _timer?.cancel();
       setState(() {
         _isPlay = false;
         _currentSeconds = widget.time;
@@ -56,7 +56,7 @@ class _CookScreenTimerState extends State<CookScreenTimer> {
   void _cancelTimer() {
     if (_isPlay) {
       print("타이머 취소");
-      _timer.cancel();
+      _timer?.cancel();
       setState(() {
         _isPlay = false;
         _currentSeconds = widget.time;

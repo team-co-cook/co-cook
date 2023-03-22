@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:co_cook/screens/cook_screen/widgets/cook_screen_body.dart';
+import 'package:co_cook/screens/cook_screen/widgets/cook_screen_recoder.dart';
 import 'package:co_cook/screens/cook_screen/widgets/cook_screen_request_rotate.dart';
 import 'package:co_cook/widgets/button/button.dart';
 import 'package:flutter/material.dart';

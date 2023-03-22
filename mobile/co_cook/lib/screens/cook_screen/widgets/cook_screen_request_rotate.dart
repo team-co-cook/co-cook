@@ -10,27 +10,24 @@ class CookScreenRequestRotate extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        width: double.infinity,
-        color: CustomColors.redPrimary,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-                width: 124,
-                margin: EdgeInsets.only(bottom: 24.0),
-                child:
-                    Image.asset('assets/images/etc/rotate_phone_request.gif')),
-            SizedBox(
-                child: Text(
-              "화면을 가로로 돌려주세요",
-              style: CustomTextStyles()
-                  .subtitle1
-                  .copyWith(color: CustomColors.monotoneLight),
-            ))
-          ],
-        ),
+    return Container(
+      width: double.infinity,
+      color: CustomColors.redPrimary,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+              width: 124,
+              margin: EdgeInsets.only(bottom: 24.0),
+              child: Image.asset('assets/images/etc/rotate_phone_request.gif')),
+          SizedBox(
+              child: Text(
+            "화면을 가로로 돌려주세요",
+            style: CustomTextStyles()
+                .subtitle1
+                .copyWith(color: CustomColors.monotoneLight),
+          ))
+        ],
       ),
     );
   }
