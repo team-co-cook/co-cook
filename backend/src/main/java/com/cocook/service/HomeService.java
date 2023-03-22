@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -59,14 +60,31 @@ public class HomeService {
         return new RecommendResDto(themeName, resultRecipes);
     }
 
-    public ThemeResDto getThemes() {
-        List<Theme> themes = themeRepository.findAll();
-        return new ThemeResDto(themes);
+    public List<ThemeResDto> getThemes() {
+        List<String> themeNames = Arrays.asList("아침", "점심", "저녁", "야식");
+        List<Theme> themes = themeRepository.findThemesNotInThemeNames(themeNames);
+        List<ThemeResDto> themeResDtos = new ArrayList<>();
+        for (Theme theme : themes) {
+            ThemeResDto themeResDto = ThemeResDto.builder()
+                    .id(theme.getId())
+                    .imgPath(theme.getImgPath())
+                    .themeName(theme.getThemeName()).build();
+            themeResDtos.add(themeResDto);
+        }
+        return themeResDtos;
     }
 
-    public CategoryResDto getCategories() {
+    public List<CategoryResDto> getCategories() {
         List<Category> categories = categoryRepository.findAll();
-        return new CategoryResDto(categories);
+        List<CategoryResDto> categoryResDtos = new ArrayList<>();
+        for (Category category : categories) {
+            CategoryResDto categoryResDto = CategoryResDto.builder()
+                    .id(category.getId())
+                    .categoryName(category.getCategoryName())
+                    .imgPath(category.getImgPath()).build();
+            categoryResDtos.add(categoryResDto);
+        }
+        return categoryResDtos;
     }
 
     public RandomResDto getRandomRecipes(String authToken) {
