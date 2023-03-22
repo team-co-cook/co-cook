@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class ReviewResDto {
     private Long reviewIdx;
+    private Long userIdx;
     private LocalDateTime createdAt;
 
     private String userNickname;
@@ -24,5 +25,5 @@ public class ReviewResDto {
 
     private Integer runningTime;
 
-
+    private boolean isLiked;
 }
