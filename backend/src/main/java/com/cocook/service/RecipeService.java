@@ -27,6 +27,7 @@ public class RecipeService {
     private final FavoriteRepository favoriteRepository;
     private final ReviewRepository reviewRepository;
     private final AmountRepository amountRepository;
+    private final LikeRepository likeRepository;
     private final TagService tagService;
     private final StepService stepService;
     private final IngredientService ingredientService;
@@ -38,7 +39,7 @@ public class RecipeService {
     public RecipeService(RecipeRepository recipeRepository, CategoryRepository categoryRepository, IngredientRepository ingredientRepository,
                          StepRepository stepRepository, ThemeRepository themeRepository, TagService tagService, StepService stepService,
                          IngredientService ingredientService, AmountService amountService, S3Uploader s3Uploader, FavoriteRepository favoriteRepository,
-                         JwtTokenProvider jwtTokenProvider, ReviewRepository reviewRepository, AmountRepository amountRepository) {
+                         JwtTokenProvider jwtTokenProvider, ReviewRepository reviewRepository, AmountRepository amountRepository, LikeRepository likeRepository) {
         this.recipeRepository = recipeRepository;
         this.categoryRepository = categoryRepository;
         this.ingredientRepository = ingredientRepository;
@@ -46,6 +47,7 @@ public class RecipeService {
         this.themeRepository = themeRepository;
         this.reviewRepository = reviewRepository;
         this.amountRepository = amountRepository;
+        this.likeRepository = likeRepository;
         this.tagService = tagService;
         this.stepService = stepService;
         this.ingredientService = ingredientService;
@@ -160,14 +162,24 @@ public class RecipeService {
         }
         List<ReviewResDto> recipeReviews = new ArrayList<>();
         for (Review review : userReview) {
-            ReviewResDto recipeReview = new ReviewResDto(review.getId(), review.getCreatedDate(), user.getNickname(), review.getContent(), review.getImgPath(),
-                    review.getLikeCnt(), review.getCommentCnt(), review.getRunningTime());
+            LikeReview foundLiked = likeRepository.findByUserIdAndReviewId(review.getUser().getId(), review.getId());
+            boolean isLiked = false;
+            if (foundLiked != null) { isLiked = true; }
+            ReviewResDto recipeReview = new ReviewResDto(review.getId(), user.getId(), review.getCreatedDate(), user.getNickname(), review.getContent(), review.getImgPath(),
+                    review.getLikeCnt(), review.getCommentCnt(), review.getRunningTime(), isLiked);
             recipeReviews.add(recipeReview);
         }
         for (Review review : otherReview) {
             String userNickname = review.getUser().getNickname();
-            ReviewResDto recipeReview = new ReviewResDto(review.getId(), review.getCreatedDate(), userNickname, review.getContent(), review.getImgPath(),
-                    review.getLikeCnt(), review.getCommentCnt(), review.getRunningTime());
+            if (!review.getUser().getIsActive()) {
+                userNickname = "알 수 없음";
+            }
+            Long userIdx = review.getUser().getId();
+            LikeReview foundLiked = likeRepository.findByUserIdAndReviewId(userIdx, review.getId());
+            boolean isLiked = false;
+            if (foundLiked != null) { isLiked = true; }
+            ReviewResDto recipeReview = new ReviewResDto(review.getId(), userIdx, review.getCreatedDate(), userNickname, review.getContent(), review.getImgPath(),
+                    review.getLikeCnt(), review.getCommentCnt(), review.getRunningTime(), isLiked);
             recipeReviews.add(recipeReview);
         }
         return new ReviewListResDto(recipeReviews);
