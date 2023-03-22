@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
+import 'dart:convert'; // decode 가져오기
+import 'package:dio/dio.dart';
+import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 import 'package:co_cook/styles/colors.dart';
 import 'package:co_cook/styles/text_styles.dart';
+import 'package:co_cook/services/detail_service.dart';
 
 class RecipeComment extends StatefulWidget {
   const RecipeComment(
-      {super.key,
-      this.highlight = false,
-      this.myComment = false,
-      required this.panelController});
-  final bool highlight;
-  final bool myComment;
+      {super.key, required this.review, required this.panelController});
+  final Map review;
   final panelController;
 
   @override
@@ -18,25 +20,80 @@ class RecipeComment extends StatefulWidget {
 
 class _RecipeCommentState extends State<RecipeComment> {
   bool _isLike = false;
+  bool _myComment = false;
 
-  void _toggleLike() {
-    setState(() {
-      _isLike = !_isLike;
-    });
+  @override
+  void initState() {
+    super.initState();
+    setIsLike();
+  }
+
+  void setIsLike() {
+    if (widget.review['liked']) {
+      setState(() {
+        _isLike = true;
+      });
+    }
+  }
+
+  Future<void> getUserIdx() async {
+    // UserIdx 가져오기
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String prefsUserData =
+        prefs.getString('userData') ?? ''; // 기본값으로 빈 문자열을 사용합니다.
+    Map<String, dynamic> decodePrefs = jsonDecode(prefsUserData);
+    int userIdx = decodePrefs['user_idx'];
+    if (widget.review['userIdx'] == userIdx) {
+      setState(() {
+        _myComment = true;
+      });
+    }
+  }
+
+  Future<void> likeDetailReview(int reviewIdx) async {
+    // API 요청
+    DetailService searchService = DetailService();
+    Response? response =
+        await searchService.likeDetailReview(reviewIdx: reviewIdx);
+    if (response?.statusCode == 200) {
+      if (response != null) {
+        setState(() {
+          _isLike = !_isLike;
+        });
+      }
+    }
+  }
+
+  Future<void> dislikeDetailReview(int reviewIdx) async {
+    // API 요청
+    DetailService searchService = DetailService();
+    Response? response =
+        await searchService.dislikeDetailReview(reviewIdx: reviewIdx);
+    if (response?.statusCode == 200) {
+      if (response != null) {
+        setState(() {
+          _isLike = !_isLike;
+        });
+      }
+    }
+  }
+
+  String formatDate(String date) {
+    DateTime parsedDate = DateTime.parse(date);
+    DateFormat dateFormat = DateFormat('yyyy. M. d.');
+    return dateFormat.format(parsedDate);
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      color:
-          widget.highlight ? CustomColors.redLight : CustomColors.monotoneLight,
       child: Column(
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                widget.myComment ? "내 한줄평" : "data",
+                _myComment ? "내 한줄평" : widget.review['userNickname'],
                 style: const CustomTextStyles()
                     .subtitle1
                     .copyWith(color: CustomColors.monotoneBlack),
@@ -51,16 +108,21 @@ class _RecipeCommentState extends State<RecipeComment> {
               ),
             ],
           ),
-          Container(
-            height: 168,
-            decoration: BoxDecoration(
-                color: Colors.black, borderRadius: BorderRadius.circular(16.0)),
+          AspectRatio(
+            aspectRatio: 16 / 10, // 비율 설정
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(16.0),
+              child: Image.network(
+                widget.review['imgPath'], // 이미지 URL
+                fit: BoxFit.cover, // 이미지를 박스 크기에 맞게 조정
+              ),
+            ),
           ),
           Container(
               margin: const EdgeInsets.fromLTRB(0.0, 8.0, 0.0, 0.0),
               alignment: Alignment.centerLeft,
               child: Text(
-                "2023. 3. 13.",
+                formatDate(widget.review['createdAt']),
                 style: const CustomTextStyles()
                     .overline
                     .copyWith(color: CustomColors.monotoneBlack),
@@ -69,7 +131,7 @@ class _RecipeCommentState extends State<RecipeComment> {
               margin: const EdgeInsets.fromLTRB(0.0, 8.0, 0.0, 0.0),
               alignment: Alignment.centerLeft,
               child: Text(
-                "댓글내용댓글내용댓글내용댓글내용댓글내용댓글내용댓글내용댓글내용댓글내용댓글내용댓글내용댓글내용댓글내용댓글내용댓글내용댓글내용댓글내용댓글내용댓글내용댓글내용댓글내용댓글내용댓글내용댓글내용댓글내용댓글내용댓글내용댓글내용댓글내용댓글내용댓글내용댓글내용댓글내용",
+                widget.review['content'],
                 style: const CustomTextStyles()
                     .body1
                     .copyWith(color: CustomColors.monotoneBlack),
@@ -78,12 +140,15 @@ class _RecipeCommentState extends State<RecipeComment> {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               GestureDetector(
-                onTap: _toggleLike,
+                onTap: _isLike
+                    ? () {
+                        dislikeDetailReview(widget.review['reviewIdx']);
+                      }
+                    : () {
+                        likeDetailReview(widget.review['reviewIdx']);
+                      },
                 child: Container(
                   height: 40,
-                  color: widget.highlight
-                      ? CustomColors.redLight
-                      : CustomColors.monotoneLight,
                   child: Row(
                     children: [
                       Icon(
@@ -96,7 +161,7 @@ class _RecipeCommentState extends State<RecipeComment> {
                       Container(
                         margin: const EdgeInsets.fromLTRB(4.0, 0.0, 0.0, 0.0),
                         child: Text(
-                          "245",
+                          widget.review['likeCnt'].toString(),
                           style: const CustomTextStyles()
                               .button
                               .copyWith(color: CustomColors.monotoneBlack),
@@ -106,33 +171,33 @@ class _RecipeCommentState extends State<RecipeComment> {
                   ),
                 ),
               ),
-              GestureDetector(
-                onTap: () => widget.panelController.open(),
-                child: Container(
-                  margin: const EdgeInsets.fromLTRB(8.0, 0.0, 0.0, 0.0),
-                  height: 40,
-                  color: widget.highlight
-                      ? CustomColors.redLight
-                      : CustomColors.monotoneLight,
-                  child: Row(
-                    children: [
-                      const Icon(
-                        Icons.mode_comment_outlined,
-                        size: 16,
-                      ),
-                      Container(
-                        margin: const EdgeInsets.fromLTRB(4.0, 0.0, 0.0, 0.0),
-                        child: Text(
-                          "32",
-                          style: const CustomTextStyles()
-                              .button
-                              .copyWith(color: CustomColors.monotoneBlack),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+              // GestureDetector(
+              //   onTap: () => widget.panelController.open(),
+              //   child: Container(
+              //     margin: const EdgeInsets.fromLTRB(8.0, 0.0, 0.0, 0.0),
+              //     height: 40,
+              //     color: widget.highlight
+              //         ? CustomColors.redLight
+              //         : CustomColors.monotoneLight,
+              //     child: Row(
+              //       children: [
+              //         const Icon(
+              //           Icons.mode_comment_outlined,
+              //           size: 16,
+              //         ),
+              //         Container(
+              //           margin: const EdgeInsets.fromLTRB(4.0, 0.0, 0.0, 0.0),
+              //           child: Text(
+              //             "32",
+              //             style: const CustomTextStyles()
+              //                 .button
+              //                 .copyWith(color: CustomColors.monotoneBlack),
+              //           ),
+              //         ),
+              //       ],
+              //     ),
+              //   ),
+              // ),
             ],
           ),
         ],

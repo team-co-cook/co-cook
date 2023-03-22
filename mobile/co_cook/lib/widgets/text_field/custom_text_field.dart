@@ -5,6 +5,7 @@ import 'package:co_cook/styles/text_styles.dart';
 
 class CustomTextField extends StatelessWidget {
   final ValueChanged<String> onChanged;
+  final bool isFormat;
   final bool isError;
   final bool isFocus;
   final int maxLength; // 글자수 제한, 0일 때 무제한
@@ -13,6 +14,7 @@ class CustomTextField extends StatelessWidget {
 
   CustomTextField(
       {required this.onChanged,
+      this.isFormat = true,
       this.isError = false,
       this.isFocus = true,
       this.maxLength = 0,
@@ -27,9 +29,12 @@ class CustomTextField extends StatelessWidget {
         autofocus: isFocus,
         textAlignVertical: TextAlignVertical.center,
         maxLength: maxLength == 0 ? null : maxLength,
-        inputFormatters: [
-          FilteringTextInputFormatter.allow(RegExp('[ㄱ-ㅎ|ㅏ-ㅣ|가-힣a-zA-Z]')),
-        ],
+        inputFormatters: isFormat
+            ? [
+                FilteringTextInputFormatter.allow(
+                    RegExp('[ㄱ-ㅎ|ㅏ-ㅣ|가-힣a-zA-Z]')),
+              ]
+            : null,
         onChanged: onChanged,
         cursorColor: Colors.black,
         onSubmitted: onSubmitted,
@@ -45,13 +50,13 @@ class CustomTextField extends StatelessWidget {
               const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(20.0),
-            borderSide:
-                const BorderSide(color: CustomColors.redPrimary, width: 4.0),
+            borderSide: const BorderSide(
+                color: CustomColors.monotoneLightGray, width: 1.0),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(20.0),
-            borderSide:
-                const BorderSide(color: CustomColors.redPrimary, width: 4.0),
+            borderSide: const BorderSide(
+                color: CustomColors.monotoneLightGray, width: 1.0),
           ),
           hintText: isSearch ? '검색어를 입력해주세요' : null,
         ),

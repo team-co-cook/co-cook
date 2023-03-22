@@ -2,6 +2,7 @@ import 'package:co_cook/screens/search_screen/search_screen.dart';
 import 'package:co_cook/screens/user_screen/user_screen.dart';
 import 'package:co_cook/widgets/sliding_up_panel/sliding_up_panel.dart';
 import 'package:flutter/material.dart';
+import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 import 'package:co_cook/styles/colors.dart';
 import 'package:co_cook/styles/text_styles.dart';
@@ -18,6 +19,8 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0; // 화면 인덱스 초기화
+  final PanelController _mainPanelController =
+      PanelController(); // 새 PanelController 추가
 
   // 화면 인텍스 변경 함수
   void _onTap(int index) {
@@ -42,15 +45,16 @@ class _MainScreenState extends State<MainScreen> {
         ),
         CustomSlidingUpPanel(
             body: Container(
-          width: double.infinity,
-          height: 1000,
-          color: Colors.black,
-        ))
+              width: double.infinity,
+              height: 1000,
+              color: Colors.black,
+            ),
+            panelController: _mainPanelController)
       ]),
       bottomNavigationBar: BottomNavBar(
           currentIndex: _currentIndex,
           onTap: _onTap,
-          panelController: panelController),
+          panelController: _mainPanelController),
     );
   }
 }

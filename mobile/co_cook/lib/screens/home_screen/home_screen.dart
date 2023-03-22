@@ -55,6 +55,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
         backgroundColor: CustomColors.monotoneLight,
         shadowColor: CustomColors.monotoneLight,
+        elevation: 0.5,
       ),
       body: SingleChildScrollView(
         physics: BouncingScrollPhysics(),
