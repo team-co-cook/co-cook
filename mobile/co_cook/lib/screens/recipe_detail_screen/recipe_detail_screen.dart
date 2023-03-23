@@ -1,28 +1,20 @@
-import 'package:co_cook/screens/cook_screen/cook_screen.dart';
-import 'package:co_cook/screens/cook_screen/widgets/cook_screen_request_rotate.dart';
-import 'package:co_cook/widgets/comment/recipe_comment.dart';
-import 'package:co_cook/widgets/sliding_up_panel/sliding_up_panel.dart';
 import 'package:flutter/material.dart';
-import 'package:dio/dio.dart';
-import 'dart:convert';
+import 'package:co_cook/utils/route.dart';
 
 import 'package:co_cook/styles/colors.dart';
 import 'package:co_cook/styles/text_styles.dart';
 
-import 'package:co_cook/utils/route.dart';
-
 import 'package:sticky_headers/sticky_headers.dart';
 import 'package:zoom_tap_animation/zoom_tap_animation.dart';
-import 'package:co_cook/services/detail_service.dart';
 
-import 'package:co_cook/widgets/comment/recipe_comment.dart';
+import 'package:sliding_up_panel/sliding_up_panel.dart';
+import 'package:co_cook/screens/cook_screen/cook_screen.dart';
 import 'package:co_cook/widgets/sliding_up_panel/sliding_up_panel.dart';
 import 'package:co_cook/screens/recipe_detail_screen/widgets/recipe_detail_info.dart';
+import 'package:co_cook/screens/recipe_detail_screen/widgets/recipe_detail_review.dart';
 import 'package:co_cook/screens/recipe_detail_screen/widgets/ai_recipe_start_button.dart';
 import 'package:co_cook/screens/recipe_detail_screen/widgets/recipe_detail_recipe_tab.dart';
 import 'package:co_cook/screens/recipe_detail_screen/widgets/recipe_detail_screen_appbar.dart';
-import 'package:co_cook/screens/recipe_detail_screen/widgets/recipe_detail_review.dart';
-import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 class RecipeDetailScreen extends StatefulWidget {
   const RecipeDetailScreen({super.key, required this.recipeIdx});

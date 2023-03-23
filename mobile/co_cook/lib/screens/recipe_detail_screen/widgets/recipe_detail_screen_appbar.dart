@@ -1,14 +1,15 @@
+import 'package:co_cook/styles/shadows.dart';
 import 'package:flutter/material.dart';
-import 'package:dio/dio.dart';
-import 'dart:convert';
 
 import 'package:co_cook/styles/colors.dart';
 import 'package:co_cook/styles/text_styles.dart';
-import 'package:co_cook/utils/bookmark.dart';
 
+import 'package:dio/dio.dart';
+import 'package:transparent_image/transparent_image.dart';
+
+import 'package:co_cook/utils/bookmark.dart';
 import 'package:co_cook/services/detail_service.dart';
 import 'package:co_cook/widgets/button/bookmark_button.dart';
-import 'package:transparent_image/transparent_image.dart';
 
 class RecipeDetailScreenAppBar extends StatefulWidget {
   const RecipeDetailScreenAppBar(
@@ -43,11 +44,10 @@ class _RecipeDetailScreenAppBarState extends State<RecipeDetailScreenAppBar> {
     DetailService searchService = DetailService();
     Response? response =
         await searchService.getDetailBasic(recipeIdx: recipeIdx);
-    print(response!.data['data']);
     if (response?.statusCode == 200) {
       if (response != null) {
         setState(() {
-          data = response!.data['data'];
+          data = response.data['data'];
         });
       }
     }
@@ -60,7 +60,7 @@ class _RecipeDetailScreenAppBarState extends State<RecipeDetailScreenAppBar> {
     double _minSafeAppBarHeight = safePadding + widget.minAppBarHeight;
 
     return data.isEmpty
-        ? Center(
+        ? const Center(
             child: CircularProgressIndicator(color: CustomColors.redPrimary))
         : Container(
             width: double.infinity,
@@ -85,6 +85,7 @@ class _RecipeDetailScreenAppBarState extends State<RecipeDetailScreenAppBar> {
                         child: Stack(children: [
                           FadeInImage.memoryNetwork(
                               width: double.infinity,
+                              height: double.infinity,
                               fadeInDuration: const Duration(milliseconds: 200),
                               fit: BoxFit.cover,
                               placeholder: kTransparentImage,
@@ -93,16 +94,17 @@ class _RecipeDetailScreenAppBarState extends State<RecipeDetailScreenAppBar> {
                             left: 24.0,
                             bottom: 24.0,
                             child: Text(data['recipeName'],
-                                style: CustomTextStyles().title2.copyWith(
-                                      color: CustomColors.monotoneLight,
-                                    )),
+                                style: const CustomTextStyles().title2.copyWith(
+                                  color: CustomColors.monotoneLight,
+                                  shadows: const [CustomShadows.text],
+                                )),
                           ),
                         ]),
                       ),
                       Container(
                         width: double.infinity,
                         height: 64,
-                        padding: EdgeInsets.only(left: 24.0, right: 24.0),
+                        padding: const EdgeInsets.only(left: 24.0, right: 24.0),
                         color: CustomColors.monotoneLight,
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -198,8 +200,9 @@ class _RecipeDetailScreenAppBarState extends State<RecipeDetailScreenAppBar> {
                         height: widget.minAppBarHeight,
                         margin: EdgeInsets.only(top: safePadding),
                         child: IconButton(
-                          icon: Icon(Icons.arrow_back,
-                              color: CustomColors.monotoneLight),
+                          icon: const Icon(Icons.arrow_back,
+                              color: CustomColors.monotoneLight,
+                              shadows: [CustomShadows.text]),
                           onPressed: () => Navigator.pop(context),
                         ))),
                 Opacity(
