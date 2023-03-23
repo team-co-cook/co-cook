@@ -1,9 +1,11 @@
 import 'dart:io';
 import 'dart:convert'; // decode 가져오기
 import 'package:co_cook/screens/photo_card_screen/photo_card_screen.dart';
+import 'package:co_cook/services/detail_service.dart';
 import 'package:dio/dio.dart'; // Response 가져오기 위함.
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:http/http.dart' as http;
 
 import 'package:co_cook/styles/colors.dart';
 import 'package:co_cook/styles/text_styles.dart';
@@ -32,10 +34,18 @@ class _ReviewScreenState extends State<ReviewScreen> {
   String _errorMessage = '';
   final _focusNode = FocusNode(); // 포커싱 여부를 추적하는 클래스 인스턴스
   XFile? _image; // 이미지를 저장
+  int _runningTime = 0;
 
   @override
   void initState() {
     super.initState();
+
+    DateTime now = DateTime.now();
+    Duration runningTime = widget.startTime.difference(now);
+    int minutes = runningTime.inMinutes.remainder(60);
+    setState(() {
+      _runningTime = minutes;
+    });
   }
 
   // 위젯이 소멸될 때 호출되는 메서드
@@ -80,6 +90,35 @@ class _ReviewScreenState extends State<ReviewScreen> {
     setState(() {
       _image = null;
     });
+  }
+
+  Future<void> getDetailBasic() async {
+    // 이미지를 MultipartFile로 변환
+    File imageFile = File(_image!.path);
+    String fileName = imageFile.path.split('/').last;
+    http.MultipartFile multipartFile = await http.MultipartFile.fromPath(
+        'reviewImg', imageFile.path,
+        filename: fileName);
+    // 여기서 'reviewImg'는 서버에서 요구하는 파일의 키값입니다. 서버 요구에 따라 적절하게 변경해 주세요.
+
+    // API 요청
+    DetailService _apiService = DetailService();
+    Map<String, dynamic> reviewData = {
+      "reviewDetail": {
+        "content": _text,
+        "runningTime": _runningTime,
+        "recipeIdx": widget.recipeIdx
+      },
+    };
+
+    // reviewData와 multipartFile을 함께 전송하기 위해 FormData를 사용합니다.
+    FormData formData = FormData.fromMap({
+      ...reviewData,
+      "reviewImg": multipartFile,
+    });
+
+    // print('body: $userData'); // 데이터 확인
+    Response? response = await _apiService.createReview(formData);
   }
 
   @override
@@ -139,7 +178,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
                                 ),
                               ),
                               child: _image == null
-                                  ? Icon(Icons.add_a_photo,
+                                  ? const Icon(Icons.add_a_photo,
                                       size: 20,
                                       color: CustomColors.monotoneGray)
                                   : ClipRRect(
@@ -220,5 +259,5 @@ void gotoPhotoCard(BuildContext context, String _text, XFile _image,
             time: startTime,
             recipeName: recipeName,
           ));
-  Navigator.push(context, photoCardScreen);
+  Navigator.pushReplacement(context, photoCardScreen);
 }

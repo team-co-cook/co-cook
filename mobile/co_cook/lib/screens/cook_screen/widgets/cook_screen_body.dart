@@ -289,5 +289,6 @@ void gotoReview(BuildContext context, int recipeIdx, String recipeName,
   Route reviewScreen = MaterialPageRoute(
       builder: (context) => ReviewScreen(
           recipeIdx: recipeIdx, recipeName: recipeName, startTime: startTime));
-  Navigator.push(context, reviewScreen);
+  // Navigator.push(context, reviewScreen);
+  Navigator.pushReplacement(context, reviewScreen); // 로그인 상태이면 홈화면으로 이동합니다.
 }

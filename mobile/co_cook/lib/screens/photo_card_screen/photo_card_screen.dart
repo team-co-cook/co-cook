@@ -124,7 +124,9 @@ class _PhotoCardScreenState extends State<PhotoCardScreen> {
                 Padding(
                   padding: const EdgeInsets.only(right: 20),
                   child: IconButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
                       icon: Icon(
                         Icons.close,
                         color: CustomColors.monotoneLight, // 아이콘 색상
