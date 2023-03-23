@@ -11,6 +11,7 @@ class AiRecipeStartButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: EdgeInsets.fromLTRB(24.0, 0.0, 24.0, 0.0),
+      padding: EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
       width: double.infinity,
       alignment: Alignment.center,
       height: 40,
@@ -18,11 +19,18 @@ class AiRecipeStartButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(16.0),
         color: CustomColors.redPrimary,
       ),
-      child: Text(
-        "AI 레시피 시작",
-        style: const CustomTextStyles()
-            .button
-            .copyWith(color: CustomColors.monotoneLight),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Image.asset('assets/images/logo/logo_ai_white.png'),
+          Text(
+            "AI 요리 레시피 시작",
+            style: const CustomTextStyles()
+                .button
+                .copyWith(color: CustomColors.monotoneLight),
+          ),
+        ],
       ),
     );
   }

@@ -1,3 +1,4 @@
+import 'package:co_cook/styles/shadows.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'dart:convert';
@@ -122,8 +123,11 @@ class _ListScreenState extends State<ListScreen> {
                 top: MediaQuery.of(context).padding.top,
                 left: 0,
                 child: IconButton(
-                  icon: const Icon(Icons.arrow_back,
-                      color: CustomColors.monotoneLight),
+                  icon: const Icon(
+                    Icons.arrow_back,
+                    color: CustomColors.monotoneLight,
+                    shadows: [CustomShadows.text],
+                  ),
                   onPressed: () {
                     Navigator.pop(context);
                   },
@@ -134,9 +138,10 @@ class _ListScreenState extends State<ListScreen> {
                 bottom: 16,
                 child: Text(
                   widget.listName,
-                  style: CustomTextStyles()
-                      .title1
-                      .copyWith(color: CustomColors.monotoneLight),
+                  style: CustomTextStyles().title1.copyWith(
+                    color: CustomColors.monotoneLight,
+                    shadows: const [CustomShadows.text],
+                  ),
                 ),
               ),
             ],
