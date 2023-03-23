@@ -35,6 +35,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
   final _focusNode = FocusNode(); // 포커싱 여부를 추적하는 클래스 인스턴스
   XFile? _image; // 이미지를 저장
   int _runningTime = 0;
+  late DateTime _endTime;
 
   @override
   void initState() {
@@ -45,6 +46,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
     int minutes = runningTime.inMinutes.remainder(60);
     setState(() {
       _runningTime = minutes;
+      _endTime = now;
     });
   }
 
@@ -227,9 +229,10 @@ class _ReviewScreenState extends State<ReviewScreen> {
                       child: CommonButton(
                           label: '저장',
                           color: ButtonType.red,
-                          onPressed: () {
+                          onPressed: () async {
+                            await getDetailBasic();
                             gotoPhotoCard(context, _text, _image!,
-                                widget.recipeName, widget.startTime);
+                                widget.recipeName, widget.startTime, _endTime);
                           }),
                     ),
                     SizedBox(height: 8),
@@ -251,12 +254,13 @@ class _ReviewScreenState extends State<ReviewScreen> {
 }
 
 void gotoPhotoCard(BuildContext context, String _text, XFile _image,
-    String recipeName, DateTime startTime) {
+    String recipeName, DateTime startTime, DateTime endTime) {
   Route photoCardScreen = MaterialPageRoute(
       builder: (context) => PhotoCardScreen(
             text: _text,
             image: _image,
-            time: startTime,
+            startTime: startTime,
+            endTime: endTime,
             recipeName: recipeName,
           ));
   Navigator.pushReplacement(context, photoCardScreen);
