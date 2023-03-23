@@ -51,7 +51,7 @@ class _MyReviewScreenState extends State<MyReviewScreen> {
         appBar: AppBar(
           backgroundColor: CustomColors.monotoneLight,
           elevation: 0.5,
-          title: const SizedBox.shrink(), // Remove the original title
+          title: const SizedBox.shrink(),
           bottom: PreferredSize(
             preferredSize: const Size.fromHeight(30.0),
             child: Row(
@@ -73,8 +73,7 @@ class _MyReviewScreenState extends State<MyReviewScreen> {
                       .subtitle1
                       .copyWith(color: CustomColors.monotoneBlack),
                 ),
-                SizedBox(
-                    width: 48), // Add space to balance the back button width
+                SizedBox(width: 48),
               ],
             ),
           ),

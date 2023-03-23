@@ -96,10 +96,19 @@ class _ReviewScreenState extends State<ReviewScreen> {
 
   Future<void> CreateReview() async {
     // 이미지를 MultipartFile로 변환
+    if (_image!.path == null) {
+      print('사진이 없어요.');
+      return;
+    }
+
+    if (_text == '') {
+      print('글자는 쓰셔야죠');
+      return;
+    }
+
     String fileName = _image!.path.split('/').last;
-    http.MultipartFile multipartFile = await http.MultipartFile.fromPath(
-        'reviewImg', _image!.path,
-        filename: fileName);
+    MultipartFile multipartFile =
+        await MultipartFile.fromFile(_image!.path, filename: fileName);
     // 여기서 'reviewImg'는 서버에서 요구하는 파일의 키값입니다. 서버 요구에 따라 적절하게 변경해 주세요.
 
     // API 요청
@@ -135,19 +144,18 @@ class _ReviewScreenState extends State<ReviewScreen> {
         },
         child: Scaffold(
           appBar: AppBar(
+            centerTitle: true,
+            automaticallyImplyLeading: false,
             backgroundColor: CustomColors.greenPrimary,
             elevation: 0.5,
             toolbarHeight: 80,
             title: Padding(
               padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
-              child: Align(
-                alignment: Alignment.center,
-                child: Text(
-                  '완성!',
-                  style: const CustomTextStyles()
-                      .title1
-                      .copyWith(color: CustomColors.monotoneLight),
-                ),
+              child: Text(
+                '완성!',
+                style: const CustomTextStyles()
+                    .title1
+                    .copyWith(color: CustomColors.monotoneLight),
               ),
             ),
           ),
@@ -241,7 +249,9 @@ class _ReviewScreenState extends State<ReviewScreen> {
                       child: CommonButton(
                           label: '취소',
                           color: ButtonType.none,
-                          onPressed: () {}),
+                          onPressed: () {
+                            Navigator.pop(context);
+                          }),
                     )
                   ],
                 ),
