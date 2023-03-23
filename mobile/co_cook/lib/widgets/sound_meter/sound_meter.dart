@@ -6,8 +6,8 @@ import 'package:co_cook/styles/text_styles.dart';
 
 import 'package:record/record.dart';
 
-class CookScreenSoundMeter extends StatefulWidget {
-  const CookScreenSoundMeter(
+class SoundMeter extends StatefulWidget {
+  const SoundMeter(
       {super.key,
       this.dotSize = 8,
       this.size = 48,
@@ -21,10 +21,10 @@ class CookScreenSoundMeter extends StatefulWidget {
   final bool isSay;
 
   @override
-  State<CookScreenSoundMeter> createState() => _CookScreenSoundMeterState();
+  State<SoundMeter> createState() => _SoundMeterState();
 }
 
-class _CookScreenSoundMeterState extends State<CookScreenSoundMeter> {
+class _SoundMeterState extends State<SoundMeter> {
   late double _currentPosition = 0;
   late Timer? _positionTimer;
 
@@ -67,18 +67,18 @@ class _CookScreenSoundMeterState extends State<CookScreenSoundMeter> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          soundMeterdot(
+          soundMeterDot(
               Duration(milliseconds: widget.isSpeak ? 200 : 700), 0.6),
-          soundMeterdot(Duration(milliseconds: widget.isSpeak ? 50 : 800), 0.9),
-          soundMeterdot(Duration(milliseconds: widget.isSpeak ? 100 : 900), 1),
-          soundMeterdot(
+          soundMeterDot(Duration(milliseconds: widget.isSpeak ? 50 : 800), 0.9),
+          soundMeterDot(Duration(milliseconds: widget.isSpeak ? 100 : 900), 1),
+          soundMeterDot(
               Duration(milliseconds: widget.isSpeak ? 300 : 1000), 0.7)
         ],
       ),
     );
   }
 
-  Widget soundMeterdot(Duration duration, double heightWeight) {
+  Widget soundMeterDot(Duration duration, double heightWeight) {
     return AnimatedContainer(
       duration: duration,
       curve: Curves.easeInOutQuad,

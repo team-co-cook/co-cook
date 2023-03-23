@@ -47,7 +47,7 @@ class PhotoCard extends StatelessWidget {
                       ),
                       SizedBox(height: 24),
                       Text(
-                        widget.cookName,
+                        widget.recipeName,
                         style: CustomTextStyles()
                             .title1
                             .copyWith(color: CustomColors.monotoneBlack),

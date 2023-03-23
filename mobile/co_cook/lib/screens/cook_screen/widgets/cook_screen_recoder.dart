@@ -1,21 +1,22 @@
-import 'dart:async';
 import 'dart:io';
-import 'package:device_info_plus/device_info_plus.dart';
-
-import 'package:co_cook/screens/cook_screen/widgets/cook_screen_sound_meter.dart';
+import 'dart:async';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+
 import 'package:co_cook/styles/colors.dart';
 import 'package:co_cook/styles/text_styles.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:flutter/foundation.dart' as foundation;
+import 'package:co_cook/services/audio_service.dart';
 
 import 'package:record/record.dart';
 import 'package:audioplayers/audioplayers.dart';
-
+import 'package:path_provider/path_provider.dart';
 import 'package:porcupine_flutter/porcupine.dart';
 import 'package:porcupine_flutter/porcupine_error.dart';
 import 'package:porcupine_flutter/porcupine_manager.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:device_info_plus/device_info_plus.dart';
+
+import 'package:co_cook/widgets/sound_meter/sound_meter.dart';
 
 class CookScreenRecoder extends StatefulWidget {
   const CookScreenRecoder({Key? key}) : super(key: key);
@@ -36,7 +37,6 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
   late PorcupineManager _porcupineManager;
 
   void createPorcupineManager() async {
-    print("asdfasdf");
     _porcupineManager = await PorcupineManager.fromKeywordPaths(
       dotenv.env['PICOVOICE_API_KEY'] ?? "",
       [keywordAsset], // os별 분기처리 해야됨!!
@@ -94,7 +94,7 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
       if (!await _recorder.isRecording()) {
         // 녹음이 실행되고 있을 때
         await _audioPlayer.play(AssetSource('audios/ai_activate.mp3'));
-        await Future.delayed(Duration(microseconds: 300));
+        await Future.delayed(const Duration(microseconds: 300));
         await _recorder
             .start(
           path: '${cookTempDir.path}/$audioFilePk.m4a',
@@ -108,10 +108,10 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
           });
           startTimer();
         }).then((_) {
-          Future.delayed(Duration(milliseconds: 3000)).then((_) {
+          Future.delayed(const Duration(milliseconds: 3000)).then((_) {
             if (ampl > -10) {
               // 계속 말하는 중이면 더 기다리기
-              return Future.delayed(Duration(milliseconds: 500));
+              return Future.delayed(const Duration(milliseconds: 500));
             }
             // 말 안하는 중이면 null return해서 종료
             return null;
@@ -121,7 +121,9 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
               _isRecording = false;
               if (_isSay) {
                 // 사용자가 말 했을 때
-                _audioPlayer.play(AssetSource('audios/ai_confirm.mp3'));
+                postAudio('${cookTempDir.path}/$audioFilePk.m4a');
+                _audioPlayer.play(
+                    DeviceFileSource('${cookTempDir.path}/$audioFilePk.m4a'));
                 setState(() {
                   _isSay = false;
                 });
@@ -133,12 +135,23 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
               audioFilePk++;
               _porcupineManager.start();
             });
-            // print(_recorder.path());
           });
         });
       }
     } else {
       // 마이크 권한이 없을 때
+    }
+  }
+
+  // 오디오 전송
+  Future<void> postAudio(String path) async {
+    // API 요청
+    AudioService searchService = AudioService();
+    Response? response = await searchService.postAudio(path);
+    if (response?.statusCode == 200) {
+      if (response != null) {
+        print("전송 성공 : ${response.data}");
+      }
     }
   }
 
@@ -196,7 +209,7 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
     return Container(
       child: Row(
         children: [
-          CookScreenSoundMeter(
+          SoundMeter(
               volume: _isRecording ? volume0to(100).toDouble() : 0,
               isSpeak: _isRecording,
               isSay: _isSay),
