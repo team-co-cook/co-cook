@@ -14,6 +14,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.get("/hello")
+async def hello():
+    return{"message" : "hello"}
+
 @app.post("/upload/")
 async def upload_audio(audio: UploadFile = File(...)):
     # 저장할 디렉토리 지정
