@@ -12,7 +12,15 @@ import 'package:co_cook/widgets/button/button.dart';
 import 'package:co_cook/widgets/text_field/custom_text_field.dart';
 
 class ReviewScreen extends StatefulWidget {
-  const ReviewScreen({Key? key}) : super(key: key);
+  const ReviewScreen(
+      {Key? key,
+      required this.recipeIdx,
+      required this.recipeName,
+      required this.startTime})
+      : super(key: key);
+  final int recipeIdx;
+  final String recipeName;
+  final DateTime startTime;
 
   @override
   State<ReviewScreen> createState() => _ReviewScreenState();
@@ -181,7 +189,8 @@ class _ReviewScreenState extends State<ReviewScreen> {
                           label: '저장',
                           color: ButtonType.red,
                           onPressed: () {
-                            gotoPhotoCard(context, _text, _image!);
+                            gotoPhotoCard(context, _text, _image!,
+                                widget.recipeName, widget.startTime);
                           }),
                     ),
                     SizedBox(height: 8),
@@ -202,13 +211,14 @@ class _ReviewScreenState extends State<ReviewScreen> {
   }
 }
 
-void gotoPhotoCard(BuildContext context, String _text, XFile _image) {
+void gotoPhotoCard(BuildContext context, String _text, XFile _image,
+    String recipeName, DateTime startTime) {
   Route photoCardScreen = MaterialPageRoute(
       builder: (context) => PhotoCardScreen(
             text: _text,
             image: _image,
-            time: DateTime.parse('2022-03-08 10:00:00'),
-            cookName: '부대찌개',
+            time: startTime,
+            recipeName: recipeName,
           ));
   Navigator.push(context, photoCardScreen);
 }

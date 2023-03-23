@@ -81,7 +81,11 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen>
                 child: Column(
                   children: [
                     ZoomTapAnimation(
-                        onTap: () => pushScreen(context, CookScreen()),
+                        onTap: () => pushScreen(
+                            context,
+                            CookScreen(
+                              recipeIdx: widget.recipeIdx,
+                            )),
                         end: 0.98,
                         child: AiRecipeStartButton()),
                     TabBar(
