@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:device_info_plus/device_info_plus.dart';
 
 import 'package:co_cook/screens/cook_screen/widgets/cook_screen_sound_meter.dart';
 import 'package:flutter/material.dart';
@@ -28,8 +29,9 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
   ///PicoVioce
   ///
 
-  final String keywordAssetAndroid = "assets/keywords/cocook_ko_android.ppn";
-  final String keywordAssetIos = "assets/keywords/cocook_ko_ios.ppn";
+  final String keywordAsset = Platform.isAndroid
+      ? "assets/keywords/cocook_ko_android.ppn"
+      : "assets/keywords/cocook_ko_ios.ppn";
 
   late PorcupineManager _porcupineManager;
 
@@ -37,7 +39,7 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
     print("asdfasdf");
     _porcupineManager = await PorcupineManager.fromKeywordPaths(
       dotenv.env['PICOVOICE_API_KEY'] ?? "",
-      [keywordAssetAndroid], // os별 분기처리 해야됨!!
+      [keywordAsset], // os별 분기처리 해야됨!!
       _wakeWordCallback,
       modelPath: "assets/keywords/porcupine_params_ko.pv",
     );
@@ -91,8 +93,7 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
       // 마이크 권한이 있을 때
       if (!await _recorder.isRecording()) {
         // 녹음이 실행되고 있을 때
-        await _audioPlayer.play(AssetSource('audios/ai_activate.mp3'),
-            volume: 100);
+        await _audioPlayer.play(AssetSource('audios/ai_activate.mp3'));
         await Future.delayed(Duration(microseconds: 300));
         await _recorder
             .start(
@@ -120,15 +121,13 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
               _isRecording = false;
               if (_isSay) {
                 // 사용자가 말 했을 때
-                _audioPlayer.play(AssetSource('audios/ai_confirm.mp3'),
-                    volume: 100);
+                _audioPlayer.play(AssetSource('audios/ai_confirm.mp3'));
                 setState(() {
                   _isSay = false;
                 });
               } else {
                 // 안했을 때
-                _audioPlayer.play(AssetSource('audios/ai_cancel.mp3'),
-                    volume: 100);
+                _audioPlayer.play(AssetSource('audios/ai_cancel.mp3'));
               }
             }).then((value) {
               audioFilePk++;
@@ -199,7 +198,8 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
         children: [
           CookScreenSoundMeter(
               volume: _isRecording ? volume0to(100).toDouble() : 0,
-              isSpeak: _isRecording),
+              isSpeak: _isRecording,
+              isSay: _isSay),
         ],
       ),
     );

@@ -71,7 +71,7 @@ class _CookScreenBodyState extends State<CookScreenBody> {
   ];
 
   final PageController recipeCardPageController =
-      PageController(viewportFraction: 0.8);
+      PageController(viewportFraction: 0.7);
 
   double _recipeCardPage = 0;
 

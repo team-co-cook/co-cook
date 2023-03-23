@@ -12,11 +12,13 @@ class CookScreenSoundMeter extends StatefulWidget {
       this.dotSize = 8,
       this.size = 48,
       required this.volume,
-      required this.isSpeak});
+      required this.isSpeak,
+      required this.isSay});
   final double dotSize;
   final double size;
   final double volume;
   final bool isSpeak;
+  final bool isSay;
 
   @override
   State<CookScreenSoundMeter> createState() => _CookScreenSoundMeterState();
@@ -88,9 +90,11 @@ class _CookScreenSoundMeterState extends State<CookScreenSoundMeter> {
           widget.dotSize + ((widget.volume * heightWeight) / 100 * widget.size),
       decoration: BoxDecoration(
           color: widget.isSpeak
-              ? CustomColors.redPrimary
+              ? widget.isSay
+                  ? CustomColors.greenPrimary
+                  : CustomColors.redPrimary
               : CustomColors.monotoneLightGray,
-          borderRadius: BorderRadius.circular(4)),
+          borderRadius: BorderRadius.circular(widget.dotSize / 2)),
     );
   }
 }
