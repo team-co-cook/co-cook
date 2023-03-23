@@ -5,6 +5,9 @@ from pathlib import Path
 from pydub import AudioSegment
 import datetime
 import speech_recognition as sr
+import logging
+
+logging.basicConfig(filename='app.log', level=logging.INFO, format='%(asctime)s - %(levelname)s: %(message)s')
 
 app = FastAPI()
 
