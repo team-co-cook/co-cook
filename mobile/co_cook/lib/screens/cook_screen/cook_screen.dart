@@ -10,7 +10,6 @@ import 'package:co_cook/styles/colors.dart';
 import 'package:co_cook/styles/text_styles.dart';
 import 'package:flutter/services.dart';
 import 'package:sensors_plus/sensors_plus.dart';
-import 'widgets/cook_screen_sound_meter.dart';
 import 'package:co_cook/services/detail_service.dart';
 
 class CookScreen extends StatefulWidget {
