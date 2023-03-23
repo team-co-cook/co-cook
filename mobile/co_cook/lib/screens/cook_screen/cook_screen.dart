@@ -58,7 +58,6 @@ class _CookScreenState extends State<CookScreen> {
     return !isRotated
         ? const CookScreenRequestRotate()
         : Scaffold(
-            backgroundColor: CustomColors.redLight,
             appBar: AppBar(
               backgroundColor: CustomColors.monotoneLight,
               elevation: 0.5,
