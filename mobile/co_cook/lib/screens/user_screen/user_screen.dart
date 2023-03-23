@@ -1,6 +1,4 @@
 import 'dart:convert'; // decode 가져오기
-import 'package:co_cook/screens/favorite_screen/favorite_screen.dart';
-import 'package:co_cook/widgets/sliding_up_panel/sliding_up_panel.dart';
 import 'package:dio/dio.dart'; // Response 가져오기 위함.
 import 'package:flutter/material.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
@@ -13,6 +11,9 @@ import 'package:co_cook/styles/text_styles.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:co_cook/screens/login_screen/login_screen.dart';
 import 'package:co_cook/widgets/nickname_change/nickname_change.dart';
+import 'package:co_cook/screens/favorite_screen/favorite_screen.dart';
+import 'package:co_cook/screens/my_review_screen/my_review_screen.dart';
+import 'package:co_cook/widgets/sliding_up_panel/sliding_up_panel.dart';
 
 class UserScreen extends StatefulWidget {
   const UserScreen({Key? key}) : super(key: key);
@@ -98,7 +99,12 @@ class _UserScreenState extends State<UserScreen> {
                   },
                 ),
                 CustomTextButton(
-                    text: '내가 작성한 한줄평', color: CustomColors.monotoneBlack),
+                  text: '내가 작성한 한줄평',
+                  color: CustomColors.monotoneBlack,
+                  onPressed: () {
+                    gotoMyReview(context);
+                  },
+                ),
                 CustomTextButton(
                     text: '이용약관', color: CustomColors.monotoneBlack),
                 CustomTextButton(
@@ -130,7 +136,7 @@ class _UserScreenState extends State<UserScreen> {
       CustomSlidingUpPanel(
         body: NicknameChange(panelController: _nickPanelController),
         panelController: _nickPanelController,
-        onPanelclosed: _fetchNickname,
+        onPanelClosed: _fetchNickname,
       )
     ]);
   }
@@ -201,4 +207,11 @@ void withdrawal(BuildContext context) async {
 void gotoFavorite(BuildContext context) {
   Route themeScreen = MaterialPageRoute(builder: (context) => FavoriteScreen());
   Navigator.push(context, themeScreen);
+}
+
+// 내가 찜한 목록으로 이동
+void gotoMyReview(BuildContext context) {
+  Route myReviewScreen =
+      MaterialPageRoute(builder: (context) => MyReviewScreen());
+  Navigator.push(context, myReviewScreen);
 }

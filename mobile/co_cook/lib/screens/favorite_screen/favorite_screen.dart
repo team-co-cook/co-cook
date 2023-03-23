@@ -51,9 +51,15 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              IconButton(
-                icon: Icon(Icons.arrow_back, color: CustomColors.monotoneBlack),
-                onPressed: () => Navigator.of(context).pop(),
+              GestureDetector(
+                onTap: () => Navigator.of(context).pop(),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Icon(
+                    Icons.arrow_back,
+                    color: CustomColors.monotoneBlack,
+                  ),
+                ),
               ),
               Text(
                 '내가 찜한 레시피',
