@@ -290,5 +290,5 @@ void gotoReview(BuildContext context, int recipeIdx, String recipeName,
       builder: (context) => ReviewScreen(
           recipeIdx: recipeIdx, recipeName: recipeName, startTime: startTime));
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
-      .then((value) => Navigator.push(context, reviewScreen));
+      .then((value) => Navigator.pushReplacement(context, reviewScreen));
 }

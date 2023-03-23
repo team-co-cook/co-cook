@@ -55,7 +55,7 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
   ///
   Record _recorder = Record(); // 녹음 라이브러리
   late Directory cookTempDir; // 음성파일이 저장될 임시디렉토리
-  late Timer? _recordingTimer; // 마이크 볼륨 추적할 타이머
+  Timer? _recordingTimer; // 마이크 볼륨 추적할 타이머
   bool _isRecording = false; // 녹음 여부
   bool _isSay = false; // 음성호출 이후 사용자가 말을 했는지 여부
 
@@ -165,6 +165,12 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
     return true;
   }
 
+  Future<bool> _diposeRecord() async {
+    _recordingTimer?.cancel();
+    _recorder.stop();
+    return true;
+  }
+
   // volume controller
   double volume = 0.0;
   double ampl = 0.0;
@@ -195,7 +201,7 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
 
   @override
   void dispose() {
-    _stopRecord();
+    _diposeRecord();
     if (cookTempDir.existsSync()) {
       cookTempDir.listSync().forEach((file) => file.deleteSync());
     }
