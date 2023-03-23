@@ -138,7 +138,7 @@ public class RecipeService {
         for (Step step : steps) {
             RecipeStepDetailResDto recipeStepDetailResDto = RecipeStepDetailResDto.builder()
                     .currentStep(step.getCurrentStep())
-                    .timer(step.getCurrentStep())
+                    .timer(step.getTimer())
                     .content(step.getContent())
                     .imgPath(step.getImgPath())
                     .build();
