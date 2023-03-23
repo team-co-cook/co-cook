@@ -37,6 +37,7 @@ class _ListScreenState extends State<ListScreen> {
   }
 
   List dataList = [];
+  bool isLoad = false;
 
   Future<void> getListData() async {
     Response? response =
@@ -46,6 +47,7 @@ class _ListScreenState extends State<ListScreen> {
       if (decodeRes != null) {
         setState(() {
           dataList = decodeRes["data"]["recipeListResDto"];
+          isLoad = true;
         });
       }
     }
@@ -206,9 +208,19 @@ class _ListScreenState extends State<ListScreen> {
                               child: ListCard(data: dataList[index]),
                             );
                           })
-                      : const Center(
-                          child: CircularProgressIndicator(
-                              color: CustomColors.redPrimary)),
+                      : isLoad
+                          ? Container(
+                              child: Center(
+                                child: Text(
+                                  '해당하는 음식이 없어요',
+                                  style: CustomTextStyles().body1.copyWith(
+                                      color: CustomColors.monotoneBlack),
+                                ),
+                              ),
+                            )
+                          : const Center(
+                              child: CircularProgressIndicator(
+                                  color: CustomColors.redPrimary)),
                 ),
               ),
             ],
