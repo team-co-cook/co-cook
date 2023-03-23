@@ -33,7 +33,7 @@ class _MyReviewScreenState extends State<MyReviewScreen> {
     Response? response = await authService.getMyReview();
     print(response!.data['data']);
     if (response?.statusCode == 200) {
-      if (response != null) {
+      if (response.data['data'] != null) {
         setState(() {
           listData = response!.data['data'];
         });
