@@ -6,6 +6,7 @@ import 'package:co_cook/services/detail_service.dart';
 import 'package:flutter/material.dart';
 import 'package:co_cook/styles/colors.dart';
 import 'package:co_cook/styles/text_styles.dart';
+import 'package:flutter/services.dart';
 import 'package:transparent_image/transparent_image.dart';
 import 'package:word_break_text/word_break_text.dart';
 import 'package:zoom_tap_animation/zoom_tap_animation.dart';
@@ -65,11 +66,10 @@ class _CookScreenBodyState extends State<CookScreenBody> {
     DetailService searchService = DetailService();
     Response? response =
         await searchService.getDetailStep(recipeIdx: recipeIdx);
-    print(response!.data['data']);
     if (response?.statusCode == 200) {
       if (response!.data['data'] != null) {
         setState(() {
-          dataList = response!.data['data']['steps'];
+          dataList = response.data['data']['steps'];
         });
       }
     }
@@ -285,9 +285,10 @@ class _CookScreenBodyState extends State<CookScreenBody> {
 }
 
 void gotoReview(BuildContext context, int recipeIdx, String recipeName,
-    DateTime startTime) {
+    DateTime startTime) async {
   Route reviewScreen = MaterialPageRoute(
       builder: (context) => ReviewScreen(
           recipeIdx: recipeIdx, recipeName: recipeName, startTime: startTime));
-  Navigator.push(context, reviewScreen);
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
+      .then((value) => Navigator.push(context, reviewScreen));
 }

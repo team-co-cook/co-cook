@@ -10,7 +10,6 @@ import 'package:co_cook/styles/colors.dart';
 import 'package:co_cook/styles/text_styles.dart';
 import 'package:flutter/services.dart';
 import 'package:sensors_plus/sensors_plus.dart';
-import 'widgets/cook_screen_sound_meter.dart';
 import 'package:co_cook/services/detail_service.dart';
 
 class CookScreen extends StatefulWidget {
@@ -54,8 +53,12 @@ class _CookScreenState extends State<CookScreen> {
   @override
   void dispose() {
     _accelerometerSub.cancel();
-    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     super.dispose();
+  }
+
+  void shutdownCook() async {
+    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
+        .then((value) => Navigator.pop(context));
   }
 
   Future<void> getDetailBasic(int recipeIdx) async {
@@ -63,11 +66,10 @@ class _CookScreenState extends State<CookScreen> {
     DetailService searchService = DetailService();
     Response? response =
         await searchService.getDetailBasic(recipeIdx: recipeIdx);
-    print(response!.data['data']);
     if (response?.statusCode == 200) {
       if (response != null) {
         setState(() {
-          _recipeData = response!.data['data'];
+          _recipeData = response.data['data'];
         });
       }
     }
@@ -79,6 +81,7 @@ class _CookScreenState extends State<CookScreen> {
         ? const CookScreenRequestRotate()
         : Scaffold(
             appBar: AppBar(
+              automaticallyImplyLeading: false,
               backgroundColor: CustomColors.monotoneLight,
               elevation: 0.5,
               toolbarHeight: 60,
@@ -99,9 +102,7 @@ class _CookScreenState extends State<CookScreen> {
                       CommonButton(
                           label: "종료",
                           color: ButtonType.red,
-                          onPressed: () {
-                            Navigator.pop(context);
-                          })
+                          onPressed: shutdownCook)
                     ],
                   ),
                 ),
