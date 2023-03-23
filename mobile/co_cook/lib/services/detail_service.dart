@@ -78,7 +78,11 @@ class DetailService {
   Future<Response?> createReview(FormData reviewData) async {
     try {
       Dio _dio = await _getDio(); // 새로운 Dio 객체 생성
-      return await _dio.post('/review/', data: reviewData);
+      return await _dio.post(
+        '/review',
+        data: reviewData,
+        options: Options(headers: {'Content-Type': 'multipart/form-data'}),
+      );
     } on DioError catch (e) {
       // DioError 처리
       return e.response; // DioError가 발생한 경우에도 무조건 리턴

@@ -94,33 +94,36 @@ class _ReviewScreenState extends State<ReviewScreen> {
     });
   }
 
-  Future<void> getDetailBasic() async {
+  Future<void> CreateReview() async {
     // 이미지를 MultipartFile로 변환
-    File imageFile = File(_image!.path);
-    String fileName = imageFile.path.split('/').last;
+    String fileName = _image!.path.split('/').last;
     http.MultipartFile multipartFile = await http.MultipartFile.fromPath(
-        'reviewImg', imageFile.path,
+        'reviewImg', _image!.path,
         filename: fileName);
     // 여기서 'reviewImg'는 서버에서 요구하는 파일의 키값입니다. 서버 요구에 따라 적절하게 변경해 주세요.
 
     // API 요청
-    DetailService _apiService = DetailService();
-    Map<String, dynamic> reviewData = {
-      "reviewDetail": {
-        "content": _text,
-        "runningTime": _runningTime,
-        "recipeIdx": widget.recipeIdx
-      },
+    DetailService apiService = DetailService();
+    Map reviewDetail = {
+      "content": _text,
+      "runningTime": _runningTime,
+      "recipeIdx": widget.recipeIdx
     };
+
+    String jsonString = jsonEncode(reviewDetail);
 
     // reviewData와 multipartFile을 함께 전송하기 위해 FormData를 사용합니다.
     FormData formData = FormData.fromMap({
-      ...reviewData,
+      "reviewDetail": jsonString,
       "reviewImg": multipartFile,
     });
 
-    // print('body: $userData'); // 데이터 확인
-    Response? response = await _apiService.createReview(formData);
+    print(formData);
+    Response? response = await apiService.createReview(formData);
+    if (response?.statusCode == 200) {
+      gotoPhotoCard(context, _text, _image!, widget.recipeName,
+          widget.startTime, _endTime);
+    }
   }
 
   @override
@@ -229,10 +232,8 @@ class _ReviewScreenState extends State<ReviewScreen> {
                       child: CommonButton(
                           label: '저장',
                           color: ButtonType.red,
-                          onPressed: () async {
-                            await getDetailBasic();
-                            gotoPhotoCard(context, _text, _image!,
-                                widget.recipeName, widget.startTime, _endTime);
+                          onPressed: () {
+                            CreateReview();
                           }),
                     ),
                     SizedBox(height: 8),
