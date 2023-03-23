@@ -31,10 +31,10 @@ async def upload_audio(audio: UploadFile = File(...)):
     with audio_path.open("wb") as buffer:
         shutil.copyfileobj(audio.file, buffer)
 
-    # 파일 확장자 사용하여 오디오 형식 지정
-    file_extension = audio.filename.split(".")[-1]
+    # # 파일 확장자 사용하여 오디오 형식 지정
+    # file_extension = audio.filename.split(".")[-1]
     
-    # 오디오 처리
-    audio_data = AudioSegment.from_file(audio_path, format=file_extension)
+    # # 오디오 처리
+    # audio_data = AudioSegment.from_file(audio_path, format=file_extension)
 
     return {"filename": audio.filename, "path": str(audio_path)}
