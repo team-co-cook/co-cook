@@ -12,11 +12,13 @@ class CookScreenSoundMeter extends StatefulWidget {
       this.dotSize = 8,
       this.size = 48,
       required this.volume,
-      required this.isSpeak});
+      required this.isSpeak,
+      required this.isSay});
   final double dotSize;
   final double size;
   final double volume;
   final bool isSpeak;
+  final bool isSay;
 
   @override
   State<CookScreenSoundMeter> createState() => _CookScreenSoundMeterState();
@@ -65,16 +67,18 @@ class _CookScreenSoundMeterState extends State<CookScreenSoundMeter> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          soundMeterdot(Duration(milliseconds: widget.isSpeak ? 200 : 600)),
-          soundMeterdot(Duration(milliseconds: widget.isSpeak ? 50 : 700)),
-          soundMeterdot(Duration(milliseconds: widget.isSpeak ? 100 : 800)),
-          soundMeterdot(Duration(milliseconds: widget.isSpeak ? 300 : 900))
+          soundMeterdot(
+              Duration(milliseconds: widget.isSpeak ? 200 : 700), 0.6),
+          soundMeterdot(Duration(milliseconds: widget.isSpeak ? 50 : 800), 0.9),
+          soundMeterdot(Duration(milliseconds: widget.isSpeak ? 100 : 900), 1),
+          soundMeterdot(
+              Duration(milliseconds: widget.isSpeak ? 300 : 1000), 0.7)
         ],
       ),
     );
   }
 
-  Widget soundMeterdot(Duration duration) {
+  Widget soundMeterdot(Duration duration, double heightWeight) {
     return AnimatedContainer(
       duration: duration,
       curve: Curves.easeInOutQuad,
@@ -82,10 +86,15 @@ class _CookScreenSoundMeterState extends State<CookScreenSoundMeter> {
           .transform,
       alignment: Alignment.center,
       width: widget.dotSize,
-      height: widget.dotSize + (widget.volume / 100 * widget.size),
+      height:
+          widget.dotSize + ((widget.volume * heightWeight) / 100 * widget.size),
       decoration: BoxDecoration(
-          color: CustomColors.redPrimary,
-          borderRadius: BorderRadius.circular(4)),
+          color: widget.isSpeak
+              ? widget.isSay
+                  ? CustomColors.greenPrimary
+                  : CustomColors.redPrimary
+              : CustomColors.monotoneLightGray,
+          borderRadius: BorderRadius.circular(widget.dotSize / 2)),
     );
   }
 }

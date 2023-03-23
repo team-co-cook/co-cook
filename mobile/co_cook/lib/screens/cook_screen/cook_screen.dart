@@ -21,61 +21,43 @@ class CookScreen extends StatefulWidget {
 class _CookScreenState extends State<CookScreen> {
   late StreamSubscription<AccelerometerEvent> _accelerometerSub;
   bool isRotated = false;
-  DeviceOrientation _orientation = DeviceOrientation.portraitUp;
 
   @override
   void initState() {
-    super.initState();
+    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     startAccelerometerListener();
+    super.initState();
   }
 
   void startAccelerometerListener() {
     _accelerometerSub = accelerometerEvents.listen((AccelerometerEvent event) {
-      // 화면이 정방향일 때
-      if (-9 < event.x && event.x < 9 && !isRotated) {
-        setState(() {
-          _orientation = DeviceOrientation.portraitUp;
-        });
-        // 화면이 가로방향일 때
-      } else if (event.x > 9) {
+      if (event.x > 9.0 || event.x < -9.0) {
+        SystemChrome.setPreferredOrientations([
+          DeviceOrientation.landscapeLeft,
+          DeviceOrientation.landscapeRight
+        ]);
         if (!isRotated) {
           setState(() {
             isRotated = true;
           });
+          _accelerometerSub.cancel();
         }
-        setState(() {
-          _orientation = DeviceOrientation.landscapeLeft;
-        });
-      } else if (event.x < -9) {
-        if (!isRotated) {
-          setState(() {
-            isRotated = true;
-          });
-        }
-        setState(() {
-          _orientation = DeviceOrientation.landscapeRight;
-        });
       }
     });
   }
 
   @override
-  void _orientationDispose(BuildContext context) {
-    setState(() {
-      _orientation = DeviceOrientation.portraitUp;
-    });
+  void dispose() {
     _accelerometerSub.cancel();
-    Navigator.pop(context);
+    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setPreferredOrientations([_orientation]);
-    return _orientation == DeviceOrientation.portraitUp
+    return !isRotated
         ? const CookScreenRequestRotate()
         : Scaffold(
-            backgroundColor: CustomColors.redLight,
             appBar: AppBar(
               backgroundColor: CustomColors.monotoneLight,
               elevation: 0.5,
@@ -88,7 +70,7 @@ class _CookScreenState extends State<CookScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text("부대찌개",
-                          style: const CustomTextStyles().subtitle1.copyWith(
+                          style: const CustomTextStyles().title2.copyWith(
                                 color: CustomColors.monotoneBlack,
                               )),
                       CookScreenRecoder(),
@@ -96,7 +78,7 @@ class _CookScreenState extends State<CookScreen> {
                           label: "종료",
                           color: ButtonType.red,
                           onPressed: () {
-                            _orientationDispose(context);
+                            Navigator.pop(context);
                           })
                     ],
                   ),

@@ -10,8 +10,8 @@ import 'cook_screen_timer.dart';
 
 class CookScreenBody extends StatefulWidget {
   const CookScreenBody({
-    super.key,
-  });
+    Key? key,
+  }) : super(key: key);
 
   @override
   State<CookScreenBody> createState() => _CookScreenBodyState();
@@ -71,17 +71,28 @@ class _CookScreenBodyState extends State<CookScreenBody> {
   ];
 
   final PageController recipeCardPageController =
-      PageController(viewportFraction: 0.8);
+      PageController(viewportFraction: 0.7);
 
   double _recipeCardPage = 0;
+  double _completeCardPage = 1;
+
+  late DateTime _startTime;
 
   @override
   void initState() {
     super.initState();
+    _startTime = DateTime.now();
     recipeCardPageController.addListener(() {
-      print("page : ${_recipeCardPage.round()}");
       setState(() {
         _recipeCardPage = recipeCardPageController.page ?? 0;
+        if (_recipeCardPage.ceil() == dataList.length) {
+          setState(() {
+            _completeCardPage = dataList.length - _recipeCardPage;
+          });
+        }
+        if (_recipeCardPage.floor() == dataList.length) {
+          print(_startTime); // 종료 콜백 넣어주세요
+        }
       });
     });
   }
@@ -94,116 +105,192 @@ class _CookScreenBodyState extends State<CookScreenBody> {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: double.infinity,
-      child: Column(
-        children: [
-          Container(
-            alignment: Alignment.centerLeft,
-            child: Container(
-              width: (MediaQuery.of(context).size.width / dataList.length) *
-                  (_recipeCardPage + 1),
-              height: 4,
-              color: CustomColors.greenPrimary,
-            ),
-          ),
-          Expanded(
-            child: Stack(children: [
-              Container(
-                  margin: const EdgeInsets.only(top: 8.0, bottom: 16.0),
-                  child: PageView.builder(
-                    controller: recipeCardPageController,
-                    itemCount: dataList.length,
-                    itemBuilder: (BuildContext context, int index) => Container(
-                        margin: const EdgeInsets.all(16.0),
-                        child: Center(
-                          child: Container(
-                              width: double.infinity,
-                              height: double.infinity,
-                              padding: const EdgeInsets.all(16.0),
-                              decoration: BoxDecoration(
-                                  color: CustomColors.monotoneLight,
-                                  borderRadius: BorderRadius.circular(16.0)),
-                              child: Row(
-                                children: [
-                                  LayoutBuilder(
-                                      builder: (context, constraints) {
-                                    return Container(
-                                      width: constraints.maxHeight,
-                                      height: constraints.maxHeight,
-                                      margin:
-                                          const EdgeInsets.only(right: 16.0),
-                                      child: ClipRRect(
-                                        borderRadius:
-                                            BorderRadius.circular(8.0),
-                                        child: FadeInImage.memoryNetwork(
-                                            fadeInDuration: const Duration(
-                                                milliseconds: 200),
-                                            fit: BoxFit.cover,
-                                            placeholder: kTransparentImage,
-                                            image: dataList[index]["imgPath"]),
-                                      ),
-                                    );
-                                  }),
-                                  Expanded(
-                                    child: Column(
-                                      children: [
-                                        Expanded(
-                                          child: Container(
-                                            padding: const EdgeInsets.only(
-                                                top: 16.0, bottom: 16.0),
-                                            child: WordBreakText(
-                                                dataList[index]["content"],
-                                                style: const CustomTextStyles()
-                                                    .title2
-                                                    .copyWith(
-                                                      color: CustomColors
-                                                          .monotoneBlack,
-                                                    )),
-                                          ),
-                                        ),
-                                        dataList[index]["timer"] != null
-                                            ? CookScreenTimer(
-                                                time: dataList[index]["timer"],
-                                                play: false)
-                                            : Container()
-                                      ],
-                                    ),
-                                  )
-                                ],
-                              )),
-                        )),
-                  )),
-              Positioned(
-                  left: 0,
-                  top: 0,
-                  bottom: 0,
-                  child: GestureDetector(
-                    onTap: () => recipeCardPageController.previousPage(
-                        duration: const Duration(milliseconds: 300),
-                        curve: Curves.easeOut),
-                    child: Container(
-                      width: MediaQuery.of(context).size.width * 0.1,
-                      color: Colors.transparent,
-                    ),
-                  )),
-              Positioned(
-                  right: 0,
-                  top: 0,
-                  bottom: 0,
-                  child: GestureDetector(
-                    onTap: () => recipeCardPageController.nextPage(
-                        duration: const Duration(milliseconds: 300),
-                        curve: Curves.easeOut),
-                    child: Container(
-                      width: MediaQuery.of(context).size.width * 0.1,
-                      color: Colors.transparent,
-                    ),
-                  ))
-            ]),
-          ),
-        ],
+    return Stack(children: [
+      Opacity(
+        opacity: _completeCardPage,
+        child: Container(
+          width: double.infinity,
+          height: double.infinity,
+          color: CustomColors.redLight,
+        ),
       ),
-    );
+      Opacity(
+        opacity: 1 - _completeCardPage,
+        child: Container(
+          width: double.infinity,
+          height: double.infinity,
+          color: CustomColors.greenPrimary,
+        ),
+      ),
+      SizedBox(
+        height: double.infinity,
+        child: Column(
+          children: [
+            Container(
+              alignment: Alignment.centerLeft,
+              child: Container(
+                width: (MediaQuery.of(context).size.width / dataList.length) *
+                    (_recipeCardPage + 1),
+                height: 4,
+                color: CustomColors.greenPrimary,
+              ),
+            ),
+            Expanded(
+              child: Stack(children: [
+                Container(
+                    margin: const EdgeInsets.only(top: 8.0, bottom: 16.0),
+                    child: PageView.builder(
+                        physics: const BouncingScrollPhysics(),
+                        controller: recipeCardPageController,
+                        itemCount: dataList.length + 1,
+                        itemBuilder: (BuildContext context, int index) {
+                          return Container(
+                              margin: const EdgeInsets.all(16.0),
+                              child: index == dataList.length
+                                  ? Container(
+                                      alignment: Alignment.centerLeft,
+                                      width: double.infinity,
+                                      height: double.infinity,
+                                      padding: const EdgeInsets.all(16.0),
+                                      decoration: BoxDecoration(
+                                          color: CustomColors.greenPrimary,
+                                          borderRadius:
+                                              BorderRadius.circular(16.0)),
+                                      child: Row(children: [
+                                        Opacity(
+                                          opacity: _completeCardPage,
+                                          child: Text("완성!",
+                                              style: const CustomTextStyles()
+                                                  .title2
+                                                  .copyWith(
+                                                    color: CustomColors
+                                                        .monotoneLight,
+                                                  )),
+                                        ),
+                                        Opacity(
+                                          opacity: 1 - _completeCardPage,
+                                          child: Text("밀어서 요리 종료하기",
+                                              style: const CustomTextStyles()
+                                                  .title2
+                                                  .copyWith(
+                                                    color: CustomColors
+                                                        .monotoneLight,
+                                                  )),
+                                        ),
+                                      ]),
+                                    )
+                                  : Opacity(
+                                      opacity: _completeCardPage,
+                                      child: Center(
+                                        child: Container(
+                                            width: double.infinity,
+                                            height: double.infinity,
+                                            padding: const EdgeInsets.all(16.0),
+                                            decoration: BoxDecoration(
+                                                color:
+                                                    CustomColors.monotoneLight,
+                                                borderRadius:
+                                                    BorderRadius.circular(
+                                                        16.0)),
+                                            child: Row(
+                                              children: [
+                                                LayoutBuilder(builder:
+                                                    (context, constraints) {
+                                                  return Container(
+                                                    width:
+                                                        constraints.maxHeight,
+                                                    height:
+                                                        constraints.maxHeight,
+                                                    margin:
+                                                        const EdgeInsets.only(
+                                                            right: 16.0),
+                                                    child: ClipRRect(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              8.0),
+                                                      child: FadeInImage.memoryNetwork(
+                                                          fadeInDuration:
+                                                              const Duration(
+                                                                  milliseconds:
+                                                                      200),
+                                                          fit: BoxFit.cover,
+                                                          placeholder:
+                                                              kTransparentImage,
+                                                          image: dataList[index]
+                                                              ["imgPath"]),
+                                                    ),
+                                                  );
+                                                }),
+                                                Expanded(
+                                                  child: Column(
+                                                    children: [
+                                                      Expanded(
+                                                        child: Container(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                      .only(
+                                                                  top: 16.0,
+                                                                  bottom: 16.0),
+                                                          child: WordBreakText(
+                                                              dataList[index]
+                                                                  ["content"],
+                                                              style:
+                                                                  const CustomTextStyles()
+                                                                      .title2
+                                                                      .copyWith(
+                                                                        color: CustomColors
+                                                                            .monotoneBlack,
+                                                                      )),
+                                                        ),
+                                                      ),
+                                                      dataList[index]
+                                                                  ["timer"] !=
+                                                              null
+                                                          ? CookScreenTimer(
+                                                              time: dataList[
+                                                                      index]
+                                                                  ["timer"],
+                                                              play: false)
+                                                          : Container()
+                                                    ],
+                                                  ),
+                                                )
+                                              ],
+                                            )),
+                                      ),
+                                    ));
+                        })),
+                Positioned(
+                    left: 0,
+                    top: 0,
+                    bottom: 0,
+                    child: GestureDetector(
+                      onTap: () => recipeCardPageController.previousPage(
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeOut),
+                      child: Container(
+                        width: MediaQuery.of(context).size.width * 0.1,
+                        color: Colors.transparent,
+                      ),
+                    )),
+                Positioned(
+                    right: 0,
+                    top: 0,
+                    bottom: 0,
+                    child: GestureDetector(
+                      onTap: () => recipeCardPageController.nextPage(
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeOut),
+                      child: Container(
+                        width: MediaQuery.of(context).size.width * 0.1,
+                        color: Colors.transparent,
+                      ),
+                    ))
+              ]),
+            ),
+          ],
+        ),
+      ),
+    ]);
   }
 }
