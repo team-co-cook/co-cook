@@ -25,12 +25,12 @@ import 'package:co_cook/screens/photo_card_screen/widgets/photo_card.dart';
 class PhotoCardScreen extends StatefulWidget {
   const PhotoCardScreen(
       {Key? key,
-      required this.cookName,
+      required this.recipeName,
       required this.time,
       required this.text,
       required this.image})
       : super(key: key);
-  final String cookName;
+  final String recipeName;
   final DateTime time;
   final String text;
   final XFile image;
