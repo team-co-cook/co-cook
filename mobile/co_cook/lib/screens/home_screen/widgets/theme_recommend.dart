@@ -30,8 +30,9 @@ class _ThemeRecommendState extends State<ThemeRecommend> {
     // API 요청
     RecommendService recommendService = RecommendService();
     Response? response = await recommendService.getCardData(apiPath);
-    print(response!.data);
+
     if (response?.statusCode == 200) {
+      print(response!.data);
       if (response.data['data'] != null) {
         setState(() {
           dataList = response.data["data"];
