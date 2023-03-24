@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart'; // Response 가져오기 위함.
 import 'package:co_cook/services/auth_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:co_cook/screens/user_screen/user_screen.dart';
 import 'package:co_cook/widgets/text_field/custom_text_field.dart';
 import 'dart:convert';
 import 'package:co_cook/styles/colors.dart';
@@ -66,9 +65,9 @@ class _SignupScreenState extends State<SignupScreen> {
                           Stack(// 텍스트 필드와 에러 텍스트 위치를 위한 스택
                               children: [
                             CustomTextField(
-                              onChanged: onNicknameChanged,
-                              isError: _isError,
-                            ),
+                                onChanged: onNicknameChanged,
+                                isError: _isError,
+                                maxLength: 16),
                             Positioned(
                                 bottom: 0,
                                 child:

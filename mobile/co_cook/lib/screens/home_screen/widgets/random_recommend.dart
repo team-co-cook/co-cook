@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:co_cook/services/recommend_service.dart';
+import 'package:co_cook/widgets/card/grid_card.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
@@ -20,33 +21,29 @@ class RandomRecommend extends StatefulWidget {
 class _RandomRecommendState extends State<RandomRecommend> {
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    getCardData("/home/random");
+    getTimeRecommendData("/home/random");
   }
 
-  var dataList = [];
+  List dataList = [];
 
-  Future<void> getCardData(String apiPath) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    final String userData = prefs.getString('userData') ?? '';
+  Future<void> getTimeRecommendData(String apiPath) async {
     // API 요청
-    RecommendService _recommendService = RecommendService();
-    Response? response = await _recommendService.getTimeRecommend(apiPath);
-
-    // 디코딩
-    var decodeRes = await jsonDecode(response.toString());
-    if (decodeRes != null) {
-      setState(() {
-        dataList = decodeRes["data"]["recipes"];
-      });
+    RecommendService recommendService = RecommendService();
+    Response? response = await recommendService.getCardData(apiPath);
+    if (response?.statusCode == 200) {
+      Map? decodeRes = await jsonDecode(response.toString());
+      if (decodeRes != null) {
+        setState(() {
+          dataList = decodeRes["data"]["recipes"];
+        });
+      }
     }
-    ;
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       child: Column(
         children: [
           Container(
@@ -58,17 +55,35 @@ class _RandomRecommendState extends State<RandomRecommend> {
                       color: CustomColors.monotoneBlack,
                     )),
           ),
-          ListView.builder(
-              shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
-              itemCount: dataList.length,
-              padding: EdgeInsets.fromLTRB(24.0, 16.0, 24.0, 24.0),
-              itemBuilder: (BuildContext context, int index) {
-                return Container(
-                  margin: EdgeInsets.only(bottom: 16),
-                  child: ListCard(data: dataList[index]),
-                );
-              }),
+          dataList.isNotEmpty
+              ? GridView.builder(
+                  physics: const NeverScrollableScrollPhysics(),
+                  padding: const EdgeInsets.all(24.0),
+                  shrinkWrap: true,
+                  itemCount: dataList.length,
+                  gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                      maxCrossAxisExtent: 200,
+                      mainAxisSpacing: 16.0,
+                      crossAxisSpacing: 16.0,
+                      childAspectRatio: 2 / 2.7),
+                  itemBuilder: (BuildContext context, int index) {
+                    return GridCard(data: dataList[index]);
+                  })
+
+              // ListView.builder(
+              //     shrinkWrap: true,
+              //     physics: const NeverScrollableScrollPhysics(),
+              //     itemCount: dataList.length,
+              //     padding: const EdgeInsets.fromLTRB(24.0, 16.0, 24.0, 24.0),
+              //     itemBuilder: (BuildContext context, int index) {
+              //       return Container(
+              //         margin: const EdgeInsets.only(bottom: 16),
+              //         child: ListCard(data: dataList[index]),
+              //       );
+              //     })
+              : const Center(
+                  child: CircularProgressIndicator(
+                      color: CustomColors.redPrimary)),
         ],
       ),
     );

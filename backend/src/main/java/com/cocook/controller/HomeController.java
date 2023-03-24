@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/home")
 public class HomeController {
@@ -32,15 +34,15 @@ public class HomeController {
     }
 
     @GetMapping("/theme")
-    public ResponseEntity<ApiResponse<ThemeResDto>> getThemes() {
-        ThemeResDto themeResDto = homeService.getThemes();
-        return ApiResponse.ok(themeResDto);
+    public ResponseEntity<ApiResponse<List<ThemeResDto>>> getThemes() {
+        List<ThemeResDto> themeResDtos = homeService.getThemes();
+        return ApiResponse.ok(themeResDtos);
     }
 
     @GetMapping("/category")
-    public ResponseEntity<ApiResponse<CategoryResDto>> getCategories() {
-        CategoryResDto categoryResDto = homeService.getCategories();
-        return ApiResponse.ok(categoryResDto);
+    public ResponseEntity<ApiResponse<List<CategoryResDto>>> getCategories() {
+        List<CategoryResDto> categoryResDtos = homeService.getCategories();
+        return ApiResponse.ok(categoryResDtos);
     }
 
     @GetMapping("/random")

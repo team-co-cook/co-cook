@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:co_cook/styles/colors.dart';
 import 'package:co_cook/styles/text_styles.dart';
+import 'package:zoom_tap_animation/zoom_tap_animation.dart';
 
 class AiRecommend extends StatefulWidget {
   const AiRecommend({super.key});
@@ -15,7 +16,7 @@ class _AiRecommendState extends State<AiRecommend> {
   Widget build(BuildContext context) {
     return SizedBox(
       width: double.infinity,
-      height: MediaQuery.of(context).size.width / 2 + 88,
+      height: MediaQuery.of(context).size.width / 2 + 80,
       child: Stack(children: [
         Positioned(
           right: 0,
@@ -36,7 +37,7 @@ class _AiRecommendState extends State<AiRecommend> {
           child: Column(
             children: [
               Container(
-                margin: const EdgeInsets.fromLTRB(24.0, 40.0, 24.0, 16.0),
+                margin: const EdgeInsets.fromLTRB(24.0, 32.0, 24.0, 16.0),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
@@ -72,7 +73,8 @@ class AiRecommendPhotoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return ZoomTapAnimation(
+      end: 0.98,
       onTap: () => print("인식 연결!!"),
       child: Stack(children: [
         Container(
@@ -140,7 +142,8 @@ class AiRecommendVoiceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return ZoomTapAnimation(
+      end: 0.98,
       onTap: () => print("음성인식 연결!!"),
       child: Stack(children: [
         Container(

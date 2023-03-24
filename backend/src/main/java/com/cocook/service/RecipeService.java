@@ -1,6 +1,10 @@
 package com.cocook.service;
 
+import com.cocook.auth.JwtTokenProvider;
 import com.cocook.dto.db.*;
+import com.cocook.dto.recipe.*;
+import com.cocook.dto.review.ReviewListResDto;
+import com.cocook.dto.review.ReviewResDto;
 import com.cocook.entity.*;
 import com.cocook.repository.*;
 import com.cocook.util.S3Uploader;
@@ -9,34 +13,49 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 
 public class RecipeService {
-    @Autowired
-    private RecipeRepository recipeRepository;
-    @Autowired
-    private CategoryRepository categoryRepository;
-    @Autowired
-    private IngredientRepository ingredientRepository;
-    @Autowired
-    private StepRepository stepRepository;
-    @Autowired
-    private ThemeRepository themeRepository;
-    @Autowired
-    private TagService tagService;
-    @Autowired
-    private StepService stepService;
+    private final RecipeRepository recipeRepository;
+    private final CategoryRepository categoryRepository;
+    private final IngredientRepository ingredientRepository;
+    private final StepRepository stepRepository;
+    private final ThemeRepository themeRepository;
+    private final FavoriteRepository favoriteRepository;
+    private final ReviewRepository reviewRepository;
+    private final AmountRepository amountRepository;
+    private final LikeRepository likeRepository;
+    private final TagService tagService;
+    private final StepService stepService;
+    private final IngredientService ingredientService;
+    private final AmountService amountService;
+    private final S3Uploader s3Uploader;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Autowired
-    private IngredientService ingredientService;
-
-    @Autowired
-    private AmountService amountService;
-
-    @Autowired
-    private S3Uploader s3Uploader;
+    public RecipeService(RecipeRepository recipeRepository, CategoryRepository categoryRepository, IngredientRepository ingredientRepository,
+                         StepRepository stepRepository, ThemeRepository themeRepository, TagService tagService, StepService stepService,
+                         IngredientService ingredientService, AmountService amountService, S3Uploader s3Uploader, FavoriteRepository favoriteRepository,
+                         JwtTokenProvider jwtTokenProvider, ReviewRepository reviewRepository, AmountRepository amountRepository, LikeRepository likeRepository) {
+        this.recipeRepository = recipeRepository;
+        this.categoryRepository = categoryRepository;
+        this.ingredientRepository = ingredientRepository;
+        this.stepRepository = stepRepository;
+        this.themeRepository = themeRepository;
+        this.reviewRepository = reviewRepository;
+        this.amountRepository = amountRepository;
+        this.likeRepository = likeRepository;
+        this.tagService = tagService;
+        this.stepService = stepService;
+        this.ingredientService = ingredientService;
+        this.amountService = amountService;
+        this.s3Uploader = s3Uploader;
+        this.favoriteRepository = favoriteRepository;
+        this.jwtTokenProvider = jwtTokenProvider;
+    }
 
     public void makeRecipe (RecipeDetailReqDto recipeDetail,
                 List<IngredientReqDto> ingredients,
@@ -79,6 +98,91 @@ public class RecipeService {
             Theme theme = themeRepository.getThemeByThemeName(themeName);
             tagService.makeTag(newRecipe, theme);
         }
+    }
+    public RecipeInfoResDto getRecipeInfo(Long recipeIdx, String authToken) {
+        Long userIdx = jwtTokenProvider.getUserIdx(authToken);
+        Recipe recipe = recipeRepository.findRecipeById(recipeIdx);
+        Favorite favorite = favoriteRepository.findByUserIdAndRecipeId(userIdx, recipeIdx);
+        boolean isFavorite = favorite != null;
+        return RecipeInfoResDto.builder()
+                .recipeName(recipe.getRecipeName())
+                .recipeImgPath(recipe.getImgPath())
+                .recipeDifficulty(recipe.getDifficulty())
+                .recipeRunningTime(recipe.getRunningTime())
+                .isFavorite(isFavorite).build();
+    }
+
+    public RecipeDetailResDto getRecipeDetail(Long recipeIdx) {
+        Recipe recipe = recipeRepository.findRecipeById(recipeIdx);
+        List<Ingredient> ingredients = ingredientRepository.findIngredientsByRecipeIdx(recipeIdx);
+        List<IngredientDto> ingredientDtos = new ArrayList<>();
+        for (Ingredient ingredient : ingredients) {
+            Amount amount = amountRepository.findAmountByRecipeIdAndIngredientId(recipeIdx, ingredient.getId());
+            String recipeAmount = amount.getContent();
+            IngredientDto ingredientDto = new IngredientDto(ingredient.getIngredientName(), recipeAmount);
+            ingredientDtos.add(ingredientDto);
+        }
+        return RecipeDetailResDto.builder()
+                .calorie(recipe.getCalorie())
+                .serving(recipe.getServing())
+                .carb(recipe.getCarb())
+                .protein(recipe.getProtein())
+                .fat(recipe.getFat())
+                .ingredients(ingredientDtos).build();
+    }
+
+    public RecipeStepResDto getRecipeStep(Long recipeIdx) {
+        List<Step> steps = stepRepository.findStepsByRecipeId(recipeIdx);
+        List<RecipeStepDetailResDto> recipeStepDetailResDtos = new ArrayList<>();
+
+        for (Step step : steps) {
+            RecipeStepDetailResDto recipeStepDetailResDto = RecipeStepDetailResDto.builder()
+                    .currentStep(step.getCurrentStep())
+                    .timer(step.getTimer())
+                    .content(step.getContent())
+                    .imgPath(step.getImgPath())
+                    .build();
+            recipeStepDetailResDtos.add(recipeStepDetailResDto);
+        }
+        return RecipeStepResDto.builder().steps(recipeStepDetailResDtos).build();
+    }
+
+    public ReviewListResDto getRecipeReview(Long recipeIdx, String authToken) {
+        User user = jwtTokenProvider.getUser(authToken);
+        List<Review> reviewList = reviewRepository.findReviewsByRecipeIdOrderByIdDesc(recipeIdx);
+        List<Review> userReview = new ArrayList<>();
+        List<Review> otherReview = new ArrayList<>();
+
+        for (Review review : reviewList) {
+            if (review.getUser() == user) {
+                userReview.add(review);
+            } else {
+                otherReview.add(review);
+            }
+        }
+        List<ReviewResDto> recipeReviews = new ArrayList<>();
+        for (Review review : userReview) {
+            LikeReview foundLiked = likeRepository.findByUserIdAndReviewId(user.getId(), review.getId());
+            boolean isLiked = false;
+            if (foundLiked != null) { isLiked = true; }
+            ReviewResDto recipeReview = new ReviewResDto(review.getId(), user.getId(), review.getCreatedDate(), user.getNickname(), review.getContent(), review.getImgPath(),
+                    review.getLikeCnt(), review.getCommentCnt(), review.getRunningTime(), isLiked);
+            recipeReviews.add(recipeReview);
+        }
+        for (Review review : otherReview) {
+            String userNickname = review.getUser().getNickname();
+            if (!review.getUser().getIsActive()) {
+                userNickname = "알 수 없음";
+            }
+            Long userIdx = review.getUser().getId();
+            LikeReview foundLiked = likeRepository.findByUserIdAndReviewId(user.getId(), review.getId());
+            boolean isLiked = false;
+            if (foundLiked != null) { isLiked = true; }
+            ReviewResDto recipeReview = new ReviewResDto(review.getId(), userIdx, review.getCreatedDate(), userNickname, review.getContent(), review.getImgPath(),
+                    review.getLikeCnt(), review.getCommentCnt(), review.getRunningTime(), isLiked);
+            recipeReviews.add(recipeReview);
+        }
+        return new ReviewListResDto(recipeReviews);
 
     }
 }

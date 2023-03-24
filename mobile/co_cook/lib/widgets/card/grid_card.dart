@@ -1,10 +1,14 @@
+import 'package:co_cook/screens/recipe_detail_screen/recipe_detail_screen.dart';
 import 'package:flutter/material.dart';
+
+import 'package:transparent_image/transparent_image.dart';
 
 import 'package:co_cook/styles/colors.dart';
 import 'package:co_cook/styles/text_styles.dart';
 import 'package:co_cook/widgets/button/bookmark_button.dart';
 
 import 'package:co_cook/utils/bookmark.dart';
+import 'package:zoom_tap_animation/zoom_tap_animation.dart';
 
 // 상위 위젯에서 그리드 사용시
 //
@@ -47,10 +51,17 @@ class _GridCardState extends State<GridCard> {
     });
   }
 
+  void routeScreen(BuildContext context, Widget screen) {
+    Route targetScreen = MaterialPageRoute(builder: (context) => screen);
+    Navigator.push(context, targetScreen);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => print(widget.data["recipeIdx"]),
+    return ZoomTapAnimation(
+      end: 0.98,
+      onTap: () => routeScreen(
+          context, RecipeDetailScreen(recipeIdx: widget.data['recipeIdx'])),
       child: SizedBox(
         width: double.infinity,
         child: Column(
@@ -63,11 +74,7 @@ class _GridCardState extends State<GridCard> {
                     height: constraints.maxWidth, // 부모 요소의 너비와 같은 값으로 설정
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(16),
-                      image: DecorationImage(
-                        fit: BoxFit.cover,
-                        image: NetworkImage(
-                            widget.data["recipeImgPath"]), // 배경 이미지
-                      ),
+                      color: Colors.white,
                       boxShadow: const [
                         BoxShadow(
                           color: Colors.black26,
@@ -77,11 +84,23 @@ class _GridCardState extends State<GridCard> {
                         )
                       ],
                     ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(16.0),
+                      child: FadeInImage.memoryNetwork(
+                          fadeInDuration: const Duration(milliseconds: 200),
+                          fit: BoxFit.cover,
+                          placeholder: kTransparentImage,
+                          image: widget.data["recipeImgPath"]),
+                    ),
                   ),
                   Positioned(
                       right: 16,
                       child: GestureDetector(
-                        onTap: () => toggleBookmark(context, isAdd, toggleIsAdd,
+                        onTap: () => toggleBookmark(
+                            context,
+                            isAdd,
+                            toggleIsAdd,
+                            widget.data["recipeIdx"],
                             widget.data["recipeName"]),
                         child: BookmarkButton(isAdd: isAdd),
                       )),
