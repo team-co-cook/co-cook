@@ -184,6 +184,12 @@ class _VoiceSearchScreenState extends State<VoiceSearchScreen> {
     }
   }
 
+  void _removeTag(String label) {
+    setState(() {
+      _reciveIngredientList.remove(label);
+    });
+  }
+
   // volume controller
   double volume = 0.0;
   double ampl = 0.0;
@@ -333,7 +339,7 @@ class _VoiceSearchScreenState extends State<VoiceSearchScreen> {
 
   Widget voiceSearchTag(String? label) {
     return ZoomTapAnimation(
-      onTap: () => label == null ? null : _reciveIngredientList.remove(label),
+      onTap: () => label == null ? null : _removeTag(label),
       child: Container(
           height: 48,
           padding: const EdgeInsets.only(left: 16, right: 16),
