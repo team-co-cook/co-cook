@@ -21,6 +21,8 @@ app.add_middleware(
 
 @app.get("/hello")
 async def hello():
+
+
     return{"message" : "hello"}
 
 @app.post("/upload")
@@ -28,11 +30,15 @@ async def upload_audio(audio: UploadFile = File(...)):
     # 저장할 디렉토리 지정
     today = datetime.date.today()
     formatted_date = today.strftime('%m%d%Y')
+    time = datetime.datetime.now()
+    formatted_date_time = time.strftime('%Y%m%d%H%M')
     save_path = Path("uploaded_files/"+ formatted_date)
     save_path.mkdir(exist_ok=True)
 
+
+
     # mp3 파일을 저장할 경로 지정
-    audio_path = save_path / (audio.filename.split(".")[0] + ".wav")
+    audio_path = save_path / (formatted_date_time+'_'+audio.filename.split(".")[0] + ".wav")
 
     # 파일 저장
     with audio_path.open("wb") as buffer:
@@ -46,6 +52,7 @@ async def upload_audio(audio: UploadFile = File(...)):
     audio_data.export(audio_path, format="wav")
     
     result = recognize_speech(str(audio_path))
+
     return {"filename": audio.filename, "path": str(audio_path), "result" : result}
 
 def recognize_speech(file_path):
