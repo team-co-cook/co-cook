@@ -52,13 +52,14 @@ class _CookScreenState extends State<CookScreen> {
 
   @override
   void dispose() {
-    _accelerometerSub.cancel();
     super.dispose();
   }
 
   void shutdownCook() async {
-    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
-        .then((value) => Navigator.pop(context));
+    _accelerometerSub.cancel();
+    await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+    // .then((value) => Navigator.pop(context));
+    Navigator.pop(context);
   }
 
   Future<void> getDetailBasic(int recipeIdx) async {
