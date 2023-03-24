@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:co_cook/screens/review_screen/review_screen.dart';
 import 'package:dio/dio.dart';
 
+import 'package:flutter_tts/flutter_tts.dart';
 import 'package:co_cook/services/detail_service.dart';
 import 'package:flutter/material.dart';
 import 'package:co_cook/styles/colors.dart';
@@ -34,6 +35,10 @@ class _CookScreenBodyState extends State<CookScreenBody> {
 
   late DateTime _startTime;
 
+  // tts 관련 코드
+  Timer? _debounce;
+  int currentTtsIndex = -1;
+
   @override
   void initState() {
     super.initState();
@@ -42,13 +47,25 @@ class _CookScreenBodyState extends State<CookScreenBody> {
     recipeCardPageController.addListener(() {
       setState(() {
         _recipeCardPage = recipeCardPageController.page ?? 0;
+
+        // debounce를 사용하여 TTS 호출을 처리
+        if (_debounce?.isActive ?? false) _debounce?.cancel();
+        _debounce = Timer(const Duration(milliseconds: 300), () {
+          if (_recipeCardPage.floor() != currentTtsIndex) {
+            currentTtsIndex = _recipeCardPage.floor();
+            if (currentTtsIndex < dataList.length) {
+              speakText(dataList[currentTtsIndex]["content"]);
+            }
+          }
+        });
+
         if (_recipeCardPage.ceil() == dataList.length) {
           setState(() {
             _completeCardPage = dataList.length - _recipeCardPage;
           });
         }
         if (_recipeCardPage.floor() == dataList.length) {
-          print(_startTime); // 종료 콜백 넣어주세요
+          // 종료 콜백 넣어주세요
           gotoReview(context, widget.recipeIdx, widget.recipeName, _startTime);
         }
       });
@@ -61,12 +78,21 @@ class _CookScreenBodyState extends State<CookScreenBody> {
     super.dispose();
   }
 
+  Future<void> speakText(String text) async {
+    FlutterTts flutterTts = FlutterTts();
+
+    // 한국어 TTS 사용 예시
+    await flutterTts.setLanguage("ko-KR");
+    await flutterTts.speak(text);
+  }
+
   Future<void> getDetailStep(int recipeIdx) async {
     // API 요청
     DetailService searchService = DetailService();
     Response? response =
         await searchService.getDetailStep(recipeIdx: recipeIdx);
     if (response?.statusCode == 200) {
+      print(response!.data['data']['steps']);
       if (response!.data['data'] != null) {
         setState(() {
           dataList = response.data['data']['steps'];

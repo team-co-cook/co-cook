@@ -96,13 +96,19 @@ class _ReviewScreenState extends State<ReviewScreen> {
 
   Future<void> CreateReview() async {
     // 이미지를 MultipartFile로 변환
-    if (_image!.path == null) {
-      print('사진이 없어요.');
+    if (_image == null) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("이미지를 등록해주세요."),
+        duration: Duration(seconds: 1),
+      ));
       return;
     }
 
     if (_text == '') {
-      print('글자는 쓰셔야죠');
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("한줄평을 입력해주세요."),
+        duration: Duration(seconds: 1),
+      ));
       return;
     }
 
