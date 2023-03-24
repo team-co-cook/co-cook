@@ -26,12 +26,14 @@ class PhotoCardScreen extends StatefulWidget {
   const PhotoCardScreen(
       {Key? key,
       required this.recipeName,
-      required this.time,
+      required this.startTime,
+      required this.endTime,
       required this.text,
       required this.image})
       : super(key: key);
   final String recipeName;
-  final DateTime time;
+  final DateTime startTime;
+  final DateTime endTime;
   final String text;
   final XFile image;
 
@@ -53,12 +55,11 @@ class _PhotoCardScreenState extends State<PhotoCardScreen> {
 
   String _getTimeString() {
     final formatter = DateFormat('yyyy. MM. dd. (E)', 'ko_KR');
-    return formatter.format(widget.time);
+    return formatter.format(widget.startTime);
   }
 
   String _getCookingTimeString() {
-    final now = DateTime.now();
-    final difference = now.difference(widget.time);
+    final difference = widget.endTime.difference(widget.startTime);
 
     final hours = difference.inHours;
     final minutes = difference.inMinutes % 60;
@@ -124,7 +125,9 @@ class _PhotoCardScreenState extends State<PhotoCardScreen> {
                 Padding(
                   padding: const EdgeInsets.only(right: 20),
                   child: IconButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
                       icon: Icon(
                         Icons.close,
                         color: CustomColors.monotoneLight, // 아이콘 색상

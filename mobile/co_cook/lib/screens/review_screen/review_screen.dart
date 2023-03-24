@@ -1,9 +1,11 @@
 import 'dart:io';
 import 'dart:convert'; // decode 가져오기
 import 'package:co_cook/screens/photo_card_screen/photo_card_screen.dart';
+import 'package:co_cook/services/detail_service.dart';
 import 'package:dio/dio.dart'; // Response 가져오기 위함.
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:http/http.dart' as http;
 
 import 'package:co_cook/styles/colors.dart';
 import 'package:co_cook/styles/text_styles.dart';
@@ -32,10 +34,20 @@ class _ReviewScreenState extends State<ReviewScreen> {
   String _errorMessage = '';
   final _focusNode = FocusNode(); // 포커싱 여부를 추적하는 클래스 인스턴스
   XFile? _image; // 이미지를 저장
+  int _runningTime = 0;
+  late DateTime _endTime;
 
   @override
   void initState() {
     super.initState();
+
+    DateTime now = DateTime.now();
+    Duration runningTime = widget.startTime.difference(now);
+    int minutes = runningTime.inMinutes.remainder(60);
+    setState(() {
+      _runningTime = minutes;
+      _endTime = now;
+    });
   }
 
   // 위젯이 소멸될 때 호출되는 메서드
@@ -82,6 +94,47 @@ class _ReviewScreenState extends State<ReviewScreen> {
     });
   }
 
+  Future<void> CreateReview() async {
+    // 이미지를 MultipartFile로 변환
+    if (_image!.path == null) {
+      print('사진이 없어요.');
+      return;
+    }
+
+    if (_text == '') {
+      print('글자는 쓰셔야죠');
+      return;
+    }
+
+    String fileName = _image!.path.split('/').last;
+    MultipartFile multipartFile =
+        await MultipartFile.fromFile(_image!.path, filename: fileName);
+    // 여기서 'reviewImg'는 서버에서 요구하는 파일의 키값입니다. 서버 요구에 따라 적절하게 변경해 주세요.
+
+    // API 요청
+    DetailService apiService = DetailService();
+    Map reviewDetail = {
+      "content": _text,
+      "runningTime": _runningTime,
+      "recipeIdx": widget.recipeIdx
+    };
+
+    String jsonString = jsonEncode(reviewDetail);
+
+    // reviewData와 multipartFile을 함께 전송하기 위해 FormData를 사용합니다.
+    FormData formData = FormData.fromMap({
+      "reviewDetail": jsonString,
+      "reviewImg": multipartFile,
+    });
+
+    print(formData);
+    Response? response = await apiService.createReview(formData);
+    if (response?.statusCode == 200) {
+      gotoPhotoCard(context, _text, _image!, widget.recipeName,
+          widget.startTime, _endTime);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(children: [
@@ -91,19 +144,18 @@ class _ReviewScreenState extends State<ReviewScreen> {
         },
         child: Scaffold(
           appBar: AppBar(
+            centerTitle: true,
+            automaticallyImplyLeading: false,
             backgroundColor: CustomColors.greenPrimary,
             elevation: 0.5,
             toolbarHeight: 80,
             title: Padding(
               padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
-              child: Align(
-                alignment: Alignment.center,
-                child: Text(
-                  '완성!',
-                  style: const CustomTextStyles()
-                      .title1
-                      .copyWith(color: CustomColors.monotoneLight),
-                ),
+              child: Text(
+                '완성!',
+                style: const CustomTextStyles()
+                    .title1
+                    .copyWith(color: CustomColors.monotoneLight),
               ),
             ),
           ),
@@ -139,7 +191,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
                                 ),
                               ),
                               child: _image == null
-                                  ? Icon(Icons.add_a_photo,
+                                  ? const Icon(Icons.add_a_photo,
                                       size: 20,
                                       color: CustomColors.monotoneGray)
                                   : ClipRRect(
@@ -189,8 +241,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
                           label: '저장',
                           color: ButtonType.red,
                           onPressed: () {
-                            gotoPhotoCard(context, _text, _image!,
-                                widget.recipeName, widget.startTime);
+                            CreateReview();
                           }),
                     ),
                     SizedBox(height: 8),
@@ -198,7 +249,9 @@ class _ReviewScreenState extends State<ReviewScreen> {
                       child: CommonButton(
                           label: '취소',
                           color: ButtonType.none,
-                          onPressed: () {}),
+                          onPressed: () {
+                            Navigator.pop(context);
+                          }),
                     )
                   ],
                 ),
@@ -212,13 +265,14 @@ class _ReviewScreenState extends State<ReviewScreen> {
 }
 
 void gotoPhotoCard(BuildContext context, String _text, XFile _image,
-    String recipeName, DateTime startTime) {
+    String recipeName, DateTime startTime, DateTime endTime) {
   Route photoCardScreen = MaterialPageRoute(
       builder: (context) => PhotoCardScreen(
             text: _text,
             image: _image,
-            time: startTime,
+            startTime: startTime,
+            endTime: endTime,
             recipeName: recipeName,
           ));
-  Navigator.push(context, photoCardScreen);
+  Navigator.pushReplacement(context, photoCardScreen);
 }

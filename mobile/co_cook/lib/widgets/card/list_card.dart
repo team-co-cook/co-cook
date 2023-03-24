@@ -1,3 +1,4 @@
+import 'package:co_cook/screens/cook_screen/cook_screen.dart';
 import 'package:flutter/material.dart';
 
 import 'package:co_cook/styles/colors.dart';
@@ -49,8 +50,9 @@ class _ListCardState extends State<ListCard> {
       end: 0.98,
       onTap: () => routeScreen(
           context,
-          RecipeDetailScreen(
-              recipeIdx: widget.data['recipeIdx'])), // 클릭시 이벤트 연결
+          widget.showImage
+              ? RecipeDetailScreen(recipeIdx: widget.data['recipeIdx'])
+              : CookScreen(recipeIdx: widget.data['recipeIdx'])), // 클릭시 이벤트 연결
       child: Container(
           // 전체 컨테이너
           decoration: BoxDecoration(
