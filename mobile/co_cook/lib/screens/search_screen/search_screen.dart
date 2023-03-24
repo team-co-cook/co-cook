@@ -90,68 +90,66 @@ class _SearchScreenState extends State<SearchScreen> {
         ),
         body: Padding(
           padding: const EdgeInsets.all(12.0),
-          child: Expanded(
-            child: SingleChildScrollView(
-              physics: const BouncingScrollPhysics(
-                  parent: AlwaysScrollableScrollPhysics()),
-              child: Align(
-                alignment: Alignment.topCenter,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    GestureDetector(
-                      onTap: () async {
-                        // CameraScreen으로 이동
-                      },
-                      child: Image.asset(
-                        'assets/images/button_img/CameraSearchLargeX2.png',
-                      ),
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(
+                parent: AlwaysScrollableScrollPhysics()),
+            child: Align(
+              alignment: Alignment.topCenter,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  GestureDetector(
+                    onTap: () async {
+                      // CameraScreen으로 이동
+                    },
+                    child: Image.asset(
+                      'assets/images/button_img/CameraSearchLargeX2.png',
                     ),
-                    if (dataList.isNotEmpty)
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Text('${dataList.length}건의 요리를 찾았어요',
-                            style: CustomTextStyles()
-                                .caption
-                                .copyWith(color: CustomColors.monotoneBlack)),
-                      ),
-                    dataList.isNotEmpty
-                        ? ListView.builder(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemCount: dataList.length,
-                            padding:
-                                const EdgeInsets.fromLTRB(8.0, 16.0, 8.0, 24.0),
-                            itemBuilder: (BuildContext context, int index) {
-                              return Container(
-                                margin: const EdgeInsets.only(bottom: 16),
-                                child: ListCard(data: dataList[index]),
-                              );
-                            })
-                        : Container(
-                            child: Column(
-                              children: [
-                                SizedBox(height: 100),
-                                Text('이렇게 검색해보세요.',
-                                    style: CustomTextStyles().body1.copyWith(
-                                          color: CustomColors.monotoneGray,
-                                        )),
-                                SizedBox(height: 16.0),
-                                Column(
-                                  children: exampleWord
-                                      .map((e) => CommonButton(
-                                          label: e,
-                                          color: ButtonType.none,
-                                          onPressed: () {
-                                            _clickSearch(e);
-                                          }))
-                                      .toList(),
-                                ),
-                              ],
-                            ),
+                  ),
+                  if (dataList.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Text('${dataList.length}건의 요리를 찾았어요',
+                          style: CustomTextStyles()
+                              .caption
+                              .copyWith(color: CustomColors.monotoneBlack)),
+                    ),
+                  dataList.isNotEmpty
+                      ? ListView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: dataList.length,
+                          padding:
+                              const EdgeInsets.fromLTRB(8.0, 16.0, 8.0, 24.0),
+                          itemBuilder: (BuildContext context, int index) {
+                            return Container(
+                              margin: const EdgeInsets.only(bottom: 16),
+                              child: ListCard(data: dataList[index]),
+                            );
+                          })
+                      : Container(
+                          child: Column(
+                            children: [
+                              SizedBox(height: 100),
+                              Text('이렇게 검색해보세요.',
+                                  style: CustomTextStyles().body1.copyWith(
+                                        color: CustomColors.monotoneGray,
+                                      )),
+                              SizedBox(height: 16.0),
+                              Column(
+                                children: exampleWord
+                                    .map((e) => CommonButton(
+                                        label: e,
+                                        color: ButtonType.none,
+                                        onPressed: () {
+                                          _clickSearch(e);
+                                        }))
+                                    .toList(),
+                              ),
+                            ],
                           ),
-                  ],
-                ),
+                        ),
+                ],
               ),
             ),
           ),
