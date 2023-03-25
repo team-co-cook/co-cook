@@ -15,6 +15,7 @@ import 'package:co_cook/styles/colors.dart';
 import 'package:co_cook/styles/text_styles.dart';
 
 import 'package:co_cook/widgets/sound_meter/sound_meter.dart';
+import 'package:co_cook/screens/ingredient_list_screen/ingredient_list_screen.dart';
 
 class VoiceSearchScreen extends StatefulWidget {
   const VoiceSearchScreen({super.key});
@@ -213,6 +214,15 @@ class _VoiceSearchScreenState extends State<VoiceSearchScreen> {
     return (volume * maxVolumeToDisplay).round().abs();
   }
 
+  // 재료 검색 결과 목록으로 이동
+  void gotoVoiceList() {
+    _stopListen();
+    Route ingredientListScreen = MaterialPageRoute(
+        builder: (context) =>
+            IngredientListScreen(ingredients: _reciveIngredientList));
+    Navigator.push(context, ingredientListScreen);
+  }
+
   /////////////////////////////////////////////////////////////////////////////
   ///
 
@@ -327,7 +337,7 @@ class _VoiceSearchScreenState extends State<VoiceSearchScreen> {
                       child: CommonButton(
                           label: "완료",
                           color: ButtonType.red,
-                          onPressed: () => print("제출"))),
+                          onPressed: () => gotoVoiceList())),
                 ],
               ),
             ),
