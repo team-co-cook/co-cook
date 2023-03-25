@@ -5,6 +5,7 @@ import com.cocook.dto.home.CategoryResDto;
 import com.cocook.dto.home.RandomResDto;
 import com.cocook.dto.home.RecommendResDto;
 import com.cocook.dto.home.ThemeResDto;
+import com.cocook.dto.recipe.RecipeIdx;
 import com.cocook.dto.recipe.RecipeListResDto;
 import com.cocook.entity.Category;
 import com.cocook.entity.Favorite;
@@ -41,23 +42,33 @@ public class HomeService {
     }
 
     public RecommendResDto getRecommendRecipes(String authToken) {
-        String themeName;
+        String timeSlot;
         int currentHour = LocalDateTime.now().getHour();
         if (currentHour >= 4 && currentHour < 9) {
-            themeName = "아침";
+            timeSlot = "아침";
         } else if (currentHour >= 9 && currentHour < 15) {
-            themeName = "점심";
+            timeSlot = "점심";
         } else if (currentHour >= 15 && currentHour < 20) {
-            themeName = "저녁";
+            timeSlot = "저녁";
         } else {
-            themeName = "야식";
+            timeSlot = "야식";
         }
 
         Long userIdx = jwtTokenProvider.getUserIdx(authToken);
-        List<Recipe> foundRecipes = recipeRepository.findRandom5RecipesByThemeName(themeName);
-        List<RecipeListResDto> resultRecipes = addRecipeToRecipeListResDto(foundRecipes, userIdx);
+        List<Recipe> recommendRecipes = new ArrayList<>();
+        List<Long> timeSlotRecipes = recipeRepository.findByTheme(timeSlot);
 
-        return new RecommendResDto(themeName, resultRecipes);
+        System.out.println(timeSlotRecipes);
+        Recipe firstRecommend = recipeRepository.findRecipeByRecentReview(timeSlotRecipes);
+        System.out.println(firstRecommend.getRecipeName());
+        recommendRecipes.add(firstRecommend);
+
+        Recipe secondRecommend = recipeRepository.findRecommendRecipeByUserIdx(userIdx, timeSlotRecipes);
+        recommendRecipes.add(secondRecommend);
+
+        List<RecipeListResDto> resultRecipes = addRecipeToRecipeListResDto(recommendRecipes, userIdx);
+
+        return new RecommendResDto(timeSlot, resultRecipes);
     }
 
     public List<ThemeResDto> getThemes() {
