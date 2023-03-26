@@ -28,7 +28,12 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
     @Query(value = "SELECT * FROM recipe " +
             "JOIN review ON review.recipe_idx = recipe.recipe_idx " +
             "WHERE review.created_date > DATE_ADD(NOW(), INTERVAL -7 DAY) AND " +
-            "recipe.recipe_idx IN (:recipeIdxList) " +
+            "recipe.recipe_idx IN (:recipeIdxList) AND " +
+            "recipe.recipe_idx in (" +
+            "   SELECT recipe.recipe_idx " +
+            "   FROM recipe " +
+            "   JOIN category ON category.category_idx = recipe.category_idx " +
+            "   WHERE category.category_name = '메인 요리')" +
             "GROUP BY review.recipe_idx " +
             "ORDER BY COUNT(*) DESC LIMIT 1;", nativeQuery = true)
     Recipe findRecipeByRecentReview(@Param("recipeIdxList") List<Long> recipeIdxList);
@@ -64,11 +69,34 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
             "GROUP BY th.theme_idx " +
             "ORDER BY COUNT(*) DESC, RAND() LIMIT 2) " +
             "AS favorite_theme ON favorite_theme.theme_idx = t.theme_idx " +
-            "WHERE recommend_recipe.recipe_idx IN (:recipeIdxList) " +
+            "WHERE recommend_recipe.recipe_idx IN (:recipeIdxList) AND " +
+            "recommend_recipe.recipe_idx NOT IN (:recommendedList) AND " +
+            "recommend_recipe.recipe_idx in (" +
+            "   SELECT recipe.recipe_idx " +
+            "   FROM recipe " +
+            "   JOIN category ON category.category_idx = recipe.category_idx " +
+            "   WHERE category.category_name = '메인 요리')" +
             "GROUP BY recommend_recipe.recipe_idx " +
-            "ORDER BY COUNT(*) DESC, RAND() LIMIT 1;", nativeQuery = true)
-    Recipe findRecommendRecipeByUserIdx(@Param("userIdx") Long userIdx, @Param("recipeIdxList") List<Long> recipeIdxList);
+            "ORDER BY COUNT(*) DESC, RAND() LIMIT :quota ;", nativeQuery = true)
+    List<Recipe> findRecommendRecipeByUserIdx(@Param("userIdx") Long userIdx, @Param("recipeIdxList") List<Long> recipeIdxList, @Param("recommendedList") List<Long> recommendedList, @Param("quota") Integer quota);
 
+    @Query(value = "SELECT * " +
+            "FROM recipe r " +
+            "WHERE r.recipe_idx = ( " +
+            "    SELECT recipe_idx " +
+            "    FROM favorite  " +
+            "    WHERE created_date > DATE_ADD(NOW(), INTERVAL -7 DAY) AND " +
+            "    recipe_idx IN :recipeIdxList AND " +
+            "    recipe_idx NOT IN (:recommendedList) AND " +
+            "    recipe_idx in (" +
+            "        SELECT recipe.recipe_idx " +
+            "        FROM recipe " +
+            "        JOIN category ON category.category_idx = recipe.category_idx " +
+            "        WHERE category.category_name = '메인 요리')" +
+            "    GROUP BY recipe_idx " +
+            "    ORDER BY COUNT(*) DESC, RAND() LIMIT :quota " +
+            ");", nativeQuery = true)
+    List<Recipe> findRecipeByRecentFavorite(@Param("recipeIdxList") List<Long> recipeIdxList, @Param("recommendedList") List<Long> recommendedList, @Param("quota") Integer quota);
     List<Recipe> findByCategoryCategoryNameOrderByIdDesc(String categoryName);
 
     List<Recipe> findAllByOrderByIdDesc();
