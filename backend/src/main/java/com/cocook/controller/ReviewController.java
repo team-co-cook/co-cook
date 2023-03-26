@@ -30,14 +30,13 @@ public class ReviewController {
     }
 
     @PostMapping(value = "", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<ApiResponse<ReviewResDto>> makeReview(@RequestHeader("AUTH-TOKEN") String authToken,
+    public ResponseEntity<ApiResponse<String>> makeReview(@RequestHeader("AUTH-TOKEN") String authToken,
                                                                 @RequestParam("reviewDetail") String reviewDetail,
                                                                 @RequestPart("reviewImg") MultipartFile reviewImg) {
         try {
             ReviewReqDto reviewReqDto = objectMapper.readValue(reviewDetail, ReviewReqDto.class);
-            System.out.println(reviewReqDto);
-            ReviewResDto reviewResDto = reviewService.makeReview(authToken, reviewReqDto, reviewImg);
-            return ApiResponse.ok(reviewResDto);
+            reviewService.makeReview(authToken, reviewReqDto, reviewImg);
+            return ApiResponse.ok("OK");
         } catch (IOException e) {
             throw new RuntimeException("유효하지 않습니다.");
         }

@@ -163,8 +163,7 @@ public class RecipeService {
         List<ReviewResDto> recipeReviews = new ArrayList<>();
         for (Review review : userReview) {
             LikeReview foundLiked = likeRepository.findByUserIdAndReviewId(user.getId(), review.getId());
-            boolean isLiked = false;
-            if (foundLiked != null) { isLiked = true; }
+            boolean isLiked = foundLiked != null;
             ReviewResDto recipeReview = new ReviewResDto(review.getId(), user.getId(), review.getCreatedDate(), user.getNickname(), review.getContent(), review.getImgPath(),
                     review.getLikeCnt(), review.getCommentCnt(), review.getRunningTime(), isLiked);
             recipeReviews.add(recipeReview);
@@ -176,9 +175,8 @@ public class RecipeService {
             }
             Long userIdx = review.getUser().getId();
             LikeReview foundLiked = likeRepository.findByUserIdAndReviewId(user.getId(), review.getId());
-            boolean isLiked = false;
-            if (foundLiked != null) { isLiked = true; }
-            ReviewResDto recipeReview = new ReviewResDto(review.getId(), userIdx, review.getCreatedDate(), userNickname, review.getContent(), review.getImgPath(),
+            boolean isLiked = foundLiked != null;
+            ReviewResDto recipeReview = new ReviewResDto(review.getId(), userIdx, review.getCreatedDate(), userNickname, review.getContent(), review.getResizedImgPath(),
                     review.getLikeCnt(), review.getCommentCnt(), review.getRunningTime(), isLiked);
             recipeReviews.add(recipeReview);
         }

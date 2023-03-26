@@ -2,7 +2,6 @@ package com.cocook.service;
 
 import com.cocook.auth.JwtTokenProvider;
 import com.cocook.dto.review.ReviewReqDto;
-import com.cocook.dto.review.ReviewResDto;
 import com.cocook.entity.LikeReview;
 import com.cocook.entity.Recipe;
 import com.cocook.entity.Review;
@@ -42,14 +41,14 @@ public class ReviewService {
 
 
 
-    public ReviewResDto makeReview(String authToken, ReviewReqDto reviewReqDto, MultipartFile reviewImg) {
+    public void makeReview(String authToken, ReviewReqDto reviewReqDto, MultipartFile reviewImg) {
         User user = jwtTokenProvider.getUser(authToken);
         Recipe recipe = recipeRepository.findRecipeById(reviewReqDto.getRecipeIdx());
         Review review = new Review();
         review.setContent(reviewReqDto.getContent());
         try {
-            String storedFilePath = s3Uploader.upload(reviewImg,"images");
-            review.setImgPath(storedFilePath);
+            review.setResizedImgPath(s3Uploader.uploadResizedImage(reviewImg,"images"));
+            review.setImgPath(s3Uploader.upload(reviewImg, "images"));
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage());
         }
@@ -59,8 +58,7 @@ public class ReviewService {
         review.setReportCnt(0);
         review.setUser(user);
         review.setRecipe(recipe);
-        Review newReview = reviewRepository.save(review);
-        return new ReviewResDto(newReview.getId(), user.getId(), newReview.getCreatedDate(), user.getNickname(), newReview.getContent(), newReview.getImgPath(), newReview.getLikeCnt(), newReview.getCommentCnt(), newReview.getRunningTime(), false);
+        reviewRepository.save(review);
     }
 
     public void deleteReview(Long reviewIdx, String authToken) {
