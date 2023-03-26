@@ -57,14 +57,23 @@ public class HomeService {
         Long userIdx = jwtTokenProvider.getUserIdx(authToken);
         List<Recipe> recommendRecipes = new ArrayList<>();
         List<Long> timeSlotRecipes = recipeRepository.findByTheme(timeSlot);
+        List<Long> recommendedRecipes = new ArrayList<>();
 
-        System.out.println(timeSlotRecipes);
         Recipe firstRecommend = recipeRepository.findRecipeByRecentReview(timeSlotRecipes);
-        System.out.println(firstRecommend.getRecipeName());
         recommendRecipes.add(firstRecommend);
+        recommendedRecipes.add(firstRecommend.getId());
 
-        Recipe secondRecommend = recipeRepository.findRecommendRecipeByUserIdx(userIdx, timeSlotRecipes);
-        recommendRecipes.add(secondRecommend);
+        List<Recipe> secondRecommend = recipeRepository.findRecommendRecipeByUserIdx(userIdx, timeSlotRecipes, recommendedRecipes, 2 - recommendRecipes.size());
+        recommendRecipes.addAll(secondRecommend);
+        for (Recipe recipe : secondRecommend) {
+            recommendedRecipes.add(recipe.getId());
+        }
+
+        List<Recipe> thirdRecommend = recipeRepository.findRecipeByRecentFavorite(timeSlotRecipes, recommendedRecipes, 3-recommendRecipes.size());
+        recommendRecipes.addAll(thirdRecommend);
+
+        Recipe fourthRecommend = recipeRepository.findRecipeById(23L);
+        recommendRecipes.add(fourthRecommend);
 
         List<RecipeListResDto> resultRecipes = addRecipeToRecipeListResDto(recommendRecipes, userIdx);
 
