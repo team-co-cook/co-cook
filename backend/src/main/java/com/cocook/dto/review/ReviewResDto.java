@@ -19,6 +19,7 @@ public class ReviewResDto {
 
     private String imgPath;
 
+
     private Integer likeCnt;
 
     private Integer commentCnt;
