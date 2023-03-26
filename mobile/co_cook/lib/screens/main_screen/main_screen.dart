@@ -1,3 +1,4 @@
+import 'package:co_cook/screens/voice_search_screen/voice_search_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
@@ -37,9 +38,7 @@ class _MainScreenState extends State<MainScreen> {
         Container(
           child: [
             const HomeScreen(),
-            Container(
-              child: Text("냉털"),
-            ),
+            VoiceSearchScreen(),
             SearchScreen(),
             UserScreen(),
           ][_currentIndex],
