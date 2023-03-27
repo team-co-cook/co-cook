@@ -11,8 +11,7 @@ import 'package:co_cook/widgets/card/grid_card.dart';
 import 'package:co_cook/services/recommend_service.dart';
 
 class TimeRecommend extends StatefulWidget {
-  const TimeRecommend({super.key, required this.dataList});
-  final List<Map> dataList;
+  const TimeRecommend({super.key});
 
   @override
   State<TimeRecommend> createState() => _TimeRecommendState();

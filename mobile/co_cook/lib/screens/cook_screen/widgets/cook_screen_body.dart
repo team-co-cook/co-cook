@@ -47,9 +47,14 @@ class _CookScreenBodyState extends State<CookScreenBody>
   AnimationController? _waveAnimationController;
   Animation? _waveAnimation;
 
+  late FlutterTts flutterTts;
+
   @override
   void initState() {
     super.initState();
+
+    flutterTts = FlutterTts();
+
     _waveAnimationController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 10),
@@ -70,6 +75,8 @@ class _CookScreenBodyState extends State<CookScreenBody>
       setState(() {
         _recipeCardPage = recipeCardPageController.page ?? 0;
 
+        flutterTts.stop();
+
         // debounce를 사용하여 TTS 호출을 처리
         if (_debounce?.isActive ?? false) _debounce?.cancel();
         _debounce = Timer(const Duration(milliseconds: 300), () {
@@ -81,10 +88,11 @@ class _CookScreenBodyState extends State<CookScreenBody>
           }
         });
 
-        if (_recipeCardPage.ceil() == dataList.length + 1) {
+        if (_recipeCardPage > dataList.length) {
+          print(_recipeCardPage);
           setState(() {
             _completeCardPage =
-                (dataList.length - _recipeCardPage).clamp(0.0, 1.0);
+                (dataList.length + 1 - _recipeCardPage).clamp(0, 1);
           });
         }
         if (_recipeCardPage.floor() == dataList.length + 1) {
@@ -99,12 +107,11 @@ class _CookScreenBodyState extends State<CookScreenBody>
   void dispose() {
     recipeCardPageController.dispose();
     _waveAnimationController?.dispose();
+    flutterTts.stop();
     super.dispose();
   }
 
   Future<void> speakText(String text) async {
-    FlutterTts flutterTts = FlutterTts();
-
     // 한국어 TTS 사용 예시
     await flutterTts.setLanguage("ko-KR");
     await flutterTts.speak(text);
