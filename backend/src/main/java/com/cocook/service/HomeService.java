@@ -72,8 +72,8 @@ public class HomeService {
         List<Recipe> thirdRecommend = recipeRepository.findRecipeByRecentFavorite(timeSlotRecipes, recommendedRecipes, 3-recommendRecipes.size());
         recommendRecipes.addAll(thirdRecommend);
 
-        Recipe fourthRecommend = recipeRepository.findRecipeById(23L);
-        recommendRecipes.add(fourthRecommend);
+        List<Recipe> fourthRecommend = recipeRepository.findRecipeByAppPicks(recommendedRecipes);
+        recommendRecipes.addAll(fourthRecommend);
 
         List<RecipeListResDto> resultRecipes = addRecipeToRecipeListResDto(recommendRecipes, userIdx);
 

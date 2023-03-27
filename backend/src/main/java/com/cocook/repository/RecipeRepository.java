@@ -97,6 +97,13 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
             "    ORDER BY COUNT(*) DESC, RAND() LIMIT :quota " +
             ");", nativeQuery = true)
     List<Recipe> findRecipeByRecentFavorite(@Param("recipeIdxList") List<Long> recipeIdxList, @Param("recommendedList") List<Long> recommendedList, @Param("quota") Integer quota);
+
+    @Query(value = "SELECT * " +
+            "FROM recipe " +
+            "WHERE recipe.recipe_idx NOT IN (:recommendList) AND " +
+            "recipe.recipe_idx IN (6, 20, 22, 23) ;", nativeQuery = true)
+    List<Recipe> findRecipeByAppPicks(@Param("recommendList") List<Long> recommendList);
+
     List<Recipe> findByCategoryCategoryNameOrderByIdDesc(String categoryName);
 
     List<Recipe> findAllByOrderByIdDesc();
