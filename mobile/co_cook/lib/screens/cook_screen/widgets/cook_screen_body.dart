@@ -88,10 +88,11 @@ class _CookScreenBodyState extends State<CookScreenBody>
           }
         });
 
-        if (_recipeCardPage.ceil() == dataList.length + 1) {
+        if (_recipeCardPage > dataList.length) {
+          print(_recipeCardPage);
           setState(() {
             _completeCardPage =
-                (dataList.length - _recipeCardPage).clamp(0.0, 1.0);
+                (dataList.length + 1 - _recipeCardPage).clamp(0, 1);
           });
         }
         if (_recipeCardPage.floor() == dataList.length + 1) {
