@@ -28,9 +28,8 @@ class _RecipeDetailInfoTabState extends State<RecipeDetailInfoTab> {
     DetailService searchService = DetailService();
     Response? response =
         await searchService.getDetailInfo(recipeIdx: recipeIdx);
-    print(response!.data['data']);
     if (response?.statusCode == 200) {
-      if (response != null) {
+      if (response?.data != null) {
         setState(() {
           data = response!.data['data'];
         });
