@@ -45,15 +45,12 @@ class _IngredientListScreenState extends State<IngredientListScreen> {
     // 선택된 재료를 콤마로 구분된 스트링으로 변환
     String selectedIngredientsString = selectedIngredients.join(',');
 
-    print(selectedIngredientsString);
-
     // API 요청
     ListService apiService = ListService();
     Response? response = await apiService.getIngredientList(
         ingredients: selectedIngredientsString);
     if (response?.statusCode == 200) {
-      print(response!.data['data']);
-      if (response.data['data'] != null) {
+      if (response?.data['data'] != null) {
         setState(() {
           dataList = response!.data['data'];
         });

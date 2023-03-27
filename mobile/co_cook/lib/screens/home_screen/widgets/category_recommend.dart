@@ -32,11 +32,10 @@ class _CategoryRecommendState extends State<CategoryRecommend> {
     // API 요청
     RecommendService recommendService = RecommendService();
     Response? response = await recommendService.getCardData(apiPath);
-    print(response!.data['data']);
     if (response?.statusCode == 200) {
-      if (response.data['data'] != null) {
+      if (response?.data['data'] != null) {
         setState(() {
-          dataList = response.data['data'];
+          dataList = response!.data['data'];
         });
       }
     }

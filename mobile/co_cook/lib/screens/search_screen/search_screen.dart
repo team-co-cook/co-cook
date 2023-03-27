@@ -35,7 +35,6 @@ class _SearchScreenState extends State<SearchScreen> {
     Response? response = await searchService.getSearchList(keyword: keyword);
     if (response?.statusCode == 200) {
       Map? decodeRes = await jsonDecode(response.toString());
-      print(decodeRes);
       if (decodeRes != null) {
         setState(() {
           dataList = decodeRes["data"]["recipeListResDto"];

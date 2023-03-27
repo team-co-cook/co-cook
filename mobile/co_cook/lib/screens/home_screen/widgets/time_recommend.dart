@@ -33,6 +33,8 @@ class _TimeRecommendState extends State<TimeRecommend> {
     Response? response = await recommendService.getCardData(apiPath);
     if (response?.statusCode == 200) {
       Map? decodeRes = await jsonDecode(response.toString());
+      print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+      print(decodeRes);
       if (decodeRes != null) {
         setState(() {
           dataList = decodeRes["data"]["recipes"];
