@@ -20,6 +20,8 @@ public class Ingredient extends BaseEntity {
 
     private String ingredientName;
 
+    private String searchKeyword;
+
 //    @OneToMany(mappedBy = "ingredient")
 //    private List<Amount> amounts = new ArrayList<>();
 }
