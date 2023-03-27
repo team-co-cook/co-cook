@@ -23,4 +23,8 @@ public class IngredientService {
         }
         return ingredient;
     }
+
+    public Ingredient checkIngredient(String ingredientName) {
+        return ingredientRepository.getIngredientByIngredientName(ingredientName);
+    }
 }
