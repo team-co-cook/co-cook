@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:co_cook/screens/camera_screen/widgets/camera_result.dart';
 import 'package:co_cook/styles/colors.dart';
+import 'package:co_cook/styles/shadows.dart';
 import 'package:co_cook/styles/text_styles.dart';
 import 'package:co_cook/utils/route.dart';
 import 'package:flutter/material.dart';
@@ -33,7 +34,19 @@ class _CameraScreenState extends State<CameraScreen> {
     setState(() {
       isProcess = true;
     });
-    XFile imgFile = await _cameraController.takePicture();
+    // XFile imgFile = await _cameraController.takePicture();
+    Future.delayed(Duration(seconds: 1)).then((value) => _searchFail());
+  }
+
+  void _searchFail() {
+    _cameraController.resumePreview();
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text("인식 실패"),
+      duration: Duration(seconds: 1),
+    ));
+    setState(() {
+      isProcess = false;
+    });
   }
 
   Future _checkAvailableCameras() async {
@@ -78,72 +91,79 @@ class _CameraScreenState extends State<CameraScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(children: [
-      isCameraInitialized
-          ? Container(
-              width: double.infinity,
-              height: double.infinity,
-              child: CameraPreview(_cameraController))
-          : Container(),
-      AnimatedPositioned(
-        curve: Curves.easeOut,
-        duration: Duration(milliseconds: 300),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                width: 300,
-                height: 300,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                      color: Color.fromARGB(67, 0, 0, 0),
-                      width: 1000,
-                      strokeAlign: BorderSide.strokeAlignOutside),
+    return Scaffold(
+      body: Stack(children: [
+        isCameraInitialized
+            ? Container(
+                width: double.infinity,
+                height: double.infinity,
+                child: CameraPreview(_cameraController))
+            : Container(),
+        Positioned(
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                AnimatedContainer(
+                  curve: Curves.easeOut,
+                  duration: Duration(milliseconds: 300),
+                  width: 300,
+                  height: 300,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: isProcess
+                        ? Border.all(
+                            color: Color.fromARGB(67, 0, 0, 0),
+                            width: MediaQuery.sizeOf(context).height / 2,
+                            strokeAlign: BorderSide.strokeAlignOutside)
+                        : Border.all(
+                            color: CustomColors.monotoneLight,
+                            width: 1,
+                            strokeAlign: BorderSide.strokeAlignOutside),
+                  ),
                 ),
-              ),
-              Container(
-                margin: EdgeInsets.only(top: 24),
-                child: Text("찾고싶은 음식을 보여주세요",
-                    style: CustomTextStyles().subtitle1.copyWith(
+                Container(
+                  margin: EdgeInsets.only(top: 24),
+                  child: Text(isProcess ? "인식중입니다" : "찾고싶은 음식을 보여주세요",
+                      style: CustomTextStyles().subtitle1.copyWith(
                           color: CustomColors.monotoneLight,
-                        )),
-              )
-            ],
+                          shadows: [CustomShadows.text])),
+                )
+              ],
+            ),
           ),
         ),
-      ),
-      Positioned(
-          right: 20,
-          top: 20,
-          child: SafeArea(
-            child: ZoomTapAnimation(
-                onTap: () => Navigator.pop(context),
-                child: Icon(
-                  Icons.close,
-                  size: 40,
-                  color: CustomColors.redLight,
-                )),
-          )),
-      Positioned(
-          left: 0,
-          right: 0,
-          bottom: 100,
-          child: isProcess
-              ? Container(
-                  width: 60,
-                  height: 60,
-                  alignment: Alignment.center,
-                  child: CircularProgressIndicator(
-                      color: CustomColors.monotoneLight))
-              : ZoomTapAnimation(
-                  onTap: () => _takePhoto(),
-                  child: Icon(
-                    Icons.circle,
-                    size: 60,
+        Positioned(
+            right: 20,
+            top: 20,
+            child: SafeArea(
+              child: ZoomTapAnimation(
+                  onTap: () => Navigator.pop(context),
+                  child: const Icon(
+                    Icons.close,
+                    size: 40,
                     color: CustomColors.redLight,
-                  )))
-    ]);
+                  )),
+            )),
+        Positioned(
+            left: 0,
+            right: 0,
+            bottom: 100,
+            child: isProcess
+                ? Container(
+                    width: 60,
+                    height: 60,
+                    alignment: Alignment.center,
+                    child: const CircularProgressIndicator(
+                        color: CustomColors.monotoneLight))
+                : ZoomTapAnimation(
+                    onTap: () => _takePhoto(),
+                    child: const Icon(
+                      Icons.circle,
+                      size: 60,
+                      color: CustomColors.redLight,
+                    )))
+      ]),
+    );
   }
 }
