@@ -5,6 +5,7 @@ import com.cocook.dto.home.CategoryResDto;
 import com.cocook.dto.home.RandomResDto;
 import com.cocook.dto.home.RecommendResDto;
 import com.cocook.dto.home.ThemeResDto;
+import com.cocook.dto.recipe.RecipeIdx;
 import com.cocook.dto.recipe.RecipeListResDto;
 import com.cocook.entity.Category;
 import com.cocook.entity.Favorite;
@@ -41,23 +42,42 @@ public class HomeService {
     }
 
     public RecommendResDto getRecommendRecipes(String authToken) {
-        String themeName;
+        String timeSlot;
         int currentHour = LocalDateTime.now().getHour();
         if (currentHour >= 4 && currentHour < 9) {
-            themeName = "아침";
+            timeSlot = "아침";
         } else if (currentHour >= 9 && currentHour < 15) {
-            themeName = "점심";
+            timeSlot = "점심";
         } else if (currentHour >= 15 && currentHour < 20) {
-            themeName = "저녁";
+            timeSlot = "저녁";
         } else {
-            themeName = "야식";
+            timeSlot = "야식";
         }
 
         Long userIdx = jwtTokenProvider.getUserIdx(authToken);
-        List<Recipe> foundRecipes = recipeRepository.findRandom5RecipesByThemeName(themeName);
-        List<RecipeListResDto> resultRecipes = addRecipeToRecipeListResDto(foundRecipes, userIdx);
+        List<Recipe> recommendRecipes = new ArrayList<>();
+        List<Long> timeSlotRecipes = recipeRepository.findByTheme(timeSlot);
+        List<Long> recommendedRecipes = new ArrayList<>();
 
-        return new RecommendResDto(themeName, resultRecipes);
+        Recipe firstRecommend = recipeRepository.findRecipeByRecentReview(timeSlotRecipes);
+        recommendRecipes.add(firstRecommend);
+        recommendedRecipes.add(firstRecommend.getId());
+
+        List<Recipe> secondRecommend = recipeRepository.findRecommendRecipeByUserIdx(userIdx, timeSlotRecipes, recommendedRecipes, 2 - recommendRecipes.size());
+        recommendRecipes.addAll(secondRecommend);
+        for (Recipe recipe : secondRecommend) {
+            recommendedRecipes.add(recipe.getId());
+        }
+
+        List<Recipe> thirdRecommend = recipeRepository.findRecipeByRecentFavorite(timeSlotRecipes, recommendedRecipes, 3-recommendRecipes.size());
+        recommendRecipes.addAll(thirdRecommend);
+
+        List<Recipe> fourthRecommend = recipeRepository.findRecipeByAppPicks(recommendedRecipes);
+        recommendRecipes.addAll(fourthRecommend);
+
+        List<RecipeListResDto> resultRecipes = addRecipeToRecipeListResDto(recommendRecipes, userIdx);
+
+        return new RecommendResDto(timeSlot, resultRecipes);
     }
 
     public List<ThemeResDto> getThemes() {

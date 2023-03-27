@@ -15,6 +15,7 @@ import 'package:co_cook/styles/colors.dart';
 import 'package:co_cook/styles/text_styles.dart';
 
 import 'package:co_cook/widgets/sound_meter/sound_meter.dart';
+import 'package:co_cook/screens/ingredient_list_screen/ingredient_list_screen.dart';
 
 class VoiceSearchScreen extends StatefulWidget {
   const VoiceSearchScreen({super.key});
@@ -184,6 +185,12 @@ class _VoiceSearchScreenState extends State<VoiceSearchScreen> {
     }
   }
 
+  void _removeTag(String label) {
+    setState(() {
+      _reciveIngredientList.remove(label);
+    });
+  }
+
   // volume controller
   double volume = 0.0;
   double ampl = 0.0;
@@ -205,6 +212,15 @@ class _VoiceSearchScreenState extends State<VoiceSearchScreen> {
 
   int volume0to(int maxVolumeToDisplay) {
     return (volume * maxVolumeToDisplay).round().abs();
+  }
+
+  // 재료 검색 결과 목록으로 이동
+  void gotoVoiceList() {
+    _stopListen();
+    Route ingredientListScreen = MaterialPageRoute(
+        builder: (context) =>
+            IngredientListScreen(ingredients: _reciveIngredientList));
+    Navigator.push(context, ingredientListScreen);
   }
 
   /////////////////////////////////////////////////////////////////////////////
@@ -321,7 +337,7 @@ class _VoiceSearchScreenState extends State<VoiceSearchScreen> {
                       child: CommonButton(
                           label: "완료",
                           color: ButtonType.red,
-                          onPressed: () => print("제출"))),
+                          onPressed: () => gotoVoiceList())),
                 ],
               ),
             ),
@@ -333,7 +349,7 @@ class _VoiceSearchScreenState extends State<VoiceSearchScreen> {
 
   Widget voiceSearchTag(String? label) {
     return ZoomTapAnimation(
-      onTap: () => label == null ? null : _reciveIngredientList.remove(label),
+      onTap: () => label == null ? null : _removeTag(label),
       child: Container(
           height: 48,
           padding: const EdgeInsets.only(left: 16, right: 16),
