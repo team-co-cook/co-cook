@@ -1,3 +1,5 @@
+import 'package:co_cook/screens/camera_screen/camera_screen.dart';
+import 'package:co_cook/utils/route.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'dart:convert';
@@ -99,9 +101,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   GestureDetector(
-                    onTap: () async {
-                      // CameraScreen으로 이동
-                    },
+                    onTap: () => pushScreen(context, CameraScreen()),
                     child: Image.asset(
                       'assets/images/button_img/CameraSearchLargeX2.png',
                     ),
