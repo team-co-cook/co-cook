@@ -6,6 +6,7 @@ import 'package:co_cook/styles/colors.dart';
 import 'package:co_cook/styles/text_styles.dart';
 import 'package:co_cook/utils/route.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:zoom_tap_animation/zoom_tap_animation.dart';
 
@@ -17,6 +18,7 @@ class CameraScreen extends StatefulWidget {
 }
 
 class _CameraScreenState extends State<CameraScreen> {
+  final ImagePicker _picker = ImagePicker();
   late List<CameraDescription> _cameras;
   late CameraController _cameraController;
   bool isCameraInitialized = false;
@@ -115,21 +117,29 @@ class _CameraScreenState extends State<CameraScreen> {
         ),
       ),
       Positioned(
-          right: 20,
-          top: 20,
+          right: 40,
+          bottom: 60,
           child: SafeArea(
             child: ZoomTapAnimation(
                 onTap: () => Navigator.pop(context),
-                child: Icon(
-                  Icons.close,
-                  size: 40,
-                  color: CustomColors.redLight,
+                child: Container(
+                  width: 60,
+                  height: 60,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Color.fromARGB(53, 0, 0, 0),
+                  ),
+                  child: Icon(
+                    Icons.close,
+                    size: 24,
+                    color: CustomColors.redLight,
+                  ),
                 )),
           )),
       Positioned(
           left: 0,
           right: 0,
-          bottom: 100,
+          bottom: 60,
           child: isProcess
               ? Container(
                   width: 60,
@@ -143,7 +153,34 @@ class _CameraScreenState extends State<CameraScreen> {
                     Icons.circle,
                     size: 60,
                     color: CustomColors.redLight,
-                  )))
+                  ))),
+      Positioned(
+          left: 40,
+          bottom: 60,
+          child: ZoomTapAnimation(
+              onTap: () async {
+                if (isProcess) {
+                } else {
+                  final XFile? image =
+                      await _picker.pickImage(source: ImageSource.gallery);
+                  print(image!.path);
+                }
+              },
+              child: Container(
+                width: 60,
+                height: 60,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Color.fromARGB(53, 0, 0, 0),
+                ),
+                child: Icon(
+                  Icons.photo_library_outlined,
+                  size: 24,
+                  color: isProcess
+                      ? CustomColors.monotoneGray
+                      : CustomColors.redLight,
+                ),
+              ))),
     ]);
   }
 }
