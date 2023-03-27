@@ -9,13 +9,17 @@ import com.cocook.entity.Amount;
 import com.cocook.entity.Recipe;
 import com.cocook.repository.*;
 import lombok.AllArgsConstructor;
+//import org.deeplearning4j.models.word2vec.Word2Vec;
+//import org.deeplearning4j.models.word2vec.WordVectors;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 
 import javax.persistence.EntityNotFoundException;
 import java.util.*;
+import java.io.File;
 
 @Service
-@AllArgsConstructor
 public class ListService {
 
     private JwtTokenProvider jwtTokenProvider;
@@ -24,6 +28,21 @@ public class ListService {
     private ThemeRepository themeRepository;
     private CategoryRepository categoryRepository;
     private AmountRepository amountRepository;
+//    private WordVector wordVector;
+
+//    @Autowired
+    public ListService(JwtTokenProvider jwtTokenProvider, RecipeRepository recipeRepository,
+                       FavoriteRepository favoriteRepository, ThemeRepository themeRepository,
+                       CategoryRepository categoryRepository, AmountRepository amountRepository
+                       ) {
+        this.jwtTokenProvider = jwtTokenProvider;
+        this.recipeRepository = recipeRepository;
+        this.favoriteRepository = favoriteRepository;
+        this.themeRepository = themeRepository;
+        this.categoryRepository = categoryRepository;
+        this.amountRepository = amountRepository;
+//        this.wordVector = WordVectorSerializer.loadTxtVectors(new File("src/main/resources/ko.bin"));
+    }
 
     public RecipeListResDto getRecipesByThemeName(String authToken, String themeName, String difficulty, Integer time) {
         Long userIdx = jwtTokenProvider.getUserIdx(authToken);
@@ -67,6 +86,16 @@ public class ListService {
             RecipeDetailResDto recipeDetailResDto = getRecipeDetailDtoWithIsFavorite(userIdx, recipe);
             newRecipes.add(recipeDetailResDto);
         }
+
+        List<Recipe> relatedRecipes = recipeRepository.findAll();
+//        relatedRecipes.sort(Comparator.comparingDouble(recipe -> -word2Vec.similarity(keyword, recipe.getRecipeName())));
+//        for (Recipe recipe : relatedRecipes) {
+//            if ((word2Vec.similarity(keyword, recipe.getRecipeName()) > 0.5) & (!newRecipes.contains(recipe))) {
+//                RecipeDetailResDto recipeDetailResDto = getRecipeDetailDtoWithIsFavorite(userIdx, recipe);
+//                newRecipes.add(recipeDetailResDto);
+//            }
+//        }
+
         return new RecipeListResDto(newRecipes);
     }
 
