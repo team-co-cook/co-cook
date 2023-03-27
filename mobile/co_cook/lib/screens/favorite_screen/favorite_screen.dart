@@ -30,7 +30,6 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
     Response? response = await searchService.getFavoriteList();
     if (response?.statusCode == 200) {
       Map? decodeRes = await jsonDecode(response.toString());
-      print(decodeRes);
       if (decodeRes != null) {
         setState(() {
           dataList = decodeRes["data"]['recipeListResDto'];

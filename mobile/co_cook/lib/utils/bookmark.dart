@@ -11,7 +11,6 @@ void toggleBookmark(BuildContext context, bool isAdd, Function toggleIsAdd,
   if (isAdd) {
     Response? response = await recommendService.deleteBookmark(recipeIdx);
     Map? decodeRes = await jsonDecode(response.toString());
-    print(decodeRes);
 
     if (response?.statusCode == 200) {
       toggleIsAdd();

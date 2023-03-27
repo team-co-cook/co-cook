@@ -127,9 +127,8 @@ class _SignupScreenState extends State<SignupScreen> {
       'nickname': _nickname,
       'access_token': widget.token
     };
-    // print('body: $userData'); // 데이터 확인
+
     Response? response = await _apiService.signupUser(userData);
-    // print('응답: $response');
 
     // 디코딩
     Map<String, dynamic> decodeRes = response?.data;
