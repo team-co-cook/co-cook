@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:transparent_image/transparent_image.dart';
+import 'package:zoom_tap_animation/zoom_tap_animation.dart';
 
 import 'package:co_cook/styles/colors.dart';
 import 'package:co_cook/styles/text_styles.dart';
-import 'package:transparent_image/transparent_image.dart';
-import 'package:zoom_tap_animation/zoom_tap_animation.dart';
+import 'package:co_cook/services/list_service.dart';
+import 'package:co_cook/screens/list_screen/list_screen.dart';
 
 class ThemeRecommendCard extends StatelessWidget {
   const ThemeRecommendCard({
@@ -15,6 +17,9 @@ class ThemeRecommendCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ZoomTapAnimation(
+      onTap: () {
+        gotoList(context, data['themeName'], data["imgPath"]);
+      },
       end: 0.98,
       child: Stack(children: [
         Container(
@@ -33,11 +38,23 @@ class ThemeRecommendCard extends StatelessWidget {
           width: 120,
           height: 120,
           child: ClipOval(
-            child: FadeInImage.memoryNetwork(
-                fadeInDuration: const Duration(milliseconds: 200),
-                fit: BoxFit.cover,
-                placeholder: kTransparentImage,
-                image: data["imgPath"]),
+            child: Stack(
+              children: [
+                FadeInImage.memoryNetwork(
+                    width: 120,
+                    height: 120,
+                    fadeInDuration: const Duration(milliseconds: 200),
+                    fit: BoxFit.cover,
+                    placeholder: kTransparentImage,
+                    image: data["imgPath"]),
+                Positioned(
+                    child: Container(
+                  width: 120,
+                  height: 120,
+                  color: Color.fromARGB(71, 0, 0, 0),
+                ))
+              ],
+            ),
           ),
         ),
         Positioned(
@@ -58,4 +75,14 @@ class ThemeRecommendCard extends StatelessWidget {
       ]),
     );
   }
+}
+
+void gotoList(BuildContext context, String listName, String imgPath) {
+  Route themeScreen = MaterialPageRoute(
+      builder: (context) => ListScreen(
+            listName: listName,
+            imgPath: imgPath,
+            dataFetcher: ListService().getThemeDataFetcher(listName),
+          ));
+  Navigator.push(context, themeScreen);
 }

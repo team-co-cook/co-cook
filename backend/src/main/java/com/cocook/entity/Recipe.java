@@ -14,7 +14,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Recipe {
+public class Recipe extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -50,6 +50,12 @@ public class Recipe {
 //    private List<Amount> amounts = new ArrayList<>();
 //
     @OneToMany(mappedBy = "recipe", fetch = FetchType.LAZY)
+    private List<Review> reviews = new ArrayList<>();
+
+    @OneToMany(mappedBy = "recipe", fetch = FetchType.LAZY)
     private List<Tag> tags = new ArrayList<>();
+
+    @OneToMany(mappedBy = "recipe", fetch = FetchType.LAZY)
+    private List<Favorite> favorites = new ArrayList<>();
 
 }

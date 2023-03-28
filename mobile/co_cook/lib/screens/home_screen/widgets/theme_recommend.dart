@@ -1,12 +1,9 @@
-import 'dart:convert';
-
-import 'package:co_cook/services/recommend_service.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
 import 'package:co_cook/styles/colors.dart';
 import 'package:co_cook/styles/text_styles.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:co_cook/services/recommend_service.dart';
 
 import 'theme_recommend_card.dart';
 
@@ -30,11 +27,11 @@ class _ThemeRecommendState extends State<ThemeRecommend> {
     // API 요청
     RecommendService recommendService = RecommendService();
     Response? response = await recommendService.getCardData(apiPath);
+
     if (response?.statusCode == 200) {
-      Map? decodeRes = await jsonDecode(response.toString());
-      if (decodeRes != null) {
+      if (response?.data['data'] != null) {
         setState(() {
-          dataList = decodeRes["data"]["themes"];
+          dataList = response!.data["data"];
         });
       }
     }

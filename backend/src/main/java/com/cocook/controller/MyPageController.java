@@ -1,6 +1,10 @@
 package com.cocook.controller;
 
 import com.cocook.dto.ApiResponse;
+import com.cocook.dto.review.MyReview;
+import com.cocook.dto.review.MyReviewResDto;
+import com.cocook.dto.review.ReviewListResDto;
+import com.cocook.dto.review.ReviewResDto;
 import com.cocook.dto.user.ChangeNicknameRequestDto;
 import com.cocook.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/mypage")
@@ -33,6 +38,11 @@ public class MyPageController {
                                                @Valid @RequestBody ChangeNicknameRequestDto changeNicknameRequestDto) {
         String changedNickname = userService.changeUserNickname(user_idx, changeNicknameRequestDto.getNickname());
         return ApiResponse.ok(changedNickname);
+    }
+
+    @GetMapping("/review")
+    public ResponseEntity<ApiResponse<List<MyReviewResDto>>> getReviews(@RequestHeader("AUTH-TOKEN") String authToken) {
+        return ApiResponse.ok(userService.getReviews(authToken));
     }
 
 }

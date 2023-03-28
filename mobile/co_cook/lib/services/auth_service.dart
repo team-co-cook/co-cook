@@ -62,11 +62,16 @@ class AuthService {
     }
   }
 
-  // DELETE
-  // Future<Response> deleteUser(int userId) async {
-  //   Dio _dio = await _getDio(); // 새로운 Dio 객체 생성
-  //   return await _dio.delete('/api/users/$userId');
-  // }
+  // GET My Review
+  Future<Response?> getMyReview() async {
+    try {
+      Dio _dio = await _getDio(); // 새로운 Dio 객체 생성
+      return await _dio.get('/mypage/review');
+    } on DioError catch (e) {
+      // DioError 처리
+      return e.response; // DioError가 발생한 경우에도 무조건 리턴
+    }
+  }
 }
 
 

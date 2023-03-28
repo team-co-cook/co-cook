@@ -1,13 +1,16 @@
-import 'package:co_cook/screens/search_screen/search_screen.dart';
-import 'package:co_cook/screens/user_screen/user_screen.dart';
-import 'package:co_cook/widgets/sliding_up_panel/sliding_up_panel.dart';
+import 'package:co_cook/screens/voice_search_screen/voice_search_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 import 'package:co_cook/styles/colors.dart';
 import 'package:co_cook/styles/text_styles.dart';
+import 'package:co_cook/widgets/favorite_direct/favorite_direct.dart';
+import 'package:co_cook/widgets/bottom_nav_bar/bottom_nav_bar.dart';
+import 'package:co_cook/widgets/sliding_up_panel/sliding_up_panel.dart';
 
 import 'package:co_cook/screens/home_screen/home_screen.dart';
-import 'package:co_cook/widgets/bottom_nav_bar/bottom_nav_bar.dart';
+import 'package:co_cook/screens/user_screen/user_screen.dart';
+import 'package:co_cook/screens/search_screen/search_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -17,10 +20,12 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  int _currentIndex = 0; // 화면 인덱스 초기화
+  int _currentIndex = 0;
+  final PanelController _mainPanelController = PanelController();
+  final GlobalKey<FavoriteDirectState> _favoriteDirectKey =
+      GlobalKey<FavoriteDirectState>(); // favorite 키 가져오기
 
-  // 화면 인텍스 변경 함수
-  void _onTap(int index) {
+  void onTap(int index) {
     setState(() {
       _currentIndex = index;
     });
@@ -32,25 +37,24 @@ class _MainScreenState extends State<MainScreen> {
       body: Stack(children: [
         Container(
           child: [
-            const HomeScreen(),
-            Container(
-              child: Text("냉털"),
-            ),
+            HomeScreen(),
+            VoiceSearchScreen(),
             SearchScreen(),
             UserScreen(),
           ][_currentIndex],
         ),
         CustomSlidingUpPanel(
-            body: Container(
-          width: double.infinity,
-          height: 1000,
-          color: Colors.black,
-        ))
+            body: FavoriteDirect(
+                key: _favoriteDirectKey), // FavoriteDirect에 GlobalKey 전달
+            panelController: _mainPanelController,
+            onPanelOpened: () {
+              _favoriteDirectKey.currentState?.getDetailInfo(); // api 새로 호출하기
+            }),
       ]),
       bottomNavigationBar: BottomNavBar(
           currentIndex: _currentIndex,
-          onTap: _onTap,
-          panelController: panelController),
+          onTap: onTap,
+          panelController: _mainPanelController),
     );
   }
 }
