@@ -9,38 +9,42 @@ import com.cocook.entity.Amount;
 import com.cocook.entity.Recipe;
 import com.cocook.repository.*;
 import lombok.AllArgsConstructor;
-//import org.deeplearning4j.models.word2vec.Word2Vec;
-//import org.deeplearning4j.models.word2vec.WordVectors;
+import org.deeplearning4j.models.word2vec.StaticWord2Vec;
+import org.springframework.beans.factory.annotation.Value;
+import org.deeplearning4j.models.embeddings.loader.WordVectorSerializer;
+import org.deeplearning4j.models.word2vec.Word2Vec;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 
 import javax.persistence.EntityNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
-import java.io.File;
 
 @Service
 public class ListService {
 
-    private JwtTokenProvider jwtTokenProvider;
-    private RecipeRepository recipeRepository;
-    private FavoriteRepository favoriteRepository;
-    private ThemeRepository themeRepository;
-    private CategoryRepository categoryRepository;
-    private AmountRepository amountRepository;
-//    private WordVector wordVector;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final RecipeRepository recipeRepository;
+    private final FavoriteRepository favoriteRepository;
+    private final ThemeRepository themeRepository;
+    private final CategoryRepository categoryRepository;
+    private final AmountRepository amountRepository;
+    private final Word2Vec word2Vec;
 
 //    @Autowired
     public ListService(JwtTokenProvider jwtTokenProvider, RecipeRepository recipeRepository,
                        FavoriteRepository favoriteRepository, ThemeRepository themeRepository,
-                       CategoryRepository categoryRepository, AmountRepository amountRepository
-                       ) {
+                       CategoryRepository categoryRepository, AmountRepository amountRepository,
+                       Word2Vec word2Vec) {
         this.jwtTokenProvider = jwtTokenProvider;
         this.recipeRepository = recipeRepository;
         this.favoriteRepository = favoriteRepository;
         this.themeRepository = themeRepository;
         this.categoryRepository = categoryRepository;
         this.amountRepository = amountRepository;
+        this.word2Vec = word2Vec;
 //        this.wordVector = WordVectorSerializer.loadTxtVectors(new File("src/main/resources/ko.bin"));
     }
 
@@ -88,11 +92,14 @@ public class ListService {
         }
 
         List<Recipe> relatedRecipes = recipeRepository.findAll();
+        System.out.println(word2Vec);
 //        relatedRecipes.sort(Comparator.comparingDouble(recipe -> -word2Vec.similarity(keyword, recipe.getRecipeName())));
-//        for (Recipe recipe : relatedRecipes) {
-//            if ((word2Vec.similarity(keyword, recipe.getRecipeName()) > 0.5) & (!newRecipes.contains(recipe))) {
+//        if (word2Vec != null){
+//            for (Recipe recipe : relatedRecipes) {
 //                RecipeDetailResDto recipeDetailResDto = getRecipeDetailDtoWithIsFavorite(userIdx, recipe);
-//                newRecipes.add(recipeDetailResDto);
+//                if ((word2Vec.similarity(keyword, recipe.getRecipeName()) > 0.5) & (!newRecipes.contains(recipeDetailResDto))) {
+//                    newRecipes.add(recipeDetailResDto);
+//                }
 //            }
 //        }
 
