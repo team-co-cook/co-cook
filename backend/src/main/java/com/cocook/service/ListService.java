@@ -9,6 +9,9 @@ import com.cocook.entity.Amount;
 import com.cocook.entity.Recipe;
 import com.cocook.repository.*;
 import lombok.AllArgsConstructor;
+import org.springframework.data.redis.core.ListOperations;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
@@ -24,6 +27,7 @@ public class ListService {
     private ThemeRepository themeRepository;
     private CategoryRepository categoryRepository;
     private AmountRepository amountRepository;
+    private RedisTemplate<String, String> redisTemplate;
 
     public RecipeListResDto getRecipesByThemeName(String authToken, String themeName, String difficulty, Integer time) {
         Long userIdx = jwtTokenProvider.getUserIdx(authToken);
@@ -66,6 +70,22 @@ public class ListService {
         for (Recipe recipe : foundRecipes) {
             RecipeDetailResDto recipeDetailResDto = getRecipeDetailDtoWithIsFavorite(userIdx, recipe);
             newRecipes.add(recipeDetailResDto);
+
+            ZSetOperations<String, String> zSetOperations = redisTemplate.opsForZSet();
+            zSetOperations.incrementScore("searchHistorySet", recipe.getRecipeName(), 1);
+            ListOperations<String, String> listOperations = redisTemplate.opsForList();
+            Long length = listOperations.size("searchHistoryList");
+            if (length == null || length < 1000) {
+                listOperations.rightPush("searchHistoryList", recipe.getRecipeName());
+            } else {
+                listOperations.leftPop("searchHistoryList");
+                listOperations.rightPush("searchHistoryList", recipe.getRecipeName());
+                zSetOperations.incrementScore("searchHistorySet", recipe.getRecipeName(), -1);
+                Double score = zSetOperations.score("searchHistorySet", recipe.getRecipeName());
+                if (score != null && score == 0) {
+                    zSetOperations.remove("searchHistorySet", recipe.getRecipeName());
+                }
+            }
         }
         return new RecipeListResDto(newRecipes);
     }
