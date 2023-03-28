@@ -1,5 +1,7 @@
 import 'package:co_cook/screens/recipe_detail_screen/recipe_detail_screen.dart';
+import 'package:co_cook/widgets/shimmer/custom_shimmer.dart';
 import 'package:flutter/material.dart';
+import 'package:shimmer/shimmer.dart';
 
 import 'package:transparent_image/transparent_image.dart';
 
@@ -27,8 +29,8 @@ import 'package:zoom_tap_animation/zoom_tap_animation.dart';
 // )
 
 class GridCard extends StatefulWidget {
-  const GridCard({super.key, required this.data});
-  final Map data; // 카드 데이터
+  const GridCard({super.key, this.data});
+  final Map? data; // 카드 데이터
 
   @override
   State<GridCard> createState() => _GridCardState();
@@ -39,7 +41,7 @@ class _GridCardState extends State<GridCard> {
   void initState() {
     super.initState();
     setState(() {
-      isAdd = widget.data["isFavorite"] ?? false;
+      isAdd = widget.data != null ? widget.data!["isFavorite"] : false;
     });
   }
 
@@ -60,8 +62,10 @@ class _GridCardState extends State<GridCard> {
   Widget build(BuildContext context) {
     return ZoomTapAnimation(
       end: 0.98,
-      onTap: () => routeScreen(
-          context, RecipeDetailScreen(recipeIdx: widget.data['recipeIdx'])),
+      onTap: () => widget.data != null
+          ? routeScreen(
+              context, RecipeDetailScreen(recipeIdx: widget.data!['recipeIdx']))
+          : null,
       child: SizedBox(
         width: double.infinity,
         child: Column(
@@ -85,75 +89,97 @@ class _GridCardState extends State<GridCard> {
                       ],
                     ),
                     child: ClipRRect(
-                      borderRadius: BorderRadius.circular(16.0),
-                      child: FadeInImage.memoryNetwork(
-                          fadeInDuration: const Duration(milliseconds: 200),
-                          fit: BoxFit.cover,
-                          placeholder: kTransparentImage,
-                          image: widget.data["recipeImgPath"]),
-                    ),
+                        borderRadius: BorderRadius.circular(16.0),
+                        child: widget.data != null
+                            ? FadeInImage.memoryNetwork(
+                                fadeInDuration:
+                                    const Duration(milliseconds: 200),
+                                fit: BoxFit.cover,
+                                placeholder: kTransparentImage,
+                                image: widget.data!["recipeImgPath"])
+                            : const CustomShimmer()),
                   ),
-                  Positioned(
-                      right: 16,
-                      child: GestureDetector(
-                        onTap: () => toggleBookmark(
-                            context,
-                            isAdd,
-                            toggleIsAdd,
-                            widget.data["recipeIdx"],
-                            widget.data["recipeName"]),
-                        child: BookmarkButton(isAdd: isAdd),
-                      )),
+                  widget.data != null
+                      ? Positioned(
+                          right: 16,
+                          child: GestureDetector(
+                            onTap: () => toggleBookmark(
+                                context,
+                                isAdd,
+                                toggleIsAdd,
+                                widget.data!["recipeIdx"],
+                                widget.data!["recipeName"]),
+                            child: BookmarkButton(isAdd: isAdd),
+                          ))
+                      : Container(),
                 ]);
               },
             ),
-            Container(
-              width: double.infinity,
-              height: 40,
-              alignment: Alignment.centerLeft,
-              child: Text(
-                widget.data["recipeName"],
-                overflow: TextOverflow.ellipsis,
-                style: const CustomTextStyles()
-                    .title2
-                    .copyWith(color: CustomColors.monotoneBlack),
-              ),
-            ),
-            Row(
-              children: [
-                const Icon(
-                  Icons.stacked_line_chart,
-                  size: 12,
-                  color: CustomColors.monotoneBlack,
-                ),
-                Container(
-                  margin: const EdgeInsets.fromLTRB(4.0, 0.0, 0.0, 0.0),
-                  child: Text(
-                    widget.data["recipeDifficulty"],
-                    style: const CustomTextStyles()
-                        .caption
-                        .copyWith(color: CustomColors.monotoneBlack),
+            widget.data != null
+                ? Container(
+                    width: double.infinity,
+                    height: 40,
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      widget.data!["recipeName"],
+                      overflow: TextOverflow.ellipsis,
+                      style: const CustomTextStyles()
+                          .title2
+                          .copyWith(color: CustomColors.monotoneBlack),
+                    ),
+                  )
+                : Container(
+                    width: double.infinity,
+                    height: 40,
+                    alignment: Alignment.centerLeft,
+                    child: const CustomShimmer(
+                      width: 160,
+                      height: 24,
+                    ),
                   ),
-                ),
-                Container(
-                  margin: const EdgeInsets.fromLTRB(8.0, 0.0, 0.0, 0.0),
-                  child: const Icon(
-                    Icons.schedule,
-                    size: 12,
-                    color: CustomColors.monotoneBlack,
+            widget.data != null
+                ? Row(
+                    children: [
+                      const Icon(
+                        Icons.stacked_line_chart,
+                        size: 12,
+                        color: CustomColors.monotoneBlack,
+                      ),
+                      Container(
+                        margin: const EdgeInsets.fromLTRB(4.0, 0.0, 0.0, 0.0),
+                        child: Text(
+                          widget.data!["recipeDifficulty"],
+                          style: const CustomTextStyles()
+                              .caption
+                              .copyWith(color: CustomColors.monotoneBlack),
+                        ),
+                      ),
+                      Container(
+                        margin: const EdgeInsets.fromLTRB(8.0, 0.0, 0.0, 0.0),
+                        child: const Icon(
+                          Icons.schedule,
+                          size: 12,
+                          color: CustomColors.monotoneBlack,
+                        ),
+                      ),
+                      Container(
+                        margin: const EdgeInsets.fromLTRB(4.0, 0.0, 0.0, 0.0),
+                        child: Text(
+                          "${widget.data!["recipeRunningTime"].toString()}분",
+                          style: const CustomTextStyles()
+                              .caption
+                              .copyWith(color: CustomColors.monotoneBlack),
+                        ),
+                      )
+                    ],
+                  )
+                : Container(
+                    alignment: Alignment.centerLeft,
+                    child: const CustomShimmer(
+                      width: 90,
+                      height: 24,
+                    ),
                   ),
-                ),
-                Container(
-                  margin: const EdgeInsets.fromLTRB(4.0, 0.0, 0.0, 0.0),
-                  child: Text(
-                    "${widget.data["recipeRunningTime"].toString()}분",
-                    style: const CustomTextStyles()
-                        .caption
-                        .copyWith(color: CustomColors.monotoneBlack),
-                  ),
-                )
-              ],
-            )
           ],
         ),
       ),
