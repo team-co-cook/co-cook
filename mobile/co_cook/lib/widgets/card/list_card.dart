@@ -24,6 +24,7 @@ class ListCard extends StatefulWidget {
 }
 
 class _ListCardState extends State<ListCard> {
+  @override
   void initState() {
     super.initState();
     setState(() {

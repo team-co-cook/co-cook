@@ -87,7 +87,7 @@ class _UserScreenState extends State<UserScreen> {
         ),
         body: Container(
           child: Padding(
-            padding: EdgeInsets.fromLTRB(20, 20, 0, 0),
+            padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -143,25 +143,57 @@ class _UserScreenState extends State<UserScreen> {
   }
 }
 
-class CustomTextButton extends StatelessWidget {
-  CustomTextButton(
-      {super.key, required this.text, required this.color, this.onPressed});
+class CustomTextButton extends StatefulWidget {
+  CustomTextButton({
+    Key? key,
+    required this.text,
+    required this.color,
+    this.onPressed,
+  }) : super(key: key);
 
   final String text;
   final Color color;
   final void Function()? onPressed;
 
   @override
+  _CustomTextButtonState createState() => _CustomTextButtonState();
+}
+
+class _CustomTextButtonState extends State<CustomTextButton> {
+  Color _backgroundColor = Colors.transparent;
+
+  @override
   Widget build(BuildContext context) {
-    return TextButton(
-      onPressed: onPressed,
-      child: Text(
-        text,
-        style: CustomTextStyles().subtitle1.copyWith(color: color),
-      ),
-      style: ButtonStyle(
-        overlayColor: MaterialStateProperty.all<Color>(
-            Colors.transparent), // 기본 터치 효과를 없애는 코드
+    return GestureDetector(
+      onTapDown: (_) {
+        setState(() {
+          _backgroundColor = widget.color.withOpacity(0.2);
+        });
+      },
+      onTapCancel: () {
+        setState(() {
+          _backgroundColor = Colors.transparent;
+        });
+      },
+      onTapUp: (_) {
+        setState(() {
+          _backgroundColor = Colors.transparent;
+        });
+      },
+      onTap: widget.onPressed,
+      child: Container(
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: _backgroundColor,
+          borderRadius: BorderRadius.circular(8.0),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Text(
+            widget.text,
+            style: CustomTextStyles().subtitle1.copyWith(color: widget.color),
+          ),
+        ),
       ),
     );
   }

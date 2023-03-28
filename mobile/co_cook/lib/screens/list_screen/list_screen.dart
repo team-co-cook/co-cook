@@ -38,8 +38,7 @@ class _ListScreenState extends State<ListScreen> {
     getListData();
   }
 
-  List dataList = [];
-  bool isLoad = false;
+  List? dataList;
 
   Future<void> getListData() async {
     Response? response =
@@ -49,7 +48,6 @@ class _ListScreenState extends State<ListScreen> {
       if (decodeRes != null) {
         setState(() {
           dataList = decodeRes["data"]["recipeListResDto"];
-          isLoad = true;
         });
       }
     }
@@ -201,34 +199,29 @@ class _ListScreenState extends State<ListScreen> {
               ),
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: dataList.isNotEmpty
-                      ? ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: dataList.length,
-                          physics: const BouncingScrollPhysics(
-                              parent: AlwaysScrollableScrollPhysics()),
-                          padding: const EdgeInsets.all(16),
-                          itemBuilder: (BuildContext context, int index) {
-                            return Container(
-                              margin: const EdgeInsets.only(bottom: 16),
-                              child: ListCard(data: dataList[index]),
-                            );
-                          })
-                      : isLoad
-                          ? Container(
-                              child: Center(
-                                child: Text(
-                                  '해당하는 음식이 없어요',
-                                  style: CustomTextStyles().body1.copyWith(
-                                      color: CustomColors.monotoneBlack),
-                                ),
+                    padding: const EdgeInsets.all(8),
+                    child: dataList == null || dataList!.isNotEmpty
+                        ? ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: dataList?.length ?? 5,
+                            physics: const BouncingScrollPhysics(
+                                parent: AlwaysScrollableScrollPhysics()),
+                            padding: const EdgeInsets.all(16),
+                            itemBuilder: (BuildContext context, int index) {
+                              return Container(
+                                margin: const EdgeInsets.only(bottom: 16),
+                                child: ListCard(data: dataList?[index]),
+                              );
+                            })
+                        : Container(
+                            child: Center(
+                              child: Text(
+                                '해당하는 음식이 없어요',
+                                style: CustomTextStyles().body1.copyWith(
+                                    color: CustomColors.monotoneBlack),
                               ),
-                            )
-                          : const Center(
-                              child: CircularProgressIndicator(
-                                  color: CustomColors.redPrimary)),
-                ),
+                            ),
+                          )),
               ),
             ],
           ),
