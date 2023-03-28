@@ -36,7 +36,7 @@ dependencies {
     // Deeplearning4j Word2Vec
     implementation 'org.deeplearning4j:deeplearning4j-core:1.0.0-beta7'
     implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
-
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 }
 
 tasks.named('test') {
