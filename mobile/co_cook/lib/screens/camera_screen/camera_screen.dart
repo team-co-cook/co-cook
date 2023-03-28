@@ -7,7 +7,9 @@ import 'package:co_cook/styles/shadows.dart';
 import 'package:co_cook/styles/text_styles.dart';
 import 'package:co_cook/utils/route.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:transparent_image/transparent_image.dart';
 import 'package:zoom_tap_animation/zoom_tap_animation.dart';
 
 class CameraScreen extends StatefulWidget {
@@ -18,11 +20,13 @@ class CameraScreen extends StatefulWidget {
 }
 
 class _CameraScreenState extends State<CameraScreen> {
+  final ImagePicker _picker = ImagePicker();
   late List<CameraDescription> _cameras;
   late CameraController _cameraController;
   bool isCameraInitialized = false;
   bool isProcess = false;
   late String tmpImgPath;
+  XFile? imgFile;
 
   void _getTmpImgPath() async {
     Directory tmpPath = await getTemporaryDirectory();
@@ -31,17 +35,41 @@ class _CameraScreenState extends State<CameraScreen> {
 
   Future<void> _takePhoto() async {
     _cameraController.pausePreview();
+    imgFile = await _cameraController.takePicture();
     setState(() {
       isProcess = true;
     });
-    // XFile imgFile = await _cameraController.takePicture();
     Future.delayed(Duration(seconds: 1)).then((value) => _searchFail());
+  }
+
+  Future<void> _selectPhoto() async {
+    _cameraController.pausePreview();
+    imgFile = await _picker.pickImage(source: ImageSource.gallery);
+    setState(() {
+      isProcess = true;
+    });
+    if (imgFile != null) {
+      print(imgFile!.path);
+    } else {
+      _searchCancel();
+    }
   }
 
   void _searchFail() {
     _cameraController.resumePreview();
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text("인식 실패"),
+      duration: Duration(seconds: 1),
+    ));
+    setState(() {
+      isProcess = false;
+    });
+  }
+
+  void _searchCancel() {
+    _cameraController.resumePreview();
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text("사진 검색이 취소되었습니다"),
       duration: Duration(seconds: 1),
     ));
     setState(() {
@@ -97,7 +125,14 @@ class _CameraScreenState extends State<CameraScreen> {
             ? Container(
                 width: double.infinity,
                 height: double.infinity,
-                child: CameraPreview(_cameraController))
+                child: isProcess && imgFile != null
+                    ? Image.file(
+                        width: double.infinity,
+                        height: double.infinity,
+                        File(imgFile!.path),
+                        fit: BoxFit.cover,
+                      )
+                    : CameraPreview(_cameraController))
             : Container(),
         Positioned(
           child: Center(
@@ -107,8 +142,10 @@ class _CameraScreenState extends State<CameraScreen> {
                 AnimatedContainer(
                   curve: Curves.easeOut,
                   duration: Duration(milliseconds: 300),
-                  width: 300,
-                  height: 300,
+                  width: MediaQuery.sizeOf(context).width *
+                      (isProcess ? 0.7 : 0.8),
+                  height: MediaQuery.sizeOf(context).width *
+                      (isProcess ? 0.7 : 0.8),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: isProcess
@@ -134,35 +171,67 @@ class _CameraScreenState extends State<CameraScreen> {
           ),
         ),
         Positioned(
-            right: 20,
-            top: 20,
+            right: 40,
+            bottom: 40,
             child: SafeArea(
               child: ZoomTapAnimation(
                   onTap: () => Navigator.pop(context),
-                  child: const Icon(
-                    Icons.close,
-                    size: 40,
-                    color: CustomColors.redLight,
+                  child: Container(
+                    width: 60,
+                    height: 60,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Color.fromARGB(53, 0, 0, 0),
+                    ),
+                    child: const Icon(
+                      Icons.close,
+                      size: 24,
+                      color: CustomColors.redLight,
+                    ),
                   )),
             )),
         Positioned(
             left: 0,
             right: 0,
-            bottom: 100,
-            child: isProcess
-                ? Container(
+            bottom: 40,
+            child: SafeArea(
+              child: isProcess
+                  ? Container(
+                      width: 60,
+                      height: 60,
+                      alignment: Alignment.center,
+                      child: const CircularProgressIndicator(
+                          color: CustomColors.monotoneLight))
+                  : ZoomTapAnimation(
+                      onTap: () => _takePhoto(),
+                      child: const Icon(
+                        Icons.circle,
+                        size: 60,
+                        color: CustomColors.redLight,
+                      )),
+            )),
+        Positioned(
+            left: 40,
+            bottom: 40,
+            child: SafeArea(
+              child: ZoomTapAnimation(
+                  onTap: () => isProcess ? null : _selectPhoto(),
+                  child: Container(
                     width: 60,
                     height: 60,
-                    alignment: Alignment.center,
-                    child: const CircularProgressIndicator(
-                        color: CustomColors.monotoneLight))
-                : ZoomTapAnimation(
-                    onTap: () => _takePhoto(),
-                    child: const Icon(
-                      Icons.circle,
-                      size: 60,
-                      color: CustomColors.redLight,
-                    )))
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Color.fromARGB(53, 0, 0, 0),
+                    ),
+                    child: Icon(
+                      Icons.photo_library_outlined,
+                      size: 24,
+                      color: isProcess
+                          ? CustomColors.monotoneGray
+                          : CustomColors.redLight,
+                    ),
+                  )),
+            )),
       ]),
     );
   }
