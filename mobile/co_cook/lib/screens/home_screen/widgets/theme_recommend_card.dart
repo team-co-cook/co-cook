@@ -1,7 +1,11 @@
+import 'package:co_cook/services/list_service.dart';
 import 'package:flutter/material.dart';
+import 'package:zoom_tap_animation/zoom_tap_animation.dart';
 
 import 'package:co_cook/styles/colors.dart';
 import 'package:co_cook/styles/text_styles.dart';
+
+import 'package:co_cook/screens/list_screen/list_screen.dart';
 import 'package:transparent_image/transparent_image.dart';
 import 'package:zoom_tap_animation/zoom_tap_animation.dart';
 
@@ -15,6 +19,9 @@ class ThemeRecommendCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ZoomTapAnimation(
+      onTap: () {
+        gotoList(context, data['themeName'], data["imgPath"]);
+      },
       end: 0.98,
       child: Stack(children: [
         Container(
@@ -58,4 +65,14 @@ class ThemeRecommendCard extends StatelessWidget {
       ]),
     );
   }
+}
+
+void gotoList(BuildContext context, String listName, String imgPath) {
+  Route themeScreen = MaterialPageRoute(
+      builder: (context) => ListScreen(
+            listName: listName,
+            imgPath: imgPath,
+            dataFetcher: ListService().getThemeDataFetcher(listName),
+          ));
+  Navigator.push(context, themeScreen);
 }

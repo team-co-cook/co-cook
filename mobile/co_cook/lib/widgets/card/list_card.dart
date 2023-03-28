@@ -1,3 +1,4 @@
+import 'package:co_cook/screens/cook_screen/cook_screen.dart';
 import 'package:flutter/material.dart';
 
 import 'package:co_cook/styles/colors.dart';
@@ -7,6 +8,7 @@ import 'package:co_cook/widgets/button/bookmark_button.dart';
 import 'package:co_cook/utils/bookmark.dart';
 import 'package:transparent_image/transparent_image.dart';
 import 'package:zoom_tap_animation/zoom_tap_animation.dart';
+import 'package:co_cook/screens/recipe_detail_screen/recipe_detail_screen.dart';
 
 class ListCard extends StatefulWidget {
   const ListCard({
@@ -37,11 +39,20 @@ class _ListCardState extends State<ListCard> {
     });
   }
 
+  void routeScreen(BuildContext context, Widget screen) {
+    Route targetScreen = MaterialPageRoute(builder: (context) => screen);
+    Navigator.push(context, targetScreen);
+  }
+
   @override
   Widget build(BuildContext context) {
     return ZoomTapAnimation(
       end: 0.98,
-      onTap: () => print("${widget.data["recipeIdx"]} 클릭"), // 클릭시 이벤트 연결
+      onTap: () => routeScreen(
+          context,
+          widget.showImage
+              ? RecipeDetailScreen(recipeIdx: widget.data['recipeIdx'])
+              : CookScreen(recipeIdx: widget.data['recipeIdx'])), // 클릭시 이벤트 연결
       child: Container(
           // 전체 컨테이너
           decoration: BoxDecoration(
@@ -49,7 +60,7 @@ class _ListCardState extends State<ListCard> {
             color: CustomColors.monotoneLight,
             boxShadow: const [
               BoxShadow(
-                color: Colors.black26,
+                color: Color.fromARGB(8, 0, 0, 0),
                 offset: Offset(1, 1),
                 blurRadius: 6.0,
                 spreadRadius: 0.0,
@@ -73,7 +84,9 @@ class _ListCardState extends State<ListCard> {
                                   bottomLeft: Radius.circular(16.0)),
                               color: Colors.white),
                           child: ClipRRect(
-                            borderRadius: BorderRadius.circular(16.0),
+                            borderRadius: const BorderRadius.only(
+                                topLeft: Radius.circular(16.0),
+                                bottomLeft: Radius.circular(16.0)),
                             child: FadeInImage.memoryNetwork(
                                 fadeInDuration:
                                     const Duration(milliseconds: 200),

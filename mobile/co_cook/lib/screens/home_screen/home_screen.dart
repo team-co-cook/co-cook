@@ -17,33 +17,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  List<Map> timeRecipeList = [
-    {
-      "recipeIdx": 3,
-      "recipeName": "테스트 요리1",
-      "recipeImgPath": "https://picsum.photos/200/300",
-      "recipeDifficulty": "쉬움",
-      "recipeRunningTime": 30,
-      "isFavorite": false
-    },
-    {
-      "recipeIdx": 3,
-      "recipeName": "테스트 요리2",
-      "recipeImgPath": "https://picsum.photos/200/300",
-      "recipeDifficulty": "보통",
-      "recipeRunningTime": 30,
-      "isFavorite": true
-    },
-    {
-      "recipeIdx": 3,
-      "recipeName": "테스트 요리2",
-      "recipeImgPath": "https://picsum.photos/200/300",
-      "recipeDifficulty": "어려움",
-      "recipeRunningTime": 30,
-      "isFavorite": false
-    }
-  ];
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -55,12 +28,13 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
         backgroundColor: CustomColors.monotoneLight,
         shadowColor: CustomColors.monotoneLight,
+        elevation: 0.5,
       ),
       body: SingleChildScrollView(
         physics: BouncingScrollPhysics(),
         child: Column(
           children: [
-            TimeRecommend(dataList: timeRecipeList),
+            TimeRecommend(),
             AiRecommend(),
             ThemeRecommend(),
             CategoryRecommend(),

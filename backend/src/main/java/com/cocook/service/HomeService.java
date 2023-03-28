@@ -5,6 +5,7 @@ import com.cocook.dto.home.CategoryResDto;
 import com.cocook.dto.home.RandomResDto;
 import com.cocook.dto.home.RecommendResDto;
 import com.cocook.dto.home.ThemeResDto;
+import com.cocook.dto.recipe.RecipeIdx;
 import com.cocook.dto.recipe.RecipeListResDto;
 import com.cocook.entity.Category;
 import com.cocook.entity.Favorite;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -40,33 +42,72 @@ public class HomeService {
     }
 
     public RecommendResDto getRecommendRecipes(String authToken) {
-        String themeName;
+        String timeSlot;
         int currentHour = LocalDateTime.now().getHour();
         if (currentHour >= 4 && currentHour < 9) {
-            themeName = "아침";
+            timeSlot = "아침";
         } else if (currentHour >= 9 && currentHour < 15) {
-            themeName = "점심";
+            timeSlot = "점심";
         } else if (currentHour >= 15 && currentHour < 20) {
-            themeName = "저녁";
+            timeSlot = "저녁";
         } else {
-            themeName = "야식";
+            timeSlot = "야식";
         }
 
         Long userIdx = jwtTokenProvider.getUserIdx(authToken);
-        List<Recipe> foundRecipes = recipeRepository.findRandom5RecipesByThemeName(themeName);
-        List<RecipeListResDto> resultRecipes = addRecipeToRecipeListResDto(foundRecipes, userIdx);
+        List<Recipe> recommendRecipes = new ArrayList<>();
+        List<Long> timeSlotRecipes = recipeRepository.findByTheme(timeSlot);
+        List<Long> recommendedRecipes = new ArrayList<>();
 
-        return new RecommendResDto(resultRecipes);
+        Recipe firstRecommend = recipeRepository.findRecipeByRecentReview(timeSlotRecipes);
+        recommendRecipes.add(firstRecommend);
+        recommendedRecipes.add(firstRecommend.getId());
+
+        List<Recipe> secondRecommend = recipeRepository.findRecommendRecipeByUserIdx(userIdx, timeSlotRecipes, recommendedRecipes, 2 - recommendRecipes.size());
+        recommendRecipes.addAll(secondRecommend);
+        for (Recipe recipe : secondRecommend) {
+            recommendedRecipes.add(recipe.getId());
+        }
+
+        List<Recipe> thirdRecommend = recipeRepository.findRecipeByRecentFavorite(timeSlotRecipes, recommendedRecipes, 3-recommendRecipes.size());
+        recommendRecipes.addAll(thirdRecommend);
+        for (Recipe recipe : thirdRecommend) {
+            recommendedRecipes.add(recipe.getId());
+        }
+
+        List<Recipe> fourthRecommend = recipeRepository.findRecipeByAppPicks(recommendedRecipes);
+        recommendRecipes.addAll(fourthRecommend);
+
+        List<RecipeListResDto> resultRecipes = addRecipeToRecipeListResDto(recommendRecipes, userIdx);
+
+        return new RecommendResDto(timeSlot, resultRecipes);
     }
 
-    public ThemeResDto getThemes() {
-        List<Theme> themes = themeRepository.findAll();
-        return new ThemeResDto(themes);
+    public List<ThemeResDto> getThemes() {
+        List<String> themeNames = Arrays.asList("아침", "점심", "저녁", "야식");
+        List<Theme> themes = themeRepository.findThemesNotInThemeNames(themeNames);
+        List<ThemeResDto> themeResDtos = new ArrayList<>();
+        for (Theme theme : themes) {
+            ThemeResDto themeResDto = ThemeResDto.builder()
+                    .id(theme.getId())
+                    .imgPath(theme.getImgPath())
+                    .themeName(theme.getThemeName()).build();
+            themeResDtos.add(themeResDto);
+        }
+        return themeResDtos;
     }
 
-    public CategoryResDto getCategories() {
+    public List<CategoryResDto> getCategories() {
         List<Category> categories = categoryRepository.findAll();
-        return new CategoryResDto(categories);
+        List<CategoryResDto> categoryResDtos = new ArrayList<>();
+        for (Category category : categories) {
+            CategoryResDto categoryResDto = CategoryResDto.builder()
+                    .id(category.getId())
+                    .categoryName(category.getCategoryName())
+                    .imgPath(category.getImgPath()).build();
+            categoryResDtos.add(categoryResDto);
+        }
+        return categoryResDtos;
     }
 
     public RandomResDto getRandomRecipes(String authToken) {
