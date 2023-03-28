@@ -18,8 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+
+import java.util.*;
 
 @Service
 public class HomeService {
@@ -53,10 +53,42 @@ public class HomeService {
         }
 
         Long userIdx = jwtTokenProvider.getUserIdx(authToken);
-        List<Recipe> foundRecipes = recipeRepository.findRandom5RecipesByThemeName(themeName);
-        List<RecipeListResDto> resultRecipes = addRecipeToRecipeListResDto(foundRecipes, userIdx);
 
-        return new RecommendResDto(resultRecipes);
+        List<Recipe> recommendRecipes = new ArrayList<>();
+        List<Long> timeSlotRecipes = recipeRepository.findByTheme(timeSlot);
+
+        Recipe firstRecommend = recipeRepository.findRecipeByRecentReview(timeSlotRecipes);
+        if (firstRecommend != null) {
+            recommendRecipes.add(firstRecommend);
+        }
+
+        List<Recipe> secondRecommend = recipeRepository.findRecommendRecipeByUserIdx(userIdx, timeSlotRecipes, 2 - recommendRecipes.size());
+        if (secondRecommend != null) {
+            recommendRecipes.addAll(secondRecommend);
+        }
+
+        List<Recipe> thirdRecommend = recipeRepository.findRecipeByRecentFavorite(timeSlotRecipes, 3-recommendRecipes.size());
+        if (thirdRecommend != null) {
+            recommendRecipes.addAll(thirdRecommend);
+        }
+
+        List<Recipe> fourthRecommend;
+        fourthRecommend = recipeRepository.findByIdIn(List.of(6L, 20L, 22L, 23L));
+        recommendRecipes.addAll(fourthRecommend);
+
+        List<Recipe> notDuplicatedRecipes = new ArrayList<>();
+        Set<Long> idxMemo = new HashSet<>();
+        for (Recipe recipe : recommendRecipes) {
+            if (idxMemo.contains(recipe.getId())) {
+                continue;
+            }
+            idxMemo.add(recipe.getId());
+            notDuplicatedRecipes.add(recipe);
+        }
+
+        List<RecipeListResDto> resultRecipes = addRecipeToRecipeListResDto(notDuplicatedRecipes, userIdx);
+
+        return new RecommendResDto(timeSlot, resultRecipes);
     }
 
     public ThemeResDto getThemes() {
