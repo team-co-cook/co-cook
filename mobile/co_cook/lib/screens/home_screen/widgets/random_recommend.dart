@@ -1,15 +1,11 @@
 import 'dart:convert';
-
-import 'package:co_cook/services/recommend_service.dart';
-import 'package:co_cook/widgets/card/grid_card.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
 import 'package:co_cook/styles/colors.dart';
 import 'package:co_cook/styles/text_styles.dart';
-
-import 'package:co_cook/widgets/card/list_card.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:co_cook/widgets/card/grid_card.dart';
+import 'package:co_cook/services/recommend_service.dart';
 
 class RandomRecommend extends StatefulWidget {
   const RandomRecommend({super.key});

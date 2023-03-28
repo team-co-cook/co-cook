@@ -1,12 +1,9 @@
-import 'dart:convert';
-
-import 'package:co_cook/services/recommend_service.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
 import 'package:co_cook/styles/colors.dart';
 import 'package:co_cook/styles/text_styles.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:co_cook/services/recommend_service.dart';
 
 import 'theme_recommend_card.dart';
 

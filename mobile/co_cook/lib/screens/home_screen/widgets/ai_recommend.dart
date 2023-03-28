@@ -1,11 +1,11 @@
-import 'package:co_cook/screens/camera_screen/camera_screen.dart';
-import 'package:co_cook/screens/voice_search_screen/voice_search_screen.dart';
-import 'package:co_cook/utils/route.dart';
 import 'package:flutter/material.dart';
+import 'package:co_cook/utils/route.dart';
+import 'package:zoom_tap_animation/zoom_tap_animation.dart';
 
 import 'package:co_cook/styles/colors.dart';
 import 'package:co_cook/styles/text_styles.dart';
-import 'package:zoom_tap_animation/zoom_tap_animation.dart';
+import 'package:co_cook/screens/camera_screen/camera_screen.dart';
+import 'package:co_cook/screens/voice_search_screen/voice_search_screen.dart';
 
 class AiRecommend extends StatefulWidget {
   const AiRecommend({super.key});
