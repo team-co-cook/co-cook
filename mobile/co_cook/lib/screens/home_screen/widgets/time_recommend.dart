@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:co_cook/widgets/shimmer/custom_shimmer.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:card_swiper/card_swiper.dart';
@@ -8,6 +7,7 @@ import 'package:co_cook/styles/colors.dart';
 import 'package:co_cook/styles/text_styles.dart';
 import 'package:co_cook/widgets/card/grid_card.dart';
 import 'package:co_cook/services/recommend_service.dart';
+import 'package:co_cook/widgets/shimmer/custom_shimmer.dart';
 
 class TimeRecommend extends StatefulWidget {
   const TimeRecommend({super.key});
