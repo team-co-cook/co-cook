@@ -18,7 +18,7 @@ class FavoriteDirect extends StatefulWidget {
 
 class FavoriteDirectState extends State<FavoriteDirect> {
   List dataList = [];
-  String _nickname = 'username';
+  String _nickname = '';
 
   @override
   void initState() {
@@ -113,7 +113,7 @@ class FavoriteDirectState extends State<FavoriteDirect> {
                     childAspectRatio: 1.2, // 카드의 가로/세로 비율
                   ),
                   itemCount: dataList.length,
-                  shrinkWrap: true,
+                  shrinkWrap: false,
                   physics: const BouncingScrollPhysics(
                       parent: AlwaysScrollableScrollPhysics()),
                   padding: const EdgeInsets.all(16),
