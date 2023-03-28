@@ -55,7 +55,11 @@ dependencies:
   audioplayers: ^3.0.1
   porcupine_flutter: ^2.1.6
   device_info_plus: ^8.1.0
-  ffmpeg_kit_flutter: ^5.1.0
+  ffmpeg_kit_flutter: 5.1.0-LTS
+  camera: ^0.10.3+2
+  sensors:
+  sensors_plus: ^2.0.2
+  shimmer: ^2.0.0
 
 dev_dependencies:
   flutter_test:
@@ -68,8 +72,6 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^2.0.0
   flutter_launcher_icons: ^0.12.0
-  sensors:
-  sensors_plus: ^2.0.2
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

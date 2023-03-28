@@ -1,7 +1,9 @@
 package com.cocook.controller;
 
+import com.cocook.dto.ApiResponse;
 import com.cocook.dto.db.*;
 import com.cocook.service.CategoryService;
+import com.cocook.service.IngredientService;
 import com.cocook.service.RecipeService;
 import com.cocook.service.ThemeService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -11,6 +13,7 @@ import org.apache.tomcat.util.json.JSONParser;
 import org.apache.tomcat.util.json.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -28,14 +31,21 @@ import java.util.Map;
 @RequestMapping("/api/v1/db")
 public class DbController {
 
-    @Autowired
     private CategoryService categoryService;
-    @Autowired
     private ThemeService themeService;
-    @Autowired
     private RecipeService recipeService;
-    @Autowired
+    private IngredientService ingredientService;
     private ObjectMapper objectMapper;
+
+    @Autowired
+    public DbController(CategoryService categoryService, ThemeService themeService, RecipeService recipeService,
+                        ObjectMapper objectMapper, IngredientService ingredientService) {
+        this.categoryService = categoryService;
+        this.themeService = themeService;
+        this.recipeService = recipeService;
+        this.objectMapper = objectMapper;
+        this.ingredientService = ingredientService;
+    }
 
     @PostMapping(value = "/category", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<CategoryResDto> makeCategory (@RequestPart String categoryName, @RequestPart MultipartFile categoryImg) {
@@ -89,4 +99,14 @@ public class DbController {
         }
         return new ResponseEntity<>("ok", HttpStatus.OK);
     }
+
+    @GetMapping("/ingredient/{ingredientName}")
+    public ResponseEntity<ApiResponse<Object>> checkIngredient(@RequestHeader("AUTH-TOKEN") String authToken, @PathVariable("ingredientName") String ingredientName) {
+        if (ingredientService.checkIngredient(ingredientName) != null) {
+            return ApiResponse.ok(null);
+        } else {
+            return ApiResponse.notFound("없는 재료", null);
+        }
+    }
+
 }

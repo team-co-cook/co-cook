@@ -35,9 +35,8 @@ class _RecipeDetailReviewTabState extends State<RecipeDetailReviewTab> {
     DetailService searchService = DetailService();
     Response? response =
         await searchService.getDetailReview(recipeIdx: recipeIdx);
-    print(response!.data['data']);
     if (response?.statusCode == 200) {
-      if (response != null) {
+      if (response?.data != null) {
         setState(() {
           listData = response!.data['data']['reviewsListResDto'];
         });

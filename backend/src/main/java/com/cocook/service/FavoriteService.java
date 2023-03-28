@@ -9,6 +9,7 @@ import com.cocook.repository.FavoriteRepository;
 import com.cocook.repository.RecipeRepository;
 import com.cocook.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
@@ -39,7 +40,7 @@ public class FavoriteService {
 
         Long userIdx = jwtTokenProvider.getUserIdx(authToken);
         if (favoriteRepository.findByUserIdAndRecipeId(userIdx, recipeIdx) != null) {
-            throw new RuntimeException("이미 해당 유저가 찜한 레시피입니다.");
+            throw new DataIntegrityViolationException("이미 해당 유저가 찜한 레시피입니다.");
         }
         User foundUser = userRepository.findByIdAndIsActiveTrue(userIdx);
 
@@ -59,7 +60,7 @@ public class FavoriteService {
 
         Favorite foundFavorite = favoriteRepository.findByUserIdAndRecipeId(userIdx, recipeIdx);
         if (foundFavorite == null) {
-            throw new RuntimeException("아직 해당 유저가 찜하지 않은 레시피입니다.");
+            throw new DataIntegrityViolationException("아직 해당 유저가 찜하지 않은 레시피입니다.");
         }
 
         favoriteRepository.delete(foundFavorite);
