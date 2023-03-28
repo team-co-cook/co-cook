@@ -1,16 +1,13 @@
-import 'package:co_cook/screens/recipe_detail_screen/recipe_detail_screen.dart';
-import 'package:co_cook/widgets/shimmer/custom_shimmer.dart';
 import 'package:flutter/material.dart';
-import 'package:shimmer/shimmer.dart';
-
 import 'package:transparent_image/transparent_image.dart';
+import 'package:zoom_tap_animation/zoom_tap_animation.dart';
 
 import 'package:co_cook/styles/colors.dart';
+import 'package:co_cook/utils/bookmark.dart';
 import 'package:co_cook/styles/text_styles.dart';
 import 'package:co_cook/widgets/button/bookmark_button.dart';
-
-import 'package:co_cook/utils/bookmark.dart';
-import 'package:zoom_tap_animation/zoom_tap_animation.dart';
+import 'package:co_cook/widgets/shimmer/custom_shimmer.dart';
+import 'package:co_cook/screens/recipe_detail_screen/recipe_detail_screen.dart';
 
 // 상위 위젯에서 그리드 사용시
 //
