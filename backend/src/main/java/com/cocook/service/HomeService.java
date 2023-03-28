@@ -19,9 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+
+import java.util.*;
 
 @Service
 public class HomeService {
@@ -55,30 +54,40 @@ public class HomeService {
         }
 
         Long userIdx = jwtTokenProvider.getUserIdx(authToken);
+
         List<Recipe> recommendRecipes = new ArrayList<>();
         List<Long> timeSlotRecipes = recipeRepository.findByTheme(timeSlot);
-        List<Long> recommendedRecipes = new ArrayList<>();
 
         Recipe firstRecommend = recipeRepository.findRecipeByRecentReview(timeSlotRecipes);
-        recommendRecipes.add(firstRecommend);
-        recommendedRecipes.add(firstRecommend.getId());
-
-        List<Recipe> secondRecommend = recipeRepository.findRecommendRecipeByUserIdx(userIdx, timeSlotRecipes, recommendedRecipes, 2 - recommendRecipes.size());
-        recommendRecipes.addAll(secondRecommend);
-        for (Recipe recipe : secondRecommend) {
-            recommendedRecipes.add(recipe.getId());
+        if (firstRecommend != null) {
+            recommendRecipes.add(firstRecommend);
         }
 
-        List<Recipe> thirdRecommend = recipeRepository.findRecipeByRecentFavorite(timeSlotRecipes, recommendedRecipes, 3-recommendRecipes.size());
-        recommendRecipes.addAll(thirdRecommend);
-        for (Recipe recipe : thirdRecommend) {
-            recommendedRecipes.add(recipe.getId());
+        List<Recipe> secondRecommend = recipeRepository.findRecommendRecipeByUserIdx(userIdx, timeSlotRecipes, 2 - recommendRecipes.size());
+        if (secondRecommend != null) {
+            recommendRecipes.addAll(secondRecommend);
         }
 
-        List<Recipe> fourthRecommend = recipeRepository.findRecipeByAppPicks(recommendedRecipes);
+        List<Recipe> thirdRecommend = recipeRepository.findRecipeByRecentFavorite(timeSlotRecipes, 3-recommendRecipes.size());
+        if (thirdRecommend != null) {
+            recommendRecipes.addAll(thirdRecommend);
+        }
+
+        List<Recipe> fourthRecommend;
+        fourthRecommend = recipeRepository.findByIdIn(List.of(6L, 20L, 22L, 23L));
         recommendRecipes.addAll(fourthRecommend);
 
-        List<RecipeListResDto> resultRecipes = addRecipeToRecipeListResDto(recommendRecipes, userIdx);
+        List<Recipe> notDuplicatedRecipes = new ArrayList<>();
+        Set<Long> idxMemo = new HashSet<>();
+        for (Recipe recipe : recommendRecipes) {
+            if (idxMemo.contains(recipe.getId())) {
+                continue;
+            }
+            idxMemo.add(recipe.getId());
+            notDuplicatedRecipes.add(recipe);
+        }
+
+        List<RecipeListResDto> resultRecipes = addRecipeToRecipeListResDto(notDuplicatedRecipes, userIdx);
 
         return new RecommendResDto(timeSlot, resultRecipes);
     }
