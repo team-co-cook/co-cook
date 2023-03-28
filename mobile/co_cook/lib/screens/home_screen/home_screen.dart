@@ -22,6 +22,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
+        automaticallyImplyLeading: false,
         title: const Text("Co-Cook!"),
         titleTextStyle: const CustomTextStyles().logo.copyWith(
               color: CustomColors.redPrimary,

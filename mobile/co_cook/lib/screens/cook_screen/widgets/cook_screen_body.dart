@@ -205,10 +205,16 @@ class _CookScreenBodyState extends State<CookScreenBody>
                                         Container(
                                           decoration: BoxDecoration(
                                             image: DecorationImage(
-                                              image: NetworkImage(
-                                                  _firstData['recipeImgPath']),
-                                              fit: BoxFit.cover,
-                                            ),
+                                                image: _firstData[
+                                                            'recipeImgPath'] !=
+                                                        null
+                                                    ? NetworkImage(_firstData[
+                                                                'recipeImgPath']
+                                                            as String)
+                                                        as ImageProvider
+                                                    : const AssetImage(
+                                                        'assets/images/background/white_background.jpg'),
+                                                fit: BoxFit.cover),
                                             borderRadius:
                                                 BorderRadius.circular(16.0),
                                           ),
@@ -238,7 +244,7 @@ class _CookScreenBodyState extends State<CookScreenBody>
                                         Positioned.fill(
                                           child: Center(
                                             child: Text(
-                                                _firstData['recipeName'],
+                                                _firstData['recipeName'] ?? '',
                                                 style: CustomTextStyles()
                                                     .title1
                                                     .copyWith(

@@ -2,6 +2,7 @@ import 'package:co_cook/styles/shadows.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'dart:convert';
+import 'package:transparent_image/transparent_image.dart';
 
 import 'package:co_cook/styles/colors.dart';
 import 'package:co_cook/styles/text_styles.dart';
@@ -107,17 +108,18 @@ class _ListScreenState extends State<ListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          automaticallyImplyLeading: false,
           backgroundColor: CustomColors.monotoneLight,
           elevation: 0,
           toolbarHeight: 120,
-          automaticallyImplyLeading: false,
           flexibleSpace: Stack(
             children: [
               FlexibleSpaceBar(
-                background: Image.network(
-                  widget.imgPath,
-                  fit: BoxFit.cover,
-                ),
+                background: FadeInImage.memoryNetwork(
+                    fadeInDuration: const Duration(milliseconds: 200),
+                    fit: BoxFit.cover,
+                    placeholder: kTransparentImage,
+                    image: widget.imgPath),
               ),
               Positioned(
                 top: MediaQuery.of(context).padding.top,

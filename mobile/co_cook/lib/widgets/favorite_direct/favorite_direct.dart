@@ -60,6 +60,7 @@ class FavoriteDirectState extends State<FavoriteDirect> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: CustomColors.monotoneLight,
         elevation: 0,
         toolbarHeight: 80, // AppBar의 높이를 조정합니다.

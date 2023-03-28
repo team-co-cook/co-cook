@@ -217,6 +217,13 @@ class _VoiceSearchScreenState extends State<VoiceSearchScreen> {
 
   // 재료 검색 결과 목록으로 이동
   void gotoVoiceList() {
+    if (_reciveIngredientList.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("검색어가 존재하지 않습니다."),
+        duration: Duration(seconds: 1),
+      ));
+      return;
+    }
     _stopListen();
     Route ingredientListScreen = MaterialPageRoute(
         builder: (context) =>
@@ -244,6 +251,7 @@ class _VoiceSearchScreenState extends State<VoiceSearchScreen> {
     return Scaffold(
       appBar: widget.isPushed
           ? AppBar(
+              automaticallyImplyLeading: false,
               backgroundColor: CustomColors.monotoneLight,
               elevation: 0.5,
               leading: GestureDetector(
