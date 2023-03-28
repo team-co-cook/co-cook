@@ -21,7 +21,7 @@ class _ThemeRecommendState extends State<ThemeRecommend> {
     getTimeRecommendData("/home/theme");
   }
 
-  List dataList = [];
+  List? dataList;
 
   Future<void> getTimeRecommendData(String apiPath) async {
     // API 요청
@@ -53,20 +53,16 @@ class _ThemeRecommendState extends State<ThemeRecommend> {
                       )),
             ),
             SizedBox(
-                height: 156,
-                child: dataList.isNotEmpty
-                    ? ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: dataList.length,
-                        physics: const BouncingScrollPhysics(),
-                        padding:
-                            const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 16.0),
-                        itemBuilder: (BuildContext context, int index) {
-                          return ThemeRecommendCard(data: dataList[index]);
-                        })
-                    : const Center(
-                        child: CircularProgressIndicator(
-                            color: CustomColors.redPrimary))),
+                height: 152,
+                child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: dataList != null ? dataList!.length : 4,
+                    physics: const BouncingScrollPhysics(),
+                    padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 16.0),
+                    itemBuilder: (BuildContext context, int index) {
+                      return ThemeRecommendCard(
+                          data: dataList != null ? dataList![index] : null);
+                    })),
           ],
         ));
   }

@@ -1,3 +1,4 @@
+import 'package:co_cook/styles/shadows.dart';
 import 'package:flutter/material.dart';
 import 'package:transparent_image/transparent_image.dart';
 import 'package:zoom_tap_animation/zoom_tap_animation.dart';
@@ -8,22 +9,6 @@ import 'package:co_cook/styles/text_styles.dart';
 import 'package:co_cook/widgets/button/bookmark_button.dart';
 import 'package:co_cook/widgets/shimmer/custom_shimmer.dart';
 import 'package:co_cook/screens/recipe_detail_screen/recipe_detail_screen.dart';
-
-// 상위 위젯에서 그리드 사용시
-//
-// GridView.builder(
-//   shrinkWrap: true,
-//   itemCount: 2,
-//   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-//     crossAxisCount: 2, // 2개의 열
-//     crossAxisSpacing: 16.0, // 열 간격
-//     mainAxisSpacing: 16.0, // 행 간격
-//     childAspectRatio: 0.7, // 아이템의 가로 세로 비율
-//   ),
-//   itemBuilder: (BuildContext context, int index) {
-//     return RecipeCardTile(cardData: {index: 1});
-//   },
-// )
 
 class GridCard extends StatefulWidget {
   const GridCard({super.key, this.data});
@@ -75,15 +60,8 @@ class _GridCardState extends State<GridCard> {
                     height: constraints.maxWidth, // 부모 요소의 너비와 같은 값으로 설정
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(16),
-                      color: Colors.white,
-                      boxShadow: const [
-                        BoxShadow(
-                          color: Colors.black26,
-                          offset: Offset(1, 1),
-                          blurRadius: 6.0,
-                          spreadRadius: 0.0,
-                        )
-                      ],
+                      color: CustomColors.redLight,
+                      boxShadow: const [CustomShadows.card],
                     ),
                     child: ClipRRect(
                         borderRadius: BorderRadius.circular(16.0),
