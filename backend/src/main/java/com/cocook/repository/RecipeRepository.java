@@ -116,6 +116,7 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
             "JOIN amount a ON a.recipe_idx = r.recipe_idx " +
             "JOIN ingredient i on i.ingredient_idx = a.ingredient_idx " +
             "WHERE i.ingredient_name IN (:ingredientNames) " +
+            "OR i.search_keyword IN (:ingredientNames) " +
             "GROUP BY r.recipe_idx " +
             "ORDER BY includingIngredientCnt DESC;", nativeQuery = true)
     List<RecipesContainingIngredientsCnt> findRecipesByIngredients(@Param("ingredientNames") List<String> ingredientNames,
