@@ -6,8 +6,19 @@ from pydub import AudioSegment
 import datetime
 import speech_recognition as sr
 import logging
+import pickle
+from tensorflow.keras.models import load_model
+import librosa
+import numpy as np
+import voice_method as vm
+import io
+import soundfile as sf
+
 
 logging.basicConfig(filename='app.log', level=logging.INFO, format='%(asctime)s - %(levelname)s: %(message)s')
+
+
+
 
 app = FastAPI()
 
@@ -64,3 +75,39 @@ def recognize_speech(file_path):
     except sr.UnknownValueError:
         text = "음성 인식을 할 수 없습니다."
     return text
+
+
+@app.post("/upload/dj")
+async def upload_audio(audio: UploadFile = File(...)):
+    # sample, sample_rate = librosa.load(audio, sr=None, mono=True)
+    # 저장할 디렉토리 지정
+    today = datetime.date.today()
+    formatted_date = today.strftime('%m%d%Y')
+    time = datetime.datetime.now()
+    formatted_date_time = time.strftime('%Y%m%d%H%M')
+    save_path = Path("uploaded_files_dj/"+ formatted_date)
+    save_path.mkdir(exist_ok=True)
+
+
+
+    # mp3 파일을 저장할 경로 지정
+    audio_path = save_path / (formatted_date_time+'_'+ audio.filename.split(".")[0] + ".wav")
+
+    # 파일 저장
+    with audio_path.open("wb") as buffer:
+        shutil.copyfileobj(audio.file, buffer)
+
+    # 파일 확장자 사용하여 오디오 형식 지정
+    # file_extension = audio.filename.split(".")[-1]
+    
+    # 오디오 처리
+    audio_data = AudioSegment.from_file(audio_path, format="m4a")
+    audio_data.export(audio_path, format="wav")
+    
+    # audio, sample_rate = librosa.load(audio_path, sr = None)
+
+    # cnt =0
+    # currect_cnt = 0
+    label = vm.result(audio_path)
+
+    return {"filename": audio.filename, "result" : label}
