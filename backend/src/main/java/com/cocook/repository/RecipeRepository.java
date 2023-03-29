@@ -13,6 +13,7 @@ import java.util.List;
 public interface RecipeRepository extends JpaRepository<Recipe, Long> {
 
     Recipe findRecipeById(Long id);
+
     @Query(value = "SELECT r.recipe_idx FROM recipe r " +
             "JOIN tag t ON t.recipe_idx = r.recipe_idx " +
             "JOIN theme th ON t.theme_idx = th.theme_idx " +
@@ -116,6 +117,7 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
             "JOIN amount a ON a.recipe_idx = r.recipe_idx " +
             "JOIN ingredient i on i.ingredient_idx = a.ingredient_idx " +
             "WHERE i.ingredient_name IN (:ingredientNames) " +
+            "OR i.search_keyword IN (:ingredientNames) " +
             "GROUP BY r.recipe_idx " +
             "ORDER BY includingIngredientCnt DESC;", nativeQuery = true)
     List<RecipesContainingIngredientsCnt> findRecipesByIngredients(@Param("ingredientNames") List<String> ingredientNames,
