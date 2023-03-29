@@ -25,10 +25,34 @@ class _SearchScreenState extends State<SearchScreen> {
   final _focusNode = FocusNode(); // 포커싱 여부를 추적하는 클래스 인스턴스
 
   List dataList = [];
-  List exampleWord = ['두부', '마늘', '김치찌개', '치킨마요덮밥'];
+  List trendWord = ['두부'];
+
+  @override
+  void initState() {
+    super.initState();
+    getTrendData();
+  }
+
+  Future<void> getTrendData() async {
+    // API 요청
+    SearchService searchService = SearchService();
+    Response? response = await searchService.getTrendList();
+    if (response?.statusCode == 200) {
+      Map? decodeRes = await jsonDecode(response.toString());
+      if (decodeRes != null) {
+        setState(() {
+          dataList = decodeRes["data"];
+        });
+      }
+    }
+  }
 
   Future<void> getSearchData(String keyword) async {
     if (keyword == '') {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("검색어가 존재하지 않습니다."),
+        duration: Duration(seconds: 1),
+      ));
       return;
     }
 
@@ -91,67 +115,71 @@ class _SearchScreenState extends State<SearchScreen> {
               )),
         ),
         body: Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(12, 0, 12, 0),
+          child: CustomScrollView(
             physics: const BouncingScrollPhysics(
                 parent: AlwaysScrollableScrollPhysics()),
-            child: Align(
-              alignment: Alignment.topCenter,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  GestureDetector(
-                    onTap: () => pushScreen(context, CameraScreen()),
-                    child: Image.asset(
-                      'assets/images/button_img/CameraSearchLargeX2.png',
-                    ),
-                  ),
-                  if (dataList.isNotEmpty)
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Text('${dataList.length}건의 요리를 찾았어요',
-                          style: CustomTextStyles()
-                              .caption
-                              .copyWith(color: CustomColors.monotoneBlack)),
-                    ),
-                  dataList.isNotEmpty
-                      ? ListView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: dataList.length,
-                          padding:
-                              const EdgeInsets.fromLTRB(8.0, 16.0, 8.0, 24.0),
-                          itemBuilder: (BuildContext context, int index) {
-                            return Container(
-                              margin: const EdgeInsets.only(bottom: 16),
-                              child: ListCard(data: dataList[index]),
-                            );
-                          })
-                      : Container(
-                          child: Column(
-                            children: [
-                              SizedBox(height: 100),
-                              Text('이렇게 검색해보세요.',
-                                  style: CustomTextStyles().body1.copyWith(
-                                        color: CustomColors.monotoneGray,
-                                      )),
-                              SizedBox(height: 16.0),
-                              Column(
-                                children: exampleWord
-                                    .map((e) => CommonButton(
-                                        label: e,
-                                        color: ButtonType.none,
-                                        onPressed: () {
-                                          _clickSearch(e);
-                                        }))
-                                    .toList(),
-                              ),
-                            ],
+            slivers: [
+              SliverList(
+                delegate: SliverChildListDelegate(
+                  [
+                    dataList.isNotEmpty
+                        ? Padding(
+                            padding: const EdgeInsets.fromLTRB(16, 28, 16, 28),
+                            child: Center(
+                              child: Text('${dataList.length}건의 요리를 찾았어요',
+                                  style: CustomTextStyles().caption.copyWith(
+                                      color: CustomColors.monotoneBlack)),
+                            ),
+                          )
+                        : GestureDetector(
+                            onTap: () => pushScreen(context, CameraScreen()),
+                            child: Image.asset(
+                              'assets/images/button_img/CameraSearchLargeX2.png',
+                            ),
                           ),
-                        ),
-                ],
+                  ],
+                ),
               ),
-            ),
+              SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  (BuildContext context, int index) {
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 16),
+                      child: ListCard(data: dataList[index]),
+                    );
+                  },
+                  childCount: dataList.isNotEmpty ? dataList.length : 0,
+                ),
+              ),
+              SliverFillRemaining(
+                hasScrollBody: false,
+                child: dataList.isNotEmpty
+                    ? SizedBox.shrink()
+                    : Container(
+                        child: Column(
+                          children: [
+                            SizedBox(height: 100),
+                            Text('인기 검색어',
+                                style: CustomTextStyles().body1.copyWith(
+                                      color: CustomColors.monotoneGray,
+                                    )),
+                            SizedBox(height: 16.0),
+                            Column(
+                              children: trendWord
+                                  .map((e) => CommonButton(
+                                      label: e,
+                                      color: ButtonType.none,
+                                      onPressed: () {
+                                        _clickSearch(e);
+                                      }))
+                                  .toList(),
+                            ),
+                          ],
+                        ),
+                      ),
+              ),
+            ],
           ),
         ),
       ),
