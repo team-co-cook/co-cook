@@ -1,3 +1,5 @@
+import 'package:co_cook/screens/camera_screen/camera_screen.dart';
+import 'package:co_cook/utils/route.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'dart:convert';
@@ -35,7 +37,6 @@ class _SearchScreenState extends State<SearchScreen> {
     Response? response = await searchService.getSearchList(keyword: keyword);
     if (response?.statusCode == 200) {
       Map? decodeRes = await jsonDecode(response.toString());
-      print(decodeRes);
       if (decodeRes != null) {
         setState(() {
           dataList = decodeRes["data"]["recipeListResDto"];
@@ -99,9 +100,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   GestureDetector(
-                    onTap: () async {
-                      // CameraScreen으로 이동
-                    },
+                    onTap: () => pushScreen(context, CameraScreen()),
                     child: Image.asset(
                       'assets/images/button_img/CameraSearchLargeX2.png',
                     ),

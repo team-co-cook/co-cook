@@ -133,7 +133,6 @@ class _ReviewScreenState extends State<ReviewScreen> {
       "reviewImg": multipartFile,
     });
 
-    print(formData);
     Response? response = await apiService.createReview(formData);
     if (response?.statusCode == 200) {
       gotoPhotoCard(context, _text, _image!, widget.recipeName,

@@ -1,11 +1,13 @@
 package com.cocook.controller;
 
 import com.cocook.dto.ApiResponse;
+import com.cocook.dto.recipe.RecipeListResDto;
 import com.cocook.dto.review.MyReview;
 import com.cocook.dto.review.MyReviewResDto;
 import com.cocook.dto.review.ReviewListResDto;
 import com.cocook.dto.review.ReviewResDto;
 import com.cocook.dto.user.ChangeNicknameRequestDto;
+import com.cocook.service.RecipeService;
 import com.cocook.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -21,10 +23,12 @@ import java.util.List;
 public class MyPageController {
 
     private final UserService userService;
+    private final RecipeService recipeService;
 
     @Autowired
-    public MyPageController(UserService userService) {
+    public MyPageController(UserService userService, RecipeService recipeService) {
         this.userService = userService;
+        this.recipeService = recipeService;
     }
 
     @PutMapping("/withdrawal/{user_idx}")
@@ -43,6 +47,11 @@ public class MyPageController {
     @GetMapping("/review")
     public ResponseEntity<ApiResponse<List<MyReviewResDto>>> getReviews(@RequestHeader("AUTH-TOKEN") String authToken) {
         return ApiResponse.ok(userService.getReviews(authToken));
+    }
+
+    @GetMapping("/recent")
+    public ResponseEntity<ApiResponse<List<RecipeListResDto>>> getRecentRecipes(@RequestHeader("AUTH-TOKEN") String authToken) {
+        return ApiResponse.ok(userService.getRecentRecipe(authToken));
     }
 
 }

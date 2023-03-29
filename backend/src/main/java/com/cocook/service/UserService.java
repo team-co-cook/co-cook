@@ -1,6 +1,7 @@
 package com.cocook.service;
 
 import com.cocook.auth.JwtTokenProvider;
+import com.cocook.dto.recipe.RecipeListResDto;
 import com.cocook.dto.review.MyReview;
 import com.cocook.dto.review.MyReviewResDto;
 import com.cocook.dto.review.ReviewReqDto;
@@ -8,8 +9,12 @@ import com.cocook.dto.review.ReviewResDto;
 import com.cocook.dto.user.GoogleOAuthResponseDto;
 import com.cocook.dto.user.LoginResponseDto;
 import com.cocook.dto.user.SignupRequestDto;
+import com.cocook.entity.Favorite;
+import com.cocook.entity.Recipe;
 import com.cocook.entity.Review;
 import com.cocook.entity.User;
+import com.cocook.repository.FavoriteRepository;
+import com.cocook.repository.RecipeRepository;
 import com.cocook.repository.ReviewRepository;
 import com.cocook.repository.UserRepository;
 import lombok.AllArgsConstructor;
@@ -17,6 +22,8 @@ import lombok.AllArgsConstructor;
 import org.hibernate.ObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationServiceException;
@@ -29,6 +36,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @AllArgsConstructor
@@ -37,6 +45,9 @@ public class UserService {
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final ReviewRepository reviewRepository;
+    private RecipeRepository recipeRepository;
+    private FavoriteRepository favoriteRepository;
+    private RedisTemplate<String, String> redisTemplate;
 
     public LoginResponseDto login(String access_token) {
 
@@ -153,6 +164,35 @@ public class UserService {
             myReviewResDtos.add(myReviewResDto);
         }
         return myReviewResDtos;
+    }
+
+    public List<RecipeListResDto> getRecentRecipe(String authToken) {
+        Long userIdx = jwtTokenProvider.getUserIdx(authToken);
+        ZSetOperations<String, String> zSetOperations = redisTemplate.opsForZSet();
+        Long length = zSetOperations.size(userIdx.toString());
+        if (length == null) {
+            return new ArrayList<>();
+        }
+        Set<String> idxList = zSetOperations.reverseRange(userIdx.toString(), 0, -1);
+        List<RecipeListResDto> recipeListResDtoList = new ArrayList<>();
+        for (String stringIdx : idxList) {
+            Recipe recipe = recipeRepository.findRecipeById(Long.parseLong(stringIdx));
+            if (recipe == null) {
+                continue;
+            }
+            Favorite favorite = favoriteRepository.findByUserIdAndRecipeId(userIdx, recipe.getId());
+            boolean isFavorite = favorite != null;
+            RecipeListResDto recipeListResDto = RecipeListResDto.builder()
+                    .recipeName(recipe.getRecipeName())
+                    .recipeDifficulty(recipe.getDifficulty())
+                    .recipeIdx(recipe.getId())
+                    .recipeImgPath(recipe.getImgPath())
+                    .recipeRunningTime(recipe.getRunningTime())
+                    .isFavorite(isFavorite)
+                    .build();
+            recipeListResDtoList.add(recipeListResDto);
+        }
+        return recipeListResDtoList;
     }
 
 }

@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:co_cook/utils/route.dart';
+import 'package:zoom_tap_animation/zoom_tap_animation.dart';
 
 import 'package:co_cook/styles/colors.dart';
 import 'package:co_cook/styles/text_styles.dart';
-import 'package:zoom_tap_animation/zoom_tap_animation.dart';
+import 'package:co_cook/screens/camera_screen/camera_screen.dart';
+import 'package:co_cook/screens/voice_search_screen/voice_search_screen.dart';
 
 class AiRecommend extends StatefulWidget {
   const AiRecommend({super.key});
@@ -54,7 +57,7 @@ class _AiRecommendState extends State<AiRecommend> {
                   ],
                 ),
               ),
-              const Row(
+              Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [AiRecommendVoiceCard(), AiRecommendPhotoCard()],
               )
@@ -64,18 +67,71 @@ class _AiRecommendState extends State<AiRecommend> {
       ]),
     );
   }
-}
 
-class AiRecommendPhotoCard extends StatelessWidget {
-  const AiRecommendPhotoCard({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
+  Widget AiRecommendVoiceCard() {
     return ZoomTapAnimation(
       end: 0.98,
-      onTap: () => print("인식 연결!!"),
+      onTap: () => pushScreen(
+          context,
+          VoiceSearchScreen(
+            isPushed: true,
+          )),
+      child: Stack(children: [
+        Container(
+          width: (MediaQuery.of(context).size.width / 2 - 24), // 부모 요소의 너비를 가져옴
+          height: (MediaQuery.of(context).size.width / 2 -
+              24), // 부모 요소의 너비와 같은 값으로 설정
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            gradient: const LinearGradient(
+              colors: [
+                Color.fromARGB(255, 239, 151, 84),
+                Color.fromARGB(255, 246, 90, 142)
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            image: const DecorationImage(
+              fit: BoxFit.cover,
+              image: AssetImage(
+                  "assets/images/background/search_voice_foreground.png"),
+            ),
+            boxShadow: const [
+              BoxShadow(
+                color: Colors.black26,
+                offset: Offset(1, 1),
+                blurRadius: 6.0,
+                spreadRadius: 0.0,
+              )
+            ],
+          ),
+        ),
+        Positioned(
+            top: 20,
+            left: 20,
+            child: Center(
+                child: Text("냉장고 속 재료를\n말해보세요",
+                    style: const CustomTextStyles().subtitle1.copyWith(
+                        color: CustomColors.monotoneLight,
+                        height: 1.2,
+                        shadows: const [
+                          BoxShadow(
+                            color: Colors.black26,
+                            offset: Offset(1, 1),
+                            blurRadius: 6.0,
+                            spreadRadius: 0.0,
+                          )
+                        ])))),
+      ]),
+    );
+  }
+
+  Widget AiRecommendPhotoCard() {
+    return ZoomTapAnimation(
+      end: 0.98,
+      onTap: () {
+        pushScreen(context, CameraScreen());
+      },
       child: Stack(children: [
         Container(
           width: (MediaQuery.of(context).size.width / 2 - 24), // 부모 요소의 너비를 가져옴
@@ -122,67 +178,6 @@ class AiRecommendPhotoCard extends StatelessWidget {
                 child: Text("레시피가 궁금하다면?",
                     style: CustomTextStyles().subtitle1.copyWith(
                         color: CustomColors.monotoneLight,
-                        shadows: const [
-                          BoxShadow(
-                            color: Colors.black26,
-                            offset: Offset(1, 1),
-                            blurRadius: 6.0,
-                            spreadRadius: 0.0,
-                          )
-                        ])))),
-      ]),
-    );
-  }
-}
-
-class AiRecommendVoiceCard extends StatelessWidget {
-  const AiRecommendVoiceCard({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return ZoomTapAnimation(
-      end: 0.98,
-      onTap: () => print("음성인식 연결!!"),
-      child: Stack(children: [
-        Container(
-          width: (MediaQuery.of(context).size.width / 2 - 24), // 부모 요소의 너비를 가져옴
-          height: (MediaQuery.of(context).size.width / 2 -
-              24), // 부모 요소의 너비와 같은 값으로 설정
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            gradient: const LinearGradient(
-              colors: [
-                Color.fromARGB(255, 239, 151, 84),
-                Color.fromARGB(255, 246, 90, 142)
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            image: const DecorationImage(
-              fit: BoxFit.cover,
-              image: AssetImage(
-                  "assets/images/background/search_voice_foreground.png"),
-            ),
-            boxShadow: const [
-              BoxShadow(
-                color: Colors.black26,
-                offset: Offset(1, 1),
-                blurRadius: 6.0,
-                spreadRadius: 0.0,
-              )
-            ],
-          ),
-        ),
-        Positioned(
-            top: 20,
-            left: 20,
-            child: Center(
-                child: Text("냉장고 속 재료를\n말해보세요",
-                    style: const CustomTextStyles().subtitle1.copyWith(
-                        color: CustomColors.monotoneLight,
-                        height: 1.2,
                         shadows: const [
                           BoxShadow(
                             color: Colors.black26,

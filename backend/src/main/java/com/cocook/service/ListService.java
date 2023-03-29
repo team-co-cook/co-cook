@@ -9,21 +9,47 @@ import com.cocook.entity.Amount;
 import com.cocook.entity.Recipe;
 import com.cocook.repository.*;
 import lombok.AllArgsConstructor;
+
+import org.springframework.data.redis.core.ListOperations;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ZSetOperations;
+//import org.deeplearning4j.models.word2vec.Word2Vec;
+//import org.deeplearning4j.models.word2vec.WordVectors;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 
 import javax.persistence.EntityNotFoundException;
 import java.util.*;
+import java.io.File;
 
 @Service
-@AllArgsConstructor
 public class ListService {
 
-    private JwtTokenProvider jwtTokenProvider;
-    private RecipeRepository recipeRepository;
-    private FavoriteRepository favoriteRepository;
-    private ThemeRepository themeRepository;
-    private CategoryRepository categoryRepository;
-    private AmountRepository amountRepository;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final RecipeRepository recipeRepository;
+    private final FavoriteRepository favoriteRepository;
+    private final ThemeRepository themeRepository;
+    private final CategoryRepository categoryRepository;
+    private final AmountRepository amountRepository;
+    private final RedisTemplate<String, String> redisTemplate;
+//    private WordVector wordVector;
+
+//    @Autowired
+    public ListService(JwtTokenProvider jwtTokenProvider, RecipeRepository recipeRepository,
+                       FavoriteRepository favoriteRepository, ThemeRepository themeRepository,
+                       CategoryRepository categoryRepository, AmountRepository amountRepository,
+                       RedisTemplate<String, String> redisTemplate
+                       ) {
+        this.jwtTokenProvider = jwtTokenProvider;
+        this.recipeRepository = recipeRepository;
+        this.favoriteRepository = favoriteRepository;
+        this.themeRepository = themeRepository;
+        this.categoryRepository = categoryRepository;
+        this.amountRepository = amountRepository;
+        this.redisTemplate = redisTemplate;
+//        this.wordVector = WordVectorSerializer.loadTxtVectors(new File("src/main/resources/ko.bin"));
+    }
 
     public RecipeListResDto getRecipesByThemeName(String authToken, String themeName, String difficulty, Integer time) {
         Long userIdx = jwtTokenProvider.getUserIdx(authToken);
@@ -66,7 +92,33 @@ public class ListService {
         for (Recipe recipe : foundRecipes) {
             RecipeDetailResDto recipeDetailResDto = getRecipeDetailDtoWithIsFavorite(userIdx, recipe);
             newRecipes.add(recipeDetailResDto);
+
+            ZSetOperations<String, String> zSetOperations = redisTemplate.opsForZSet();
+            zSetOperations.incrementScore("searchHistorySet", recipe.getRecipeName(), 1);
+            ListOperations<String, String> listOperations = redisTemplate.opsForList();
+            Long length = listOperations.size("searchHistoryList");
+            if (length == null || length < 1000) {
+                listOperations.rightPush("searchHistoryList", recipe.getRecipeName());
+            } else {
+                listOperations.leftPop("searchHistoryList");
+                listOperations.rightPush("searchHistoryList", recipe.getRecipeName());
+                zSetOperations.incrementScore("searchHistorySet", recipe.getRecipeName(), -1);
+                Double score = zSetOperations.score("searchHistorySet", recipe.getRecipeName());
+                if (score != null && score == 0) {
+                    zSetOperations.remove("searchHistorySet", recipe.getRecipeName());
+                }
+            }
         }
+
+        List<Recipe> relatedRecipes = recipeRepository.findAll();
+//        relatedRecipes.sort(Comparator.comparingDouble(recipe -> -word2Vec.similarity(keyword, recipe.getRecipeName())));
+//        for (Recipe recipe : relatedRecipes) {
+//            if ((word2Vec.similarity(keyword, recipe.getRecipeName()) > 0.5) & (!newRecipes.contains(recipe))) {
+//                RecipeDetailResDto recipeDetailResDto = getRecipeDetailDtoWithIsFavorite(userIdx, recipe);
+//                newRecipes.add(recipeDetailResDto);
+//            }
+//        }
+
         return new RecipeListResDto(newRecipes);
     }
 

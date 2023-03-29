@@ -18,7 +18,8 @@ import 'package:co_cook/widgets/sound_meter/sound_meter.dart';
 import 'package:co_cook/screens/ingredient_list_screen/ingredient_list_screen.dart';
 
 class VoiceSearchScreen extends StatefulWidget {
-  const VoiceSearchScreen({super.key});
+  const VoiceSearchScreen({super.key, this.isPushed = false});
+  final bool isPushed;
 
   @override
   State<VoiceSearchScreen> createState() => _VoiceSearchScreenState();
@@ -240,108 +241,123 @@ class _VoiceSearchScreenState extends State<VoiceSearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      alignment: Alignment.topCenter,
-      color: CustomColors.redLight,
-      padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 5),
-      child: SizedBox(
-        height: MediaQuery.of(context).size.height / 5 * 4,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            ZoomTapAnimation(
-              onTap: () {
-                !_isListening ? _startListen() : _stopListen();
-              },
-              child: Container(
-                width: 140,
-                height: 140,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(70.0),
-                  color: CustomColors.monotoneLight,
-                  border: Border.all(
-                      color: _isListening
-                          ? _isRecording
-                              ? CustomColors.greenPrimary
-                              : CustomColors.redPrimary
-                          : CustomColors.monotoneLightGray,
-                      width: 8,
-                      strokeAlign: BorderSide.strokeAlignOutside),
-                  boxShadow: [
-                    BoxShadow(
-                      color: _isRecording
-                          ? CustomColors.greenPrimary
-                          : CustomColors.redPrimary,
-                      offset: const Offset(0, 0),
-                      blurRadius: volume0to(100).toDouble(),
-                      spreadRadius: 0.0,
-                    )
-                  ],
-                ),
-                alignment: Alignment.center,
-                child: SoundMeter(
-                  volume: volume0to(100).toDouble(),
-                  isSpeak: _isListening,
-                  isSay: _isRecording,
-                  dotSize: 12,
-                  size: 72,
+    return Scaffold(
+      appBar: widget.isPushed
+          ? AppBar(
+              backgroundColor: CustomColors.monotoneLight,
+              elevation: 0.5,
+              leading: GestureDetector(
+                onTap: () => Navigator.pop(context),
+                child: Icon(
+                  Icons.arrow_back,
+                  color: CustomColors.monotoneBlack,
                 ),
               ),
-            ),
-            ZoomTapAnimation(
-              onTap: () {
-                !_isListening ? _startListen() : _stopListen();
-              },
-              child: Container(
-                margin: const EdgeInsets.only(top: 40.0, bottom: 20),
-                child: Text(_isListening ? "듣고있어요" : "탭하여 시작",
-                    style: const CustomTextStyles().title1.copyWith(
-                          color: _isListening
-                              ? CustomColors.redPrimary
-                              : CustomColors.monotoneLightGray,
-                        )),
+            )
+          : null,
+      body: Container(
+        alignment: Alignment.topCenter,
+        color: CustomColors.redLight,
+        padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 5),
+        child: SizedBox(
+          height: MediaQuery.of(context).size.height / 5 * 4,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              ZoomTapAnimation(
+                onTap: () {
+                  !_isListening ? _startListen() : _stopListen();
+                },
+                child: Container(
+                  width: 140,
+                  height: 140,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(70.0),
+                    color: CustomColors.monotoneLight,
+                    border: Border.all(
+                        color: _isListening
+                            ? _isRecording
+                                ? CustomColors.greenPrimary
+                                : CustomColors.redPrimary
+                            : CustomColors.monotoneLightGray,
+                        width: 8,
+                        strokeAlign: BorderSide.strokeAlignOutside),
+                    boxShadow: [
+                      BoxShadow(
+                        color: _isRecording
+                            ? CustomColors.greenPrimary
+                            : CustomColors.redPrimary,
+                        offset: const Offset(0, 0),
+                        blurRadius: volume0to(100).toDouble(),
+                        spreadRadius: 0.0,
+                      )
+                    ],
+                  ),
+                  alignment: Alignment.center,
+                  child: SoundMeter(
+                    volume: volume0to(100).toDouble(),
+                    isSpeak: _isListening,
+                    isSay: _isRecording,
+                    dotSize: 12,
+                    size: 72,
+                  ),
+                ),
               ),
-            ),
-            Text("냉장고 속 재료를\n말해보세요",
-                textAlign: TextAlign.center,
-                style: const CustomTextStyles().subtitle2.copyWith(
-                      color: CustomColors.monotoneGray,
-                    )),
-            Expanded(
-              child: Column(
-                children: [
-                  Expanded(
-                    child: Container(
-                      margin: const EdgeInsets.only(top: 32.0),
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.vertical,
-                        physics: const BouncingScrollPhysics(),
-                        child: Container(
-                          margin: const EdgeInsets.fromLTRB(0, 16.0, 0, 16.0),
-                          child: Wrap(
-                              alignment: WrapAlignment.center,
-                              direction: Axis.horizontal, // 나열 방향
-                              spacing: 8, // 좌우 간격
-                              runSpacing: 8, // 상하 간격
-                              children: List.from(List<Widget>.generate(
-                                  _loadIngreciveIngredientCount,
-                                  (index) => voiceSearchTag(null)))
-                                ..addAll(_reciveIngredientList
-                                    .map((item) => voiceSearchTag(item)))),
+              ZoomTapAnimation(
+                onTap: () {
+                  !_isListening ? _startListen() : _stopListen();
+                },
+                child: Container(
+                  margin: const EdgeInsets.only(top: 40.0, bottom: 20),
+                  child: Text(_isListening ? "듣고있어요" : "탭하여 시작",
+                      style: const CustomTextStyles().title1.copyWith(
+                            color: _isListening
+                                ? CustomColors.redPrimary
+                                : CustomColors.monotoneLightGray,
+                          )),
+                ),
+              ),
+              Text("냉장고 속 재료를\n말해보세요",
+                  textAlign: TextAlign.center,
+                  style: const CustomTextStyles().subtitle2.copyWith(
+                        color: CustomColors.monotoneGray,
+                      )),
+              Expanded(
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        margin: const EdgeInsets.only(top: 32.0),
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.vertical,
+                          physics: const BouncingScrollPhysics(),
+                          child: Container(
+                            margin: const EdgeInsets.fromLTRB(0, 16.0, 0, 16.0),
+                            child: Wrap(
+                                alignment: WrapAlignment.center,
+                                direction: Axis.horizontal, // 나열 방향
+                                spacing: 8, // 좌우 간격
+                                runSpacing: 8, // 상하 간격
+                                children: List.from(List<Widget>.generate(
+                                    _loadIngreciveIngredientCount,
+                                    (index) => voiceSearchTag(null)))
+                                  ..addAll(_reciveIngredientList
+                                      .map((item) => voiceSearchTag(item)))),
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  Container(
-                      padding: const EdgeInsets.only(top: 24.0, bottom: 40.0),
-                      child: CommonButton(
-                          label: "완료",
-                          color: ButtonType.red,
-                          onPressed: () => gotoVoiceList())),
-                ],
+                    Container(
+                        padding: const EdgeInsets.only(top: 24.0, bottom: 40.0),
+                        child: CommonButton(
+                            label: "완료",
+                            color: ButtonType.red,
+                            onPressed: () => gotoVoiceList())),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
