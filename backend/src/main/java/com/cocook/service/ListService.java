@@ -26,19 +26,20 @@ import java.io.File;
 @Service
 public class ListService {
 
-    private JwtTokenProvider jwtTokenProvider;
-    private RecipeRepository recipeRepository;
-    private FavoriteRepository favoriteRepository;
-    private ThemeRepository themeRepository;
-    private CategoryRepository categoryRepository;
-    private AmountRepository amountRepository;
-    private RedisTemplate<String, String> redisTemplate;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final RecipeRepository recipeRepository;
+    private final FavoriteRepository favoriteRepository;
+    private final ThemeRepository themeRepository;
+    private final CategoryRepository categoryRepository;
+    private final AmountRepository amountRepository;
+    private final RedisTemplate<String, String> redisTemplate;
 //    private WordVector wordVector;
 
 //    @Autowired
     public ListService(JwtTokenProvider jwtTokenProvider, RecipeRepository recipeRepository,
                        FavoriteRepository favoriteRepository, ThemeRepository themeRepository,
-                       CategoryRepository categoryRepository, AmountRepository amountRepository
+                       CategoryRepository categoryRepository, AmountRepository amountRepository,
+                       RedisTemplate<String, String> redisTemplate
                        ) {
         this.jwtTokenProvider = jwtTokenProvider;
         this.recipeRepository = recipeRepository;
