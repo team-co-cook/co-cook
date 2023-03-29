@@ -1,6 +1,6 @@
 import { NavLink } from "react-router-dom";
 import styled from "styled-components";
-import { ReactComponent as LogoRed } from "../assets/logo/logoRed.svg";
+import { ReactComponent as LogoRed } from "../../assets/logo/logoRed.svg";
 
 function NavBar() {
   return (

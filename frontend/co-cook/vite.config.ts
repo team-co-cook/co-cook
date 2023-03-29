@@ -5,4 +5,8 @@ import svgr from "vite-plugin-svgr";
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react(), svgr()],
+  define: {
+    "process.env.REACT_APP_EMAILJS_PUBLIC_KEY":
+      process.env.REACT_APP_EMAILJS_PUBLIC_KEY,
+  },
 });

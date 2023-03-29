@@ -1,21 +1,15 @@
-import { isMobile, isAndroid } from "react-device-detect";
+import { isMobile } from "react-device-detect";
 
 import styled from "styled-components";
-import NavBar from "../components/NavBar";
+import NavBar from "../components/common/NavBar";
+import DownloadMobile from "../components/DownloadPage/DownloadMobile";
+import DownloadPc from "../components/DownloadPage/DownloadPc";
 
 function DownloadPage() {
   return (
     <StyledDownloadPage>
-      <NavBar></NavBar>
-      {isMobile ? (
-        isAndroid ? (
-          <div>android</div>
-        ) : (
-          <div>ios</div>
-        )
-      ) : (
-        <div>pc</div>
-      )}
+      <NavBar />
+      {isMobile ? <DownloadMobile /> : <DownloadPc />}
     </StyledDownloadPage>
   );
 }
