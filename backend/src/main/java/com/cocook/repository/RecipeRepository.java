@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Arrays;
 import java.util.List;
 
 public interface RecipeRepository extends JpaRepository<Recipe, Long> {
@@ -18,7 +19,7 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
             "JOIN theme th ON t.theme_idx = th.theme_idx " +
             "WHERE th.theme_name = :themeName ;", nativeQuery = true)
     List<Long> findByTheme(@Param("themeName") String themeName);
-    List<Recipe> findByTags_Theme_ThemeName(String themeName);
+//    List<Recipe> findByTags_Theme_ThemeName(String themeName);
 //    @Query(value = "SELECT * FROM recipe r " +
 //            "JOIN tag t ON t.recipe_idx = r.recipe_idx " +
 //            "JOIN theme th ON t.theme_idx = th.theme_idx " +
@@ -49,6 +50,15 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
                 "ORDER BY r.recipe_idx DESC;", nativeQuery = true)
     List<Recipe> findByThemeNameOrderByIdDesc(@Param("themeName") String themeName);
 
+    List<Recipe> findByCategoryCategoryNameOrderByIdDesc(String categoryName);
+
+    List<Recipe> findAllByOrderByIdDesc();
+
+    List<Recipe> findByRecipeNameContainingOrderByIdDesc(String keyword);
+
+    @Query("SELECT r FROM Recipe r JOIN r.favorites f WHERE f.user.id = :userId")
+    List<Recipe> findRecipesByUserId(@Param("userId") Long userId);
+
     @Query(value = "SELECT r.recipe_idx FROM recipe r " +
             "JOIN favorite f ON f.recipe_idx = r.recipe_idx " +
             "JOIN user u ON u.user_idx = f.user_idx " +
@@ -71,7 +81,6 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
             "ORDER BY COUNT(*) DESC, RAND() LIMIT 2) " +
             "AS favorite_theme ON favorite_theme.theme_idx = t.theme_idx " +
             "WHERE recommend_recipe.recipe_idx IN (:recipeIdxList) AND " +
-            "recommend_recipe.recipe_idx NOT IN (:recommendedList) AND " +
             "recommend_recipe.recipe_idx in (" +
             "   SELECT recipe.recipe_idx " +
             "   FROM recipe " +
@@ -79,7 +88,7 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
             "   WHERE category.category_name = '메인 요리')" +
             "GROUP BY recommend_recipe.recipe_idx " +
             "ORDER BY COUNT(*) DESC, RAND() LIMIT :quota ;", nativeQuery = true)
-    List<Recipe> findRecommendRecipeByUserIdx(@Param("userIdx") Long userIdx, @Param("recipeIdxList") List<Long> recipeIdxList, @Param("recommendedList") List<Long> recommendedList, @Param("quota") Integer quota);
+    List<Recipe> findRecommendRecipeByUserIdx(@Param("userIdx") Long userIdx, @Param("recipeIdxList") List<Long> recipeIdxList, @Param("quota") Integer quota);
 
     @Query(value = "SELECT * " +
             "FROM recipe r " +
@@ -88,7 +97,6 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
             "    FROM favorite  " +
             "    WHERE created_date > DATE_ADD(NOW(), INTERVAL -7 DAY) AND " +
             "    recipe_idx IN :recipeIdxList AND " +
-            "    recipe_idx NOT IN (:recommendedList) AND " +
             "    recipe_idx in (" +
             "        SELECT recipe.recipe_idx " +
             "        FROM recipe " +
@@ -97,23 +105,9 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
             "    GROUP BY recipe_idx " +
             "    ORDER BY COUNT(*) DESC, RAND() LIMIT :quota " +
             ");", nativeQuery = true)
-    List<Recipe> findRecipeByRecentFavorite(@Param("recipeIdxList") List<Long> recipeIdxList, @Param("recommendedList") List<Long> recommendedList, @Param("quota") Integer quota);
+    List<Recipe> findRecipeByRecentFavorite(@Param("recipeIdxList") List<Long> recipeIdxList, @Param("quota") Integer quota);
 
-    @Query(value = "SELECT * " +
-            "FROM recipe " +
-            "WHERE recipe.recipe_idx NOT IN (:recommendList) AND " +
-            "recipe.recipe_idx IN (6, 20, 22, 23) ;", nativeQuery = true)
-    List<Recipe> findRecipeByAppPicks(@Param("recommendList") List<Long> recommendList);
-
-    List<Recipe> findByCategoryCategoryNameOrderByIdDesc(String categoryName);
-
-    List<Recipe> findAllByOrderByIdDesc();
-
-    List<Recipe> findByRecipeNameContainingOrderByIdDesc(String keyword);
-
-    @Query("SELECT r FROM Recipe r JOIN r.favorites f WHERE f.user.id = :userId")
-    List<Recipe> findRecipesByUserId(@Param("userId") Long userId);
-
+    List<Recipe> findByIdIn(List<Long> pickList);
 
     @Query(value = "SELECT r.recipe_idx as recipeIdx, r.recipe_name as recipeName, r.img_path as recipeImgPath," +
             " r.difficulty as recipeDifficulty, r.running_time as recipeRunningTime, " +
@@ -123,6 +117,7 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
             "JOIN amount a ON a.recipe_idx = r.recipe_idx " +
             "JOIN ingredient i on i.ingredient_idx = a.ingredient_idx " +
             "WHERE i.ingredient_name IN (:ingredientNames) " +
+            "OR i.search_keyword IN (:ingredientNames) " +
             "GROUP BY r.recipe_idx " +
             "ORDER BY includingIngredientCnt DESC;", nativeQuery = true)
     List<RecipesContainingIngredientsCnt> findRecipesByIngredients(@Param("ingredientNames") List<String> ingredientNames,

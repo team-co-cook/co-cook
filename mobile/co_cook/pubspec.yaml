@@ -59,6 +59,7 @@ dependencies:
   camera: ^0.10.3+2
   sensors:
   sensors_plus: ^2.0.2
+  shimmer: ^2.0.0
 
 dev_dependencies:
   flutter_test:

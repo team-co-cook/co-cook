@@ -123,9 +123,8 @@ class _NicknameChangeState extends State<NicknameChange> {
     Map<String, dynamic> userData = {
       'nickname': _nickname,
     };
-    // print('body: $userData'); // 데이터 확인
+
     Response? response = await _apiService.changeNickname(userData, userIdx);
-    // print('응답: $response');
 
     // 디코딩
     Map<String, dynamic> decodeRes = jsonDecode(response.toString());
@@ -144,7 +143,6 @@ class _NicknameChangeState extends State<NicknameChange> {
     } else if (decodeRes['status'] == 200) {
       // shared preferences에 저장
       decodePrefs['nickname'] = _nickname;
-      // print(jsonEncode(decodePrefs));
       prefs.setString('userData', jsonEncode(decodePrefs));
       // print('저장 완료');
 

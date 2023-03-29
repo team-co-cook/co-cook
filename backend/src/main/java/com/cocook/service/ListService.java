@@ -11,6 +11,10 @@ import com.cocook.repository.*;
 import com.cocook.util.WordSimilarity;
 import com.github.jfasttext.JFastText;
 import lombok.AllArgsConstructor;
+
+import org.springframework.data.redis.core.ListOperations;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,12 +26,13 @@ import java.util.*;
 @Service
 public class ListService {
 
-    private final JwtTokenProvider jwtTokenProvider;
-    private final RecipeRepository recipeRepository;
-    private final FavoriteRepository favoriteRepository;
-    private final ThemeRepository themeRepository;
-    private final CategoryRepository categoryRepository;
-    private final AmountRepository amountRepository;
+    private final final JwtTokenProvider jwtTokenProvider;
+    private final final RecipeRepository recipeRepository;
+    private final final FavoriteRepository favoriteRepository;
+    private final final ThemeRepository themeRepository;
+    private final final CategoryRepository categoryRepository;
+    private final final AmountRepository amountRepository;
+    private final RedisTemplate<String, String> redisTemplate;
     private final JFastText fastText;
     private final WordSimilarity wordSimilarity;
 
@@ -35,6 +40,7 @@ public class ListService {
     public ListService(JwtTokenProvider jwtTokenProvider, RecipeRepository recipeRepository,
                        FavoriteRepository favoriteRepository, ThemeRepository themeRepository,
                        CategoryRepository categoryRepository, AmountRepository amountRepository,
+                       RedisTemplate<String, String> redisTemplate,
                        JFastText fastText, WordSimilarity wordSimilarity) {
         this.jwtTokenProvider = jwtTokenProvider;
         this.recipeRepository = recipeRepository;
@@ -42,6 +48,7 @@ public class ListService {
         this.themeRepository = themeRepository;
         this.categoryRepository = categoryRepository;
         this.amountRepository = amountRepository;
+        this.redisTemplate = redisTemplate;
         this.fastText = fastText;
         this.wordSimilarity = wordSimilarity;
 //        this.wordVector = WordVectorSerializer.loadTxtVectors(new File("src/main/resources/ko.bin"));
@@ -89,6 +96,22 @@ public class ListService {
         for (Recipe recipe : foundRecipes) {
             RecipeDetailResDto recipeDetailResDto = getRecipeDetailDtoWithIsFavorite(userIdx, recipe);
             newRecipes.add(recipeDetailResDto);
+
+            ZSetOperations<String, String> zSetOperations = redisTemplate.opsForZSet();
+            zSetOperations.incrementScore("searchHistorySet", recipe.getRecipeName(), 1);
+            ListOperations<String, String> listOperations = redisTemplate.opsForList();
+            Long length = listOperations.size("searchHistoryList");
+            if (length == null || length < 1000) {
+                listOperations.rightPush("searchHistoryList", recipe.getRecipeName());
+            } else {
+                listOperations.leftPop("searchHistoryList");
+                listOperations.rightPush("searchHistoryList", recipe.getRecipeName());
+                zSetOperations.incrementScore("searchHistorySet", recipe.getRecipeName(), -1);
+                Double score = zSetOperations.score("searchHistorySet", recipe.getRecipeName());
+                if (score != null && score == 0) {
+                    zSetOperations.remove("searchHistorySet", recipe.getRecipeName());
+                }
+            }
         }
 
         List<Recipe> relatedRecipes = recipeRepository.findAll();
