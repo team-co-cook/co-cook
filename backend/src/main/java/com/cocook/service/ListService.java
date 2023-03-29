@@ -26,12 +26,12 @@ import java.util.*;
 @Service
 public class ListService {
 
-    private final final JwtTokenProvider jwtTokenProvider;
-    private final final RecipeRepository recipeRepository;
-    private final final FavoriteRepository favoriteRepository;
-    private final final ThemeRepository themeRepository;
-    private final final CategoryRepository categoryRepository;
-    private final final AmountRepository amountRepository;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final RecipeRepository recipeRepository;
+    private final FavoriteRepository favoriteRepository;
+    private final ThemeRepository themeRepository;
+    private final CategoryRepository categoryRepository;
+    private final AmountRepository amountRepository;
     private final RedisTemplate<String, String> redisTemplate;
     private final JFastText fastText;
     private final WordSimilarity wordSimilarity;
@@ -91,7 +91,7 @@ public class ListService {
         }
         Long userIdx = jwtTokenProvider.getUserIdx(authToken);
         List<Recipe> foundRecipes = recipeRepository.findByRecipeNameContainingOrderByIdDesc(keyword);
-        List<RecipeDetailResDto> newRecipes = new ArrayList<>();
+        Set<RecipeDetailResDto> newRecipes = new HashSet<>();
 
         for (Recipe recipe : foundRecipes) {
             RecipeDetailResDto recipeDetailResDto = getRecipeDetailDtoWithIsFavorite(userIdx, recipe);
@@ -118,12 +118,14 @@ public class ListService {
         List<Float> keywordVector = fastText.getVector(keyword);
         relatedRecipes.sort(Comparator.comparingDouble(recipe -> -wordSimilarity.getCosineSimilarity(fastText, keywordVector, recipe.getRecipeName())));
         for (Recipe recipe : relatedRecipes) {
-            RecipeDetailResDto recipeDetailResDto = getRecipeDetailDtoWithIsFavorite(userIdx, recipe);
-            if ((wordSimilarity.getCosineSimilarity(fastText, keywordVector, recipe.getRecipeName()) > 0.8) & (!newRecipes.contains(recipeDetailResDto))) {
+            if ((wordSimilarity.getCosineSimilarity(fastText, keywordVector, recipe.getRecipeName()) > 0.7)) {
+                RecipeDetailResDto recipeDetailResDto = getRecipeDetailDtoWithIsFavorite(userIdx, recipe);
                 newRecipes.add(recipeDetailResDto);
             }
         }
-        return new RecipeListResDto(newRecipes);
+        List<RecipeDetailResDto> resultRecipe = List.copyOf(newRecipes);
+
+        return new RecipeListResDto(resultRecipe);
     }
 
     public RecipeListResDto getRecipesByFavorite(String authToken) {
