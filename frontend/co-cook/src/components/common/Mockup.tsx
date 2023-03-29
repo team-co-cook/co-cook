@@ -3,7 +3,7 @@ import mockupImg from "../../assets/image/mockupImg.png";
 
 interface Iprops {
   isVideo: boolean;
-  splashImg: string;
+  screen: string;
 }
 
 function Mockup(props: Iprops) {
@@ -11,7 +11,17 @@ function Mockup(props: Iprops) {
     <StyledMockup>
       <img className="mockup-img" src={mockupImg} alt="" />
       <div className="mockup-screen">
-        <img className="mockup-screen-img" src={props.splashImg} alt="" />
+        {props.isVideo ? (
+          <video
+            className="mockup-screen-img"
+            src={props.screen}
+            autoPlay={true}
+            loop={true}
+            muted={true}
+          ></video>
+        ) : (
+          <img className="mockup-screen-img" src={props.screen} alt="screen" />
+        )}
       </div>
     </StyledMockup>
   );
@@ -21,6 +31,7 @@ export default Mockup;
 
 const StyledMockup = styled.div`
   width: 100%;
+  height: 100%;
   position: relative;
   .mockup-img {
     mix-blend-mode: darken;
@@ -42,7 +53,7 @@ const StyledMockup = styled.div`
 
     &-img {
       width: 100%;
-      aspect-ratio: 1/2.17;
+      aspect-ratio: 1/2.19;
       border-radius: 6%;
     }
   }

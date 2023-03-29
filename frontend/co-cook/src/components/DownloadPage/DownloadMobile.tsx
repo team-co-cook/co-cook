@@ -193,7 +193,7 @@ const StyledDownloadMobile = styled.main`
     }
     & span {
       margin-bottom: 4px;
-      ${({ theme }) => theme.fontStyles.overline}
+      ${({ theme }) => theme.fontStyles.caption}
       color: ${({ theme }) => theme.Colors.RED_PRIMARY};
     }
     & > div p {
@@ -212,17 +212,23 @@ const StyledDownloadMobile = styled.main`
       color: ${({ theme }) => theme.Colors.MONOTONE_BLACK};
     }
     & label {
+      margin-left: 8px;
       word-break: keep-all;
       font-size: 0.8rem;
       color: ${({ theme }) => theme.Colors.MONOTONE_BLACK};
+      ${({ theme }) => theme.fontStyles.body2}
     }
     & a {
       margin-bottom: 24px;
       color: ${({ theme }) => theme.Colors.MONOTONE_BLACK};
+      text-align: center;
       text-decoration: none;
+      ${({ theme }) => theme.fontStyles.button}
     }
     & input {
       margin-bottom: 8px;
+      height: 24px;
+      ${({ theme }) => theme.fontStyles.caption}
     }
   }
   .submit-box {

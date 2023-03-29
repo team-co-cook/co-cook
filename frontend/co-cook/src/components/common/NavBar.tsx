@@ -9,7 +9,7 @@ function NavBar() {
         <LogoRed className="nav-logo" />
       </NavLink>
       <NavLink to={"/install"} className="nav-link">
-        Install
+        Download
       </NavLink>
     </StyledNavBar>
   );
@@ -51,7 +51,7 @@ const StyledNavBar = styled.nav`
     text-decoration: none;
     ${({ theme }) => theme.fontStyles.button}
     cursor: pointer;
-    transition: all 0.1s;
+    transition: all ease-out 0.1s;
     &:hover {
       background-color: ${({ theme }) => theme.Colors.MONOTONE_BLACK};
       color: ${({ theme }) => theme.Colors.MONOTONE_LIGHT};

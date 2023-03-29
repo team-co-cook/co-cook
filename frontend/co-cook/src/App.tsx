@@ -1,4 +1,3 @@
-import NavBar from "./components/NavBar";
 import { ThemeProvider } from "styled-components";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
