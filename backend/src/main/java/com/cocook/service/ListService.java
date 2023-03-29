@@ -8,18 +8,15 @@ import com.cocook.dto.list.RecipesContainingIngredientsCnt;
 import com.cocook.entity.Amount;
 import com.cocook.entity.Recipe;
 import com.cocook.repository.*;
+import com.cocook.util.WordSimilarity;
+import com.github.jfasttext.JFastText;
 import lombok.AllArgsConstructor;
-import org.deeplearning4j.models.word2vec.StaticWord2Vec;
 import org.springframework.beans.factory.annotation.Value;
-import org.deeplearning4j.models.embeddings.loader.WordVectorSerializer;
-import org.deeplearning4j.models.word2vec.Word2Vec;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 
 import javax.persistence.EntityNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.*;
 
 @Service
@@ -31,20 +28,22 @@ public class ListService {
     private final ThemeRepository themeRepository;
     private final CategoryRepository categoryRepository;
     private final AmountRepository amountRepository;
-    private final Word2Vec word2Vec;
+    private final JFastText fastText;
+    private final WordSimilarity wordSimilarity;
 
 //    @Autowired
     public ListService(JwtTokenProvider jwtTokenProvider, RecipeRepository recipeRepository,
                        FavoriteRepository favoriteRepository, ThemeRepository themeRepository,
                        CategoryRepository categoryRepository, AmountRepository amountRepository,
-                       Word2Vec word2Vec) {
+                       JFastText fastText, WordSimilarity wordSimilarity) {
         this.jwtTokenProvider = jwtTokenProvider;
         this.recipeRepository = recipeRepository;
         this.favoriteRepository = favoriteRepository;
         this.themeRepository = themeRepository;
         this.categoryRepository = categoryRepository;
         this.amountRepository = amountRepository;
-        this.word2Vec = word2Vec;
+        this.fastText = fastText;
+        this.wordSimilarity = wordSimilarity;
 //        this.wordVector = WordVectorSerializer.loadTxtVectors(new File("src/main/resources/ko.bin"));
     }
 
@@ -78,6 +77,7 @@ public class ListService {
         return getRecipesByDifficultyAndTime(foundRecipes, userIdx, difficulty, time);
     }
 
+
     public RecipeListResDto getRecipesByKeyword(String authToken, String keyword) {
         if (keyword.trim().isEmpty()) {
             throw new EntityNotFoundException("키워드를 입력해주세요.");
@@ -92,17 +92,14 @@ public class ListService {
         }
 
         List<Recipe> relatedRecipes = recipeRepository.findAll();
-        System.out.println(word2Vec);
-//        relatedRecipes.sort(Comparator.comparingDouble(recipe -> -word2Vec.similarity(keyword, recipe.getRecipeName())));
-//        if (word2Vec != null){
-//            for (Recipe recipe : relatedRecipes) {
-//                RecipeDetailResDto recipeDetailResDto = getRecipeDetailDtoWithIsFavorite(userIdx, recipe);
-//                if ((word2Vec.similarity(keyword, recipe.getRecipeName()) > 0.5) & (!newRecipes.contains(recipeDetailResDto))) {
-//                    newRecipes.add(recipeDetailResDto);
-//                }
-//            }
-//        }
-
+        List<Float> keywordVector = fastText.getVector(keyword);
+        relatedRecipes.sort(Comparator.comparingDouble(recipe -> -wordSimilarity.getCosineSimilarity(fastText, keywordVector, recipe.getRecipeName())));
+        for (Recipe recipe : relatedRecipes) {
+            RecipeDetailResDto recipeDetailResDto = getRecipeDetailDtoWithIsFavorite(userIdx, recipe);
+            if ((wordSimilarity.getCosineSimilarity(fastText, keywordVector, recipe.getRecipeName()) > 0.8) & (!newRecipes.contains(recipeDetailResDto))) {
+                newRecipes.add(recipeDetailResDto);
+            }
+        }
         return new RecipeListResDto(newRecipes);
     }
 
