@@ -29,7 +29,6 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
   /////////////////////////////////////////////////////////////////////////////
   ///PicoVioce
   ///
-
   final List<String> keywordAssets = Platform.isAndroid
       ? [
           "assets/keywords/cocook_ko_android.ppn",
