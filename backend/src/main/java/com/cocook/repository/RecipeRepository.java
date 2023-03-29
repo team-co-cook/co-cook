@@ -13,6 +13,7 @@ import java.util.List;
 public interface RecipeRepository extends JpaRepository<Recipe, Long> {
 
     Recipe findRecipeById(Long id);
+
     @Query(value = "SELECT r.recipe_idx FROM recipe r " +
             "JOIN tag t ON t.recipe_idx = r.recipe_idx " +
             "JOIN theme th ON t.theme_idx = th.theme_idx " +
