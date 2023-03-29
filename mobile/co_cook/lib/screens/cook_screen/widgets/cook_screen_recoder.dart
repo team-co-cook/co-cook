@@ -30,16 +30,22 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
   ///PicoVioce
   ///
 
-  final String keywordAsset = Platform.isAndroid
-      ? "assets/keywords/cocook_ko_android.ppn"
-      : "assets/keywords/cocook_ko_ios.ppn";
+  final List<String> keywordAssets = Platform.isAndroid
+      ? [
+          "assets/keywords/cocook_ko_android.ppn",
+          "assets/keywords/seongwun_ko_android.ppn"
+        ]
+      : [
+          "assets/keywords/cocook_ko_ios.ppn",
+          "assets/keywords/seongwun_ko_ios.ppn"
+        ];
 
   late PorcupineManager _porcupineManager;
 
   void createPorcupineManager() async {
     _porcupineManager = await PorcupineManager.fromKeywordPaths(
       dotenv.env['PICOVOICE_API_KEY'] ?? "",
-      [keywordAsset], // os별 분기처리 해야됨!!
+      keywordAssets, // os별 분기처리 해야됨!!
       _wakeWordCallback,
       modelPath: "assets/keywords/porcupine_params_ko.pv",
     );
@@ -47,7 +53,15 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
   }
 
   _wakeWordCallback(int value) async {
-    await _porcupineManager.stop().then((value) => _startRecord());
+    // value는 감지된 키워드의 인덱스입니다. keywordAssets에서 정의한 순서와 일치합니다.
+    if (value == 0) {
+      // 코국 키워드에 대한 작업 수행
+      print('코쿡');
+      await _porcupineManager.stop().then((value) => _startRecord());
+    } else if (value == 1) {
+      // 성운 키워드에 대한 작업 수행
+      print('성운');
+    }
   }
 
   /////////////////////////////////////////////////////////////////////////////
