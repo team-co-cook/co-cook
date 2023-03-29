@@ -101,11 +101,11 @@ public class DbController {
     }
 
     @GetMapping("/ingredient/{ingredientName}")
-    public ResponseEntity<ApiResponse<Object>> checkIngredient(@RequestHeader("AUTH-TOKEN") String authToken, @PathVariable("ingredientName") String ingredientName) {
-        if (ingredientService.checkIngredient(ingredientName) != null) {
-            return ApiResponse.ok(null);
+    public ResponseEntity<ApiResponse<String>> checkIngredient(@PathVariable("ingredientName") String ingredientName) {
+        if (ingredientService.checkIngredient(ingredientName).isEmpty()) {
+            return ApiResponse.noContent("없는 재료입니다.");
         } else {
-            return ApiResponse.notFound("없는 재료", null);
+            return ApiResponse.ok(null);
         }
     }
 
