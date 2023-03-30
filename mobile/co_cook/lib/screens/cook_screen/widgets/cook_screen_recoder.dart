@@ -32,7 +32,7 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
   ///PicoVioce
   ///
   late List apiKeys;
-  late int apiKeyIndex;
+  int apiKeyIndex = 0;
   int maxIndex = 3;
 
   final List<String> keywordAssets = Platform.isAndroid
@@ -126,10 +126,6 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
       _audioPlayer = AudioPlayer();
     });
     createPorcupineManager();
-
-    // 오늘자 기준 키  인덱스 설정
-    DateTime now = DateTime.now();
-    apiKeyIndex = now.day % 4;
   }
 
   Future<void> setTempDir() async {

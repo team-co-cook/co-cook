@@ -123,7 +123,8 @@ class _CameraScreenState extends State<CameraScreen> {
     String fileName = imgFile!.path.split('/').last;
     MultipartFile multipartFile =
         await MultipartFile.fromFile(imgFile!.path, filename: fileName);
-    print(imgFile!.path);
+    print(fileName);
+
     FormData formData = FormData.fromMap({
       "image": multipartFile,
     });

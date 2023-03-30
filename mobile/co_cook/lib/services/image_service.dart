@@ -9,7 +9,11 @@ class ImageService {
     String url = 'http://j8b302.p.ssafy.io:3000/upload/img';
     try {
       Dio dio = Dio(); // 새로운 Dio 객체 생성
-      return await dio.post(url, data: data);
+      return await dio.post(
+        url,
+        data: data,
+        options: Options(headers: {'Content-Type': 'multipart/form-data'}),
+      );
     } on DioError catch (e) {
       // DioError 처리
       print("postAudio Error : ${e.response}");
