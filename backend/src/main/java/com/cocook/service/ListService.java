@@ -144,7 +144,10 @@ public class ListService {
         }
         Integer currentCounts = 0;
         if (listOperations.size("searchCountsList") != null) {
-            currentCounts = Integer.parseInt(listOperations.rightPop("searchCountsList"));
+            if (listOperations.size("searchCountsList") != 0L) {
+                System.out.println(listOperations.size("searchCountsList"));
+                currentCounts = Integer.parseInt(listOperations.rightPop("searchCountsList"));
+            }
         }
 
         for (Recipe recipe : foundRecipes) {
