@@ -42,14 +42,14 @@ const StyledVoiceSearch = styled.section<{
   }
   display: flex;
   justify-content: center;
-  height: 70vh;
+  height: 500px;
   width: 100vw;
   background-image: url("/src/assets/image/refrigerator.jpg");
   background-size: auto 100vh;
 
   background-position: 50% 20%;
   @media (max-width: 734px) {
-    height: 100vh;
+    height: 700px;
   }
 
   & > div {
@@ -116,7 +116,7 @@ const StyledVoiceSearch = styled.section<{
       width: 250px;
       margin-top: 50px;
       @media (max-width: 734px) {
-        margin-top: -10px;
+        margin-top: -20px;
       }
     }
   }

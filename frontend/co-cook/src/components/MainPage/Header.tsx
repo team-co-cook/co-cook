@@ -76,7 +76,7 @@ const StyledHeader = styled.header`
   }
   & > section {
     width: 100%;
-    height: 480px;
+    height: 350px;
     @media (min-width: 734px) {
       height: 620px;
     }

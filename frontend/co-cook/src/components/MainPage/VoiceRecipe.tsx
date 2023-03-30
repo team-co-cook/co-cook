@@ -3,6 +3,7 @@ import { useInView } from "react-intersection-observer";
 import Mockup from "../common/Mockup";
 import timer from "../../assets/videos/timer.webm";
 import recipeNext from "../../assets/videos/recipeNext.webm";
+import audioWave from "../../assets/videos/audioWave.mp4";
 
 function VoiceRecipe() {
   const { ref, inView, entry } = useInView({
@@ -22,6 +23,7 @@ function VoiceRecipe() {
       </div>
 
       <div>
+        <video className="bg-video" src={audioWave} loop autoPlay muted></video>
         <h2>"코쿡, 타이머"</h2>
         <p>요리 중 손을 쓰기 힘들다면 언제든 말만 하세요.</p>
       </div>
@@ -52,7 +54,7 @@ const StyledVoiceRecipe = styled.section<{ inView: boolean }>`
       transform: translateX(0px) rotate(90deg);
     }
   }
-  height: 60vh;
+  height: 500px;
   width: 100%;
   max-width: 980px;
   justify-content: space-between;
@@ -61,7 +63,7 @@ const StyledVoiceRecipe = styled.section<{ inView: boolean }>`
     flex-direction: column-reverse;
     justify-content: center;
     align-items: center;
-    height: 80vh;
+    height: 650px;
   }
   & > div {
     display: flex;
@@ -103,6 +105,7 @@ const StyledVoiceRecipe = styled.section<{ inView: boolean }>`
     margin-left: 80px;
     & > div:first-child {
       margin-bottom: 24px;
+      animation-duration: 1s;
     }
     & > div:last-child {
       margin-right: 90px;
@@ -110,32 +113,42 @@ const StyledVoiceRecipe = styled.section<{ inView: boolean }>`
     @media (max-width: 734px) {
       align-items: center;
       justify-content: center;
-      margin-top: 72px;
-      margin-left: 500px;
+      margin-left: 450px;
       & > div:last-child {
-        margin-right: 400px;
+        margin-right: 300px;
       }
     }
   }
 
   & .mockup {
-    height: 250px;
+    height: 150px;
     transform: rotate(90deg);
     position: relative;
     bottom: 0px;
     ${({ inView }) =>
       inView
-        ? "animation: contentFadeH 1s ease-out;"
+        ? "animation: contentFadeH 0.5s ease-out;"
         : "opacity: 0; transform: translateY(50px);"}
     z-index: 1;
     width: 250px;
     margin-top: 50px;
     @media (max-width: 734px) {
+      width: 200px;
+      height: 150px;
       margin-top: -10px;
-    }
-    @media (max-width: 734px) {
       align-items: center;
       justify-content: center;
     }
+  }
+
+  .bg-video {
+    z-index: -2;
+    width: 100%;
+    mix-blend-mode: darken;
+    max-width: 600px;
+    height: 80px;
+    left: 0;
+    object-fit: cover;
+    margin-bottom: 16px;
   }
 `;
