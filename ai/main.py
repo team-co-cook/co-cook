@@ -47,8 +47,6 @@ async def upload_audio(audio: UploadFile = File(...)):
     save_path = Path("uploaded_files/"+ formatted_date)
     save_path.mkdir(exist_ok=True)
 
-
-
     # mp3 파일을 저장할 경로 지정
     audio_path = save_path / (formatted_date_time+'_'+audio.filename.split(".")[0] + ".wav")
 
@@ -56,9 +54,6 @@ async def upload_audio(audio: UploadFile = File(...)):
     with audio_path.open("wb") as buffer:
         shutil.copyfileobj(audio.file, buffer)
 
-    # 파일 확장자 사용하여 오디오 형식 지정
-    file_extension = audio.filename.split(".")[-1]
-    
     # 오디오 처리
     audio_data = AudioSegment.from_file(audio_path, format="m4a")
     audio_data.export(audio_path, format="wav")
@@ -77,10 +72,8 @@ def recognize_speech(file_path):
         text = "음성 인식을 할 수 없습니다."
     return text
 
-
 @app.post("/upload/dj")
 async def upload_audio(audio: UploadFile = File(...)):
-    # sample, sample_rate = librosa.load(audio, sr=None, mono=True)
     # 저장할 디렉토리 지정
     today = datetime.date.today()
     formatted_date = today.strftime('%m%d%Y')
@@ -89,8 +82,6 @@ async def upload_audio(audio: UploadFile = File(...)):
     save_path = Path("uploaded_files_dj/"+ formatted_date)
     save_path.mkdir(exist_ok=True)
 
-
-
     # mp3 파일을 저장할 경로 지정
     audio_path = save_path / (formatted_date_time+'_'+ audio.filename.split(".")[0] + ".wav")
 
@@ -98,20 +89,22 @@ async def upload_audio(audio: UploadFile = File(...)):
     with audio_path.open("wb") as buffer:
         shutil.copyfileobj(audio.file, buffer)
 
-    # 파일 확장자 사용하여 오디오 형식 지정
-    # file_extension = audio.filename.split(".")[-1]
-    
     # 오디오 처리
     audio_data = AudioSegment.from_file(audio_path, format="m4a")
     audio_data.export(audio_path, format="wav")
     
-    # audio, sample_rate = librosa.load(audio_path, sr = None)
-
-    # cnt =0
-    # currect_cnt = 0
     label = vm.result(audio_path)
+    result = ""
+    if label == "before":
+        result = "이전"
+    elif label== "next" :
+        result = "다음"
+    elif label== "replay" :
+        result = "다시"
+    elif label== "timer" :
+        result = "타이머"        
 
-    return {"filename": audio.filename, "result" : label}
+    return {"message": "조회 성공", "status" : 200, "result" : result}
 
 @app.post("/upload/ingredient")
 async def upload_audio(audio: UploadFile = File(...)):
@@ -143,8 +136,7 @@ async def upload_audio(audio: UploadFile = File(...)):
     if result == "음성 인식을 할 수 없습니다.":
         return {"message" : result, 'status' : 400, 'data' : None}
 
-    headers = {'AUTH-TOKEN': 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwicm9sZXMiOlsiUk9MRV9BRE1JTiJdLCJpYXQiOjE2Nzk0ODUzMTMsImV4cCI6MTY4MDc4MTMxM30.FGt7kCSx_jCjoWknclZylNDBnxZCU7Re7-mxIEiFyk8'}
-    response = requests.get('http://localhost:8080/api/v1/db/ingredient/'+ result, headers=headers)
+    response = requests.get('http://localhost:8080/api/v1/search/ingredient/'+ result)
     data = response.json()
     isIn = data['status']
 
