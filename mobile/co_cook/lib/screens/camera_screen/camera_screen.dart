@@ -1,11 +1,12 @@
 import 'dart:io';
-
+import 'package:co_cook/services/image_service.dart';
 import 'package:camera/camera.dart';
 import 'package:co_cook/screens/camera_screen/widgets/camera_result.dart';
 import 'package:co_cook/styles/colors.dart';
 import 'package:co_cook/styles/shadows.dart';
 import 'package:co_cook/styles/text_styles.dart';
 import 'package:co_cook/utils/route.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
@@ -13,7 +14,8 @@ import 'package:transparent_image/transparent_image.dart';
 import 'package:zoom_tap_animation/zoom_tap_animation.dart';
 
 class CameraScreen extends StatefulWidget {
-  const CameraScreen({super.key});
+  const CameraScreen({super.key, required this.setWordAndSearch});
+  final Function setWordAndSearch;
 
   @override
   State<CameraScreen> createState() => _CameraScreenState();
@@ -39,17 +41,30 @@ class _CameraScreenState extends State<CameraScreen> {
     setState(() {
       isProcess = true;
     });
-    Future.delayed(Duration(seconds: 1)).then((value) => _searchFail());
+    await Future.delayed(Duration(seconds: 1));
+    bool state = await getImgData();
+    if (state) {
+      Navigator.pop(context);
+    } else {
+      _searchFail();
+    }
   }
 
   Future<void> _selectPhoto() async {
     _cameraController.pausePreview();
-    imgFile = await _picker.pickImage(source: ImageSource.gallery);
     setState(() {
       isProcess = true;
     });
+    imgFile = await _picker.pickImage(source: ImageSource.gallery);
     if (imgFile != null) {
-      print(imgFile!.path);
+      print('이미지 검색 중');
+      bool state = await getImgData();
+      print(state);
+      if (state) {
+        Navigator.pop(context);
+      } else {
+        _searchFail();
+      }
     } else {
       _searchCancel();
     }
@@ -102,6 +117,33 @@ class _CameraScreenState extends State<CameraScreen> {
         }
       }
     });
+  }
+
+  Future<bool> getImgData() async {
+    String fileName = imgFile!.path.split('/').last;
+    MultipartFile multipartFile =
+        await MultipartFile.fromFile(imgFile!.path, filename: fileName);
+    print(imgFile!.path);
+    FormData formData = FormData.fromMap({
+      "image": multipartFile,
+    });
+
+    // API 요청
+    ImageService searchService = ImageService();
+    Response? response = await searchService.postImage(formData);
+    print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!$response');
+    if (response?.statusCode == 200) {
+      if (response!.data != null) {
+        setState(() {
+          widget.setWordAndSearch(response.data);
+        });
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
   }
 
   @override

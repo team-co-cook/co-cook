@@ -130,7 +130,7 @@ class _AiRecommendState extends State<AiRecommend> {
     return ZoomTapAnimation(
       end: 0.98,
       onTap: () {
-        pushScreen(context, CameraScreen());
+        // pushScreen(context, CameraScreen());
       },
       child: Stack(children: [
         Container(

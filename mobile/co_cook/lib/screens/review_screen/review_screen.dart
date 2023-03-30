@@ -115,7 +115,6 @@ class _ReviewScreenState extends State<ReviewScreen> {
     String fileName = _image!.path.split('/').last;
     MultipartFile multipartFile =
         await MultipartFile.fromFile(_image!.path, filename: fileName);
-    // 여기서 'reviewImg'는 서버에서 요구하는 파일의 키값입니다. 서버 요구에 따라 적절하게 변경해 주세요.
 
     // API 요청
     DetailService apiService = DetailService();
@@ -130,6 +129,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
     // reviewData와 multipartFile을 함께 전송하기 위해 FormData를 사용합니다.
     FormData formData = FormData.fromMap({
       "reviewDetail": jsonString,
+      // 여기서 'reviewImg'는 서버에서 요구하는 파일의 키값입니다. 서버 요구에 따라 적절하게 변경해 주세요.
       "reviewImg": multipartFile,
     });
 

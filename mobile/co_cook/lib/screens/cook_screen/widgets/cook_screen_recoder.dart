@@ -32,7 +32,7 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
   ///PicoVioce
   ///
   late List apiKeys;
-  int apiKeyIndex = 0;
+  late int apiKeyIndex;
   int maxIndex = 3;
 
   final List<String> keywordAssets = Platform.isAndroid
@@ -180,7 +180,7 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
               _isRecording = false;
               if (_isSay) {
                 // 사용자가 말 했을 때
-                postAudio('${cookTempDir.path}/$audioFilePk.m4a');
+                postAudioDJ('${cookTempDir.path}/$audioFilePk.m4a');
                 _audioPlayer.play(
                     DeviceFileSource('${cookTempDir.path}/$audioFilePk.m4a'));
                 setState(() {
@@ -203,7 +203,7 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
   }
 
   // 오디오 전송
-  Future<void> postAudio(String path) async {
+  Future<void> postAudioDJ(String path) async {
     // API 요청
     AudioService searchService = AudioService();
     Response? response = await searchService.postAudioDJ(path);
