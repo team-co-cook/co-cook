@@ -11,15 +11,13 @@ from tensorflow.keras.models import load_model
 import librosa
 import numpy as np
 import voice_method as vm
+import image_method as im
 import io
+import os
 import soundfile as sf
 import requests
 
-
 logging.basicConfig(filename='app.log', level=logging.INFO, format='%(asctime)s - %(levelname)s: %(message)s')
-
-
-
 
 app = FastAPI()
 
@@ -33,8 +31,6 @@ app.add_middleware(
 
 @app.get("/hello")
 async def hello():
-
-
     return{"message" : "hello"}
 
 @app.post("/upload")
@@ -46,8 +42,6 @@ async def upload_audio(audio: UploadFile = File(...)):
     formatted_date_time = time.strftime('%Y%m%d%H%M')
     save_path = Path("uploaded_files/"+ formatted_date)
     save_path.mkdir(exist_ok=True)
-
-
 
     # mp3 파일을 저장할 경로 지정
     audio_path = save_path / (formatted_date_time+'_'+audio.filename.split(".")[0] + ".wav")
@@ -77,7 +71,6 @@ def recognize_speech(file_path):
         text = "음성 인식을 할 수 없습니다."
     return text
 
-
 @app.post("/upload/dj")
 async def upload_audio(audio: UploadFile = File(...)):
     # sample, sample_rate = librosa.load(audio, sr=None, mono=True)
@@ -88,8 +81,6 @@ async def upload_audio(audio: UploadFile = File(...)):
     formatted_date_time = time.strftime('%Y%m%d%H%M')
     save_path = Path("uploaded_files_dj/"+ formatted_date)
     save_path.mkdir(exist_ok=True)
-
-
 
     # mp3 파일을 저장할 경로 지정
     audio_path = save_path / (formatted_date_time+'_'+ audio.filename.split(".")[0] + ".wav")
@@ -120,10 +111,9 @@ async def upload_audio(audio: UploadFile = File(...)):
     formatted_date = today.strftime('%m%d%Y')
     time = datetime.datetime.now()
     formatted_date_time = time.strftime('%Y%m%d%H%M')
+
     save_path = Path("uploaded_files/"+ formatted_date)
     save_path.mkdir(exist_ok=True)
-
-
 
     # mp3 파일을 저장할 경로 지정
     audio_path = save_path / (formatted_date_time+'_'+audio.filename.split(".")[0] + ".wav")
@@ -163,3 +153,25 @@ def recognize_speech(file_path):
     except sr.UnknownValueError:
         text = "음성 인식을 할 수 없습니다."
     return text
+
+@app.post("/upload/img")
+async def upload_img(image: UploadFile = File(...)):
+    today = datetime.date.today()
+    formatted_date = today.strftime('%m%d%Y')
+    time = datetime.datetime.now()
+    formatted_date_time = time.strftime('%Y%m%d%H%M')
+    save_path = Path("uploaded_files_hs/"+ formatted_date)
+    save_path.mkdir(exist_ok=True)
+
+    # mp3 파일을 저장할 경로 지정
+    image_path = save_path / (formatted_date_time+'_'+ image.filename)
+    print(image_path)
+    # 파일 저장
+    with image_path.open("wb") as buffer:
+        shutil.copyfileobj(image.file, buffer)
+        result = await im.find_image(image_path)
+    
+    # os.remove(image_path)
+    
+    return result
+
