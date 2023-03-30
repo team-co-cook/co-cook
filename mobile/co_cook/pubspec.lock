@@ -885,6 +885,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.4.18"
+  tflite_audio:
+    dependency: "direct main"
+    description:
+      name: tflite_audio
+      sha256: "5eac80c2d7ee3871da802a7a1442cd4f4ce02a77737b0776eb9dae86c5d8443b"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.3.0"
   transparent_image:
     dependency: "direct main"
     description:

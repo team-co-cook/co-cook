@@ -1,21 +1,17 @@
 import 'dart:io';
 import 'dart:async';
 import 'package:dio/dio.dart';
+import 'package:record/record.dart';
 import 'package:flutter/material.dart';
+import 'package:tflite_audio/tflite_audio.dart';
+import 'package:audioplayers/audioplayers.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 
 import 'package:co_cook/styles/colors.dart';
 import 'package:co_cook/styles/text_styles.dart';
 import 'package:co_cook/services/audio_service.dart';
-
-import 'package:record/record.dart';
-import 'package:audioplayers/audioplayers.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:porcupine_flutter/porcupine.dart';
-import 'package:porcupine_flutter/porcupine_error.dart';
-import 'package:porcupine_flutter/porcupine_manager.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:device_info_plus/device_info_plus.dart';
-
 import 'package:co_cook/widgets/sound_meter/sound_meter.dart';
 
 class CookScreenRecoder extends StatefulWidget {
@@ -28,80 +24,40 @@ class CookScreenRecoder extends StatefulWidget {
 }
 
 class _CookScreenRecoderState extends State<CookScreenRecoder> {
-  /////////////////////////////////////////////////////////////////////////////
-  ///PicoVioce
-  ///
-  late List apiKeys;
-  int apiKeyIndex = 0;
-  int maxIndex = 3;
-
-  final List<String> keywordAssets = Platform.isAndroid
-      ? [
-          "assets/keywords/cocook_ko_android.ppn",
-          "assets/keywords/seongwun_ko_android.ppn"
-        ]
-      : [
-          "assets/keywords/cocook_ko_ios.ppn",
-          "assets/keywords/seongwun_ko_ios.ppn"
-        ];
-
-  late PorcupineManager _porcupineManager;
-
-  void createPorcupineManager() async {
-    apiKeys = [
-      dotenv.env['PICOVOICE_API_KEY_1'],
-      dotenv.env['PICOVOICE_API_KEY_2'],
-      dotenv.env['PICOVOICE_API_KEY_3'],
-      dotenv.env['PICOVOICE_API_KEY_4']
-    ];
-
-    try {
-      // PorcupineManager를 생성하고 키워드 검출을 시작합니다.
-      _porcupineManager = await PorcupineManager.fromKeywordPaths(
-          apiKeys[apiKeyIndex],
-          keywordAssets, // os별 분기처리 해야됨!!
-          _wakeWordCallback,
-          modelPath: "assets/keywords/porcupine_params_ko.pv",
-          sensitivities: [0.8, 0.8] // 기본값은 0.5 높을수록 더 잘 응답한다. 오답일 경우도 늘어난다.
-          );
-      await _porcupineManager.start();
-    } catch (e) {
-      if (e is PorcupineActivationLimitException) {
-        // 다음 인덱스를 사용합니다.
-        apiKeyIndex++;
-
-        // 최대 인덱스에 도달하면 다시 0번 인덱스로 돌아갑니다.
-        if (apiKeyIndex > maxIndex) {
-          apiKeyIndex = 0;
-        }
-
-        // PorcupineManager를 생성하고 키워드 검출을 시작합니다.
-        _porcupineManager = await PorcupineManager.fromKeywordPaths(
-            apiKeys[apiKeyIndex],
-            keywordAssets, // os별 분기처리 해야됨!!
-            _wakeWordCallback,
-            modelPath: "assets/keywords/porcupine_params_ko.pv",
-            sensitivities: [0.8, 0.8] // 기본값은 0.5 높을수록 더 잘 응답한다. 오답일 경우도 늘어난다.
-            );
-        await _porcupineManager.start();
-      } else {
-        // 다른 예외는 다시 throw합니다.
-        throw e;
-      }
-    }
+  @override
+  void initState() {
+    super.initState();
+    loadWakeWordModel();
+    setTempDir();
+    setState(() {
+      _audioPlayer = AudioPlayer();
+    });
+    startWakeWordRecord();
   }
 
-  _wakeWordCallback(int value) async {
-    // value는 감지된 키워드의 인덱스입니다. keywordAssets에서 정의한 순서와 일치합니다.
-    if (value == 0) {
-      // 코국 키워드에 대한 작업 수행
-      print('코쿡');
-      await _porcupineManager.stop().then((value) => _startRecord());
-    } else if (value == 1) {
-      // 성운 키워드에 대한 작업 수행
-      print('성운');
-      await _porcupineManager.stop().then((value) => _startRecord());
-    }
+  Future<void> loadWakeWordModel() async {
+    await TfliteAudio.loadModel(
+        model: 'assets/models/wake_word.tflite',
+        label: 'assets/models/wake_word_labels.txt',
+        inputType: 'rawAudio');
+  }
+
+  late Stream<Map<dynamic, dynamic>> recognitionStream;
+  String tfliteResult = '';
+
+  Future<void> startWakeWordRecord() async {
+    recognitionStream = TfliteAudio.startAudioRecognition(
+        sampleRate: 44100,
+        bufferSize: 10000,
+        numOfInferences: 10,
+        detectionThreshold: 0.5);
+    recognitionStream.listen((event) {
+      setState(() {
+        tfliteResult = event["recognitionResult"];
+      });
+    }).onDone(() {
+      startWakeWordRecord();
+    });
   }
 
   /////////////////////////////////////////////////////////////////////////////
@@ -116,21 +72,6 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
   int audioFilePk = 0; // 녹음파일 제목 pk값
 
   late AudioPlayer _audioPlayer; // 음성인식시 효과음 재생할 player 선언
-
-  @override
-  void initState() {
-    super.initState();
-
-    setTempDir();
-    setState(() {
-      _audioPlayer = AudioPlayer();
-    });
-    createPorcupineManager();
-
-    // 오늘자 기준 키  인덱스 설정
-    DateTime now = DateTime.now();
-    apiKeyIndex = now.day % 4;
-  }
 
   Future<void> setTempDir() async {
     final Directory tempDir = await getTemporaryDirectory();
@@ -192,7 +133,7 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
               }
             }).then((value) {
               audioFilePk++;
-              _porcupineManager.start();
+              print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
             });
           });
         });
@@ -265,8 +206,8 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
     if (cookTempDir.existsSync()) {
       cookTempDir.listSync().forEach((file) => file.deleteSync());
     }
-    _porcupineManager.stop();
-    _porcupineManager.delete();
+    TfliteAudio.stopAudioRecognition();
+
     super.dispose();
   }
 
@@ -275,6 +216,10 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
     return Container(
       child: Row(
         children: [
+          Text(tfliteResult),
+          TextButton(onPressed: startWakeWordRecord, child: Text("시작")),
+          TextButton(
+              onPressed: TfliteAudio.stopAudioRecognition, child: Text("종료")),
           SoundMeter(
               volume: _isRecording ? volume0to(100).toDouble() : 0,
               isSpeak: _isRecording,

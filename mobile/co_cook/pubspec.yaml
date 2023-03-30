@@ -60,6 +60,7 @@ dependencies:
   sensors:
   sensors_plus: ^2.0.2
   shimmer: ^2.0.0
+  tflite_audio: ^0.3.0
 
 dev_dependencies:
   flutter_test:
@@ -98,13 +99,8 @@ flutter:
     # audios
     - assets/audios/
 
-    # picovoice keyword
-    - assets/keywords/
-    - assets/keywords/cocook_ko_android.ppn
-    - assets/keywords/cocook_ko_ios.ppn
-    - assets/keywords/seongwun_ko_android.ppn
-    - assets/keywords/seongwun_ko_ios.ppn
-    - assets/keywords/porcupine_params_ko.pv
+    # tensor flow lite
+    - assets/models/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
