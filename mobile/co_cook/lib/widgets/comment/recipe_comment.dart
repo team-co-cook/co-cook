@@ -3,6 +3,7 @@ import 'dart:convert'; // decode 가져오기
 import 'package:dio/dio.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:transparent_image/transparent_image.dart';
 
 import 'package:co_cook/styles/colors.dart';
 import 'package:co_cook/styles/text_styles.dart';
@@ -142,10 +143,11 @@ class _RecipeCommentState extends State<RecipeComment> {
             aspectRatio: 16 / 10, // 비율 설정
             child: ClipRRect(
               borderRadius: BorderRadius.circular(16.0),
-              child: Image.network(
-                widget.review['imgPath'], // 이미지 URL
-                fit: BoxFit.cover, // 이미지를 박스 크기에 맞게 조정
-              ),
+              child: FadeInImage.memoryNetwork(
+                  fadeInDuration: const Duration(milliseconds: 200),
+                  fit: BoxFit.cover,
+                  placeholder: kTransparentImage,
+                  image: widget.review['imgPath']),
             ),
           ),
           Container(

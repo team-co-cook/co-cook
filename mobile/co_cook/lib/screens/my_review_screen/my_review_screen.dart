@@ -48,6 +48,7 @@ class _MyReviewScreenState extends State<MyReviewScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          automaticallyImplyLeading: false,
           backgroundColor: CustomColors.monotoneLight,
           elevation: 0.5,
           title: const SizedBox.shrink(),

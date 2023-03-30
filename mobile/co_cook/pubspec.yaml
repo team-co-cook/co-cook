@@ -100,6 +100,11 @@ flutter:
 
     # picovoice keyword
     - assets/keywords/
+    - assets/keywords/cocook_ko_android.ppn
+    - assets/keywords/cocook_ko_ios.ppn
+    - assets/keywords/seongwun_ko_android.ppn
+    - assets/keywords/seongwun_ko_ios.ppn
+    - assets/keywords/porcupine_params_ko.pv
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

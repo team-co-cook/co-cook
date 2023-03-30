@@ -255,7 +255,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
                           label: '취소',
                           color: ButtonType.none,
                           onPressed: () {
-                            Navigator.pop(context);
+                            showCloseConfirmDialog(context);
                           }),
                     )
                   ],
@@ -280,4 +280,51 @@ void gotoPhotoCard(BuildContext context, String _text, XFile _image,
             recipeName: recipeName,
           ));
   Navigator.pushReplacement(context, photoCardScreen);
+}
+
+Future<void> showCloseConfirmDialog(BuildContext context) async {
+  return showDialog<void>(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        content: Text('한줄평을 저장하지 않으면 이 음식의 한줄평을 다시 남김 수 없습니다.',
+            style: CustomTextStyles()
+                .body1
+                .copyWith(color: CustomColors.monotoneBlack)),
+        actions: [
+          TextButton(
+            child: Text('취소',
+                style: CustomTextStyles()
+                    .body1
+                    .copyWith(color: CustomColors.monotoneBlack)),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.transparent,
+              shadowColor: Colors.transparent,
+              elevation: 0,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+          ),
+          TextButton(
+            child: Text('확인',
+                style: CustomTextStyles()
+                    .body1
+                    .copyWith(color: CustomColors.redPrimary)),
+            onPressed: () {
+              Navigator.of(context).pop();
+              Navigator.pop(context);
+            },
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.transparent,
+              shadowColor: Colors.transparent,
+              elevation: 0,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+          ),
+        ],
+      );
+    },
+  );
 }

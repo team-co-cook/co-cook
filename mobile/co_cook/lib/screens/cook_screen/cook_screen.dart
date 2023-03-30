@@ -55,10 +55,9 @@ class _CookScreenState extends State<CookScreen> {
     super.dispose();
   }
 
-  void shutdownCook() async {
+  void shutdownCook(BuildContext context) async {
     _accelerometerSub.cancel();
     await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-    // .then((value) => Navigator.pop(context));
     Navigator.pop(context);
   }
 
@@ -103,7 +102,9 @@ class _CookScreenState extends State<CookScreen> {
                       CommonButton(
                           label: "종료",
                           color: ButtonType.red,
-                          onPressed: shutdownCook)
+                          onPressed: () {
+                            showCloseConfirmDialog(context, shutdownCook);
+                          })
                     ],
                   ),
                 ),
@@ -115,4 +116,55 @@ class _CookScreenState extends State<CookScreen> {
                     recipeName: _recipeData['recipeName'])
                 : Container());
   }
+}
+
+Future<void> showCloseConfirmDialog(BuildContext context, onPressed) async {
+  return showDialog<void>(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text('종료하시겠습니까?',
+            style: CustomTextStyles()
+                .body1
+                .copyWith(color: CustomColors.monotoneBlack)),
+        content: Text('진행사항은 저장되지 않습니다.',
+            style: CustomTextStyles()
+                .body1
+                .copyWith(color: CustomColors.monotoneBlack)),
+        actions: [
+          TextButton(
+            child: Text('취소',
+                style: CustomTextStyles()
+                    .body1
+                    .copyWith(color: CustomColors.monotoneBlack)),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.transparent,
+              shadowColor: Colors.transparent,
+              elevation: 0,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+          ),
+          TextButton(
+            child: Text('종료',
+                style: CustomTextStyles()
+                    .body1
+                    .copyWith(color: CustomColors.redPrimary)),
+            onPressed: () {
+              Navigator.of(context).pop();
+              onPressed(context);
+            },
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.transparent,
+              shadowColor: Colors.transparent,
+              elevation: 0,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+          ),
+        ],
+      );
+    },
+  );
 }
