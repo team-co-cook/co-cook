@@ -45,3 +45,11 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
 }
+
+bootJar {
+    exclude 'wiki.ko.bin'
+}
+
+jar {
+    exclude 'wiki.ko.bin'
+}
