@@ -8,39 +8,49 @@ import com.cocook.dto.list.RecipesContainingIngredientsCnt;
 import com.cocook.entity.Amount;
 import com.cocook.entity.Recipe;
 import com.cocook.repository.*;
+import com.cocook.util.WordSimilarity;
+import com.github.jfasttext.JFastText;
 import lombok.AllArgsConstructor;
-//import org.deeplearning4j.models.word2vec.Word2Vec;
-//import org.deeplearning4j.models.word2vec.WordVectors;
+
+import org.springframework.data.redis.core.ListOperations;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ZSetOperations;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 
 import javax.persistence.EntityNotFoundException;
 import java.util.*;
-import java.io.File;
 
 @Service
 public class ListService {
 
-    private JwtTokenProvider jwtTokenProvider;
-    private RecipeRepository recipeRepository;
-    private FavoriteRepository favoriteRepository;
-    private ThemeRepository themeRepository;
-    private CategoryRepository categoryRepository;
-    private AmountRepository amountRepository;
-//    private WordVector wordVector;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final RecipeRepository recipeRepository;
+    private final FavoriteRepository favoriteRepository;
+    private final ThemeRepository themeRepository;
+    private final CategoryRepository categoryRepository;
+    private final AmountRepository amountRepository;
+    private final RedisTemplate<String, String> redisTemplate;
+    private final JFastText fastText;
+    private final WordSimilarity wordSimilarity;
 
 //    @Autowired
     public ListService(JwtTokenProvider jwtTokenProvider, RecipeRepository recipeRepository,
                        FavoriteRepository favoriteRepository, ThemeRepository themeRepository,
-                       CategoryRepository categoryRepository, AmountRepository amountRepository
-                       ) {
+                       CategoryRepository categoryRepository, AmountRepository amountRepository,
+                       RedisTemplate<String, String> redisTemplate,
+                       JFastText fastText, WordSimilarity wordSimilarity) {
         this.jwtTokenProvider = jwtTokenProvider;
         this.recipeRepository = recipeRepository;
         this.favoriteRepository = favoriteRepository;
         this.themeRepository = themeRepository;
         this.categoryRepository = categoryRepository;
         this.amountRepository = amountRepository;
+        this.redisTemplate = redisTemplate;
+        this.fastText = fastText;
+        this.wordSimilarity = wordSimilarity;
 //        this.wordVector = WordVectorSerializer.loadTxtVectors(new File("src/main/resources/ko.bin"));
     }
 
@@ -74,29 +84,48 @@ public class ListService {
         return getRecipesByDifficultyAndTime(foundRecipes, userIdx, difficulty, time);
     }
 
+
     public RecipeListResDto getRecipesByKeyword(String authToken, String keyword) {
         if (keyword.trim().isEmpty()) {
             throw new EntityNotFoundException("키워드를 입력해주세요.");
         }
         Long userIdx = jwtTokenProvider.getUserIdx(authToken);
         List<Recipe> foundRecipes = recipeRepository.findByRecipeNameContainingOrderByIdDesc(keyword);
-        List<RecipeDetailResDto> newRecipes = new ArrayList<>();
+        Set<RecipeDetailResDto> newRecipes = new HashSet<>();
 
         for (Recipe recipe : foundRecipes) {
             RecipeDetailResDto recipeDetailResDto = getRecipeDetailDtoWithIsFavorite(userIdx, recipe);
             newRecipes.add(recipeDetailResDto);
+
+            ZSetOperations<String, String> zSetOperations = redisTemplate.opsForZSet();
+            zSetOperations.incrementScore("searchHistorySet", recipe.getRecipeName(), 1);
+            ListOperations<String, String> listOperations = redisTemplate.opsForList();
+            Long length = listOperations.size("searchHistoryList");
+            if (length == null || length < 1000) {
+                listOperations.rightPush("searchHistoryList", recipe.getRecipeName());
+            } else {
+                listOperations.leftPop("searchHistoryList");
+                listOperations.rightPush("searchHistoryList", recipe.getRecipeName());
+                zSetOperations.incrementScore("searchHistorySet", recipe.getRecipeName(), -1);
+                Double score = zSetOperations.score("searchHistorySet", recipe.getRecipeName());
+                if (score != null && score == 0) {
+                    zSetOperations.remove("searchHistorySet", recipe.getRecipeName());
+                }
+            }
         }
 
         List<Recipe> relatedRecipes = recipeRepository.findAll();
-//        relatedRecipes.sort(Comparator.comparingDouble(recipe -> -word2Vec.similarity(keyword, recipe.getRecipeName())));
-//        for (Recipe recipe : relatedRecipes) {
-//            if ((word2Vec.similarity(keyword, recipe.getRecipeName()) > 0.5) & (!newRecipes.contains(recipe))) {
-//                RecipeDetailResDto recipeDetailResDto = getRecipeDetailDtoWithIsFavorite(userIdx, recipe);
-//                newRecipes.add(recipeDetailResDto);
-//            }
-//        }
+        List<Float> keywordVector = fastText.getVector(keyword);
+        relatedRecipes.sort(Comparator.comparingDouble(recipe -> -wordSimilarity.getCosineSimilarity(fastText, keywordVector, recipe.getRecipeName())));
+        for (Recipe recipe : relatedRecipes) {
+            if ((wordSimilarity.getCosineSimilarity(fastText, keywordVector, recipe.getRecipeName()) > 0.7)) {
+                RecipeDetailResDto recipeDetailResDto = getRecipeDetailDtoWithIsFavorite(userIdx, recipe);
+                newRecipes.add(recipeDetailResDto);
+            }
+        }
+        List<RecipeDetailResDto> resultRecipe = List.copyOf(newRecipes);
 
-        return new RecipeListResDto(newRecipes);
+        return new RecipeListResDto(resultRecipe);
     }
 
     public RecipeListResDto getRecipesByFavorite(String authToken) {
