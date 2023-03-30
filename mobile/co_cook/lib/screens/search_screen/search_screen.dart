@@ -210,15 +210,24 @@ class _SearchScreenState extends State<SearchScreen> {
                                   int index = entry.key;
                                   String word = entry.value;
                                   return Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
-                                      Text(
-                                        '${index + 1}위',
-                                        style: CustomTextStyles()
-                                            .body1
-                                            .copyWith(
-                                              color: CustomColors.monotoneGray,
-                                            ),
+                                      SizedBox(
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width /
+                                              4),
+                                      SizedBox(
+                                        width: 30,
+                                        child: Text(
+                                          '${index + 1}위',
+                                          style: CustomTextStyles()
+                                              .body1
+                                              .copyWith(
+                                                color:
+                                                    CustomColors.monotoneGray,
+                                              ),
+                                        ),
                                       ),
                                       SizedBox(width: 8.0),
                                       CommonButton(
