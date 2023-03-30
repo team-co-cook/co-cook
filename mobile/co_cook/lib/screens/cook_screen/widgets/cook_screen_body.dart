@@ -1,19 +1,19 @@
-import 'dart:async';
-import 'package:co_cook/screens/review_screen/review_screen.dart';
-import 'package:co_cook/styles/shadows.dart';
-import 'package:dio/dio.dart';
 import 'dart:math';
-
-import 'package:flutter_tts/flutter_tts.dart';
-import 'package:co_cook/services/detail_service.dart';
-import 'package:flutter/material.dart';
-import 'package:co_cook/styles/colors.dart';
-import 'package:co_cook/styles/text_styles.dart';
+import 'dart:async';
+import 'package:dio/dio.dart';
 import 'package:flutter/services.dart';
-import 'package:transparent_image/transparent_image.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 import 'package:word_break_text/word_break_text.dart';
-import 'package:zoom_tap_animation/zoom_tap_animation.dart';
-import 'cook_screen_timer.dart';
+import 'package:transparent_image/transparent_image.dart';
+
+import 'package:co_cook/styles/colors.dart';
+import 'package:co_cook/styles/shadows.dart';
+import 'package:co_cook/styles/text_styles.dart';
+
+import 'package:co_cook/services/detail_service.dart';
+import 'package:co_cook/screens/review_screen/review_screen.dart';
+import 'package:co_cook/screens/cook_screen/widgets/cook_screen_timer.dart';
 
 class CookScreenBody extends StatefulWidget {
   const CookScreenBody(
@@ -205,10 +205,16 @@ class _CookScreenBodyState extends State<CookScreenBody>
                                         Container(
                                           decoration: BoxDecoration(
                                             image: DecorationImage(
-                                              image: NetworkImage(
-                                                  _firstData['recipeImgPath']),
-                                              fit: BoxFit.cover,
-                                            ),
+                                                image: _firstData[
+                                                            'recipeImgPath'] !=
+                                                        null
+                                                    ? NetworkImage(_firstData[
+                                                                'recipeImgPath']
+                                                            as String)
+                                                        as ImageProvider
+                                                    : const AssetImage(
+                                                        'assets/images/background/white_background.jpg'),
+                                                fit: BoxFit.cover),
                                             borderRadius:
                                                 BorderRadius.circular(16.0),
                                           ),
@@ -238,7 +244,7 @@ class _CookScreenBodyState extends State<CookScreenBody>
                                         Positioned.fill(
                                           child: Center(
                                             child: Text(
-                                                _firstData['recipeName'],
+                                                _firstData['recipeName'] ?? '',
                                                 style: CustomTextStyles()
                                                     .title1
                                                     .copyWith(

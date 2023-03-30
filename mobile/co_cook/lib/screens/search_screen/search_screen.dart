@@ -1,6 +1,7 @@
 import 'package:co_cook/screens/camera_screen/camera_screen.dart';
 import 'package:co_cook/utils/route.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:dio/dio.dart';
 import 'dart:convert';
 
@@ -23,12 +24,38 @@ class SearchScreen extends StatefulWidget {
 class _SearchScreenState extends State<SearchScreen> {
   String? _searchWord;
   final _focusNode = FocusNode(); // 포커싱 여부를 추적하는 클래스 인스턴스
+  final TextEditingController _customTextFieldController =
+      TextEditingController();
 
   List dataList = [];
-  List exampleWord = ['두부', '마늘', '김치찌개', '치킨마요덮밥'];
+  List trendWord = ['두부', '감자'];
+
+  @override
+  void initState() {
+    super.initState();
+    getTrendData();
+  }
+
+  Future<void> getTrendData() async {
+    // API 요청
+    SearchService searchService = SearchService();
+    Response? response = await searchService.getTrendList();
+    if (response?.statusCode == 200) {
+      Map? decodeRes = await jsonDecode(response.toString());
+      if (decodeRes != null) {
+        setState(() {
+          dataList = decodeRes["data"];
+        });
+      }
+    }
+  }
 
   Future<void> getSearchData(String keyword) async {
     if (keyword == '') {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("검색어가 존재하지 않습니다."),
+        duration: Duration(seconds: 1),
+      ));
       return;
     }
 
@@ -65,7 +92,15 @@ class _SearchScreenState extends State<SearchScreen> {
     setState(() {
       _searchWord = word;
     });
+    _customTextFieldController.text = _searchWord!;
     getSearchData(word);
+  }
+
+  // 커스텀 텍스트 필드에 내려주기 위한 onChange-setState 함수
+  void _onWordChanged(String value) {
+    setState(() {
+      _searchWord = value;
+    });
   }
 
   @override
@@ -75,92 +110,150 @@ class _SearchScreenState extends State<SearchScreen> {
       child: Scaffold(
         backgroundColor: CustomColors.redLight,
         appBar: AppBar(
+          automaticallyImplyLeading: false,
           backgroundColor: CustomColors.monotoneLight,
           elevation: 0.5,
           toolbarHeight: 100,
           title: Padding(
-              padding: const EdgeInsets.fromLTRB(0, 30, 0, 10),
-              child: CustomTextField(
-                onChanged: onWordChanged,
-                isFocus: false,
-                isSearch: true,
-                onSubmitted: (value) {
-                  getSearchData(value);
-                },
-              )),
+            padding: const EdgeInsets.fromLTRB(0, 30, 0, 10),
+            child: Row(
+              children: [
+                Expanded(
+                  child: CustomTextField(
+                    controller: _customTextFieldController,
+                    onChanged: _onWordChanged,
+                    isFocus: false,
+                    isSearch: true,
+                    onSubmitted: (value) {
+                      getSearchData(value);
+                    },
+                  ),
+                ),
+                if (_searchWord != null && _searchWord!.isNotEmpty)
+                  IconButton(
+                    color: CustomColors.monotoneGray,
+                    onPressed: () {
+                      setState(() {
+                        _searchWord = '';
+                        dataList = [];
+                      });
+                      // 커스텀 텍스트 필드의 컨트롤러를 사용하여 텍스트 필드 값을 업데이트
+                      _customTextFieldController.text = _searchWord!;
+                    },
+                    icon: Icon(Icons.close),
+                    // 기본 효과 제거
+                    splashRadius: 0.01,
+                    highlightColor: Colors.transparent,
+                    splashColor: Colors.transparent,
+                  ),
+                IconButton(
+                  color: CustomColors.monotoneGray,
+                  onPressed: () => pushScreen(context, CameraScreen()),
+                  icon: Icon(CupertinoIcons.camera),
+                  // 기본 효과 제거
+                  splashRadius: 0.01,
+                  highlightColor: Colors.transparent,
+                  splashColor: Colors.transparent,
+                ),
+              ],
+            ),
+          ),
         ),
         body: Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(12, 0, 12, 0),
+          child: CustomScrollView(
             physics: const BouncingScrollPhysics(
                 parent: AlwaysScrollableScrollPhysics()),
-            child: Align(
-              alignment: Alignment.topCenter,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  GestureDetector(
-                    onTap: () => pushScreen(context, CameraScreen()),
-                    child: Image.asset(
-                      'assets/images/button_img/CameraSearchLargeX2.png',
-                    ),
-                  ),
-                  if (dataList.isNotEmpty)
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Text('${dataList.length}건의 요리를 찾았어요',
-                          style: CustomTextStyles()
-                              .caption
-                              .copyWith(color: CustomColors.monotoneBlack)),
-                    ),
-                  dataList.isNotEmpty
-                      ? ListView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: dataList.length,
-                          padding:
-                              const EdgeInsets.fromLTRB(8.0, 16.0, 8.0, 24.0),
-                          itemBuilder: (BuildContext context, int index) {
-                            return Container(
-                              margin: const EdgeInsets.only(bottom: 16),
-                              child: ListCard(data: dataList[index]),
-                            );
-                          })
-                      : Container(
-                          child: Column(
+            slivers: [
+              SliverList(
+                delegate: SliverChildListDelegate(
+                  [
+                    if (dataList.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 28, 16, 28),
+                        child: Center(
+                          child: Text('${dataList.length}건의 요리를 찾았어요',
+                              style: CustomTextStyles()
+                                  .caption
+                                  .copyWith(color: CustomColors.monotoneBlack)),
+                        ),
+                      )
+                  ],
+                ),
+              ),
+              SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  (BuildContext context, int index) {
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 16),
+                      child: ListCard(data: dataList[index]),
+                    );
+                  },
+                  childCount: dataList.isNotEmpty ? dataList.length : 0,
+                ),
+              ),
+              SliverFillRemaining(
+                hasScrollBody: false,
+                child: dataList.isNotEmpty
+                    ? SizedBox.shrink()
+                    : Stack(
+                        children: [
+                          Column(
                             children: [
-                              SizedBox(height: 100),
-                              Text('이렇게 검색해보세요.',
+                              SizedBox(height: 80),
+                              Text('인기 검색어',
                                   style: CustomTextStyles().body1.copyWith(
                                         color: CustomColors.monotoneGray,
                                       )),
                               SizedBox(height: 16.0),
                               Column(
-                                children: exampleWord
-                                    .map((e) => CommonButton(
-                                        label: e,
+                                children:
+                                    trendWord.asMap().entries.map((entry) {
+                                  int index = entry.key;
+                                  String word = entry.value;
+                                  return Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        '${index + 1}위',
+                                        style: CustomTextStyles()
+                                            .body1
+                                            .copyWith(
+                                              color: CustomColors.monotoneGray,
+                                            ),
+                                      ),
+                                      SizedBox(width: 8.0),
+                                      CommonButton(
+                                        label: word,
                                         color: ButtonType.none,
                                         onPressed: () {
-                                          _clickSearch(e);
-                                        }))
-                                    .toList(),
+                                          _clickSearch(word);
+                                        },
+                                      ),
+                                    ],
+                                  );
+                                }).toList(),
                               ),
                             ],
                           ),
-                        ),
-                ],
+                          // Positioned(
+                          //   bottom: 0,
+                          //   left: 0,
+                          //   right: 0,
+                          //   child: GestureDetector(
+                          //     onTap: () => pushScreen(context, CameraScreen()),
+                          //     child: Image.asset(
+                          //       'assets/images/button_img/CameraSearchLargeX2.png',
+                          //     ),
+                          //   ),
+                          // ),
+                        ],
+                      ),
               ),
-            ),
+            ],
           ),
         ),
       ),
     );
-  }
-
-  // 커스텀 텍스트 필드에 내려주기 위한 onChange-setState 함수
-  void onWordChanged(String value) {
-    setState(() {
-      _searchWord = value;
-    });
   }
 }
