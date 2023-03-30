@@ -13,6 +13,7 @@ import numpy as np
 import voice_method as vm
 import io
 import soundfile as sf
+import requests
 
 
 logging.basicConfig(filename='app.log', level=logging.INFO, format='%(asctime)s - %(levelname)s: %(message)s')
@@ -111,3 +112,54 @@ async def upload_audio(audio: UploadFile = File(...)):
     label = vm.result(audio_path)
 
     return {"filename": audio.filename, "result" : label}
+
+@app.post("/upload/ingredient")
+async def upload_audio(audio: UploadFile = File(...)):
+    # 저장할 디렉토리 지정
+    today = datetime.date.today()
+    formatted_date = today.strftime('%m%d%Y')
+    time = datetime.datetime.now()
+    formatted_date_time = time.strftime('%Y%m%d%H%M')
+    save_path = Path("uploaded_files/"+ formatted_date)
+    save_path.mkdir(exist_ok=True)
+
+
+
+    # mp3 파일을 저장할 경로 지정
+    audio_path = save_path / (formatted_date_time+'_'+audio.filename.split(".")[0] + ".wav")
+
+    # 파일 저장
+    with audio_path.open("wb") as buffer:
+        shutil.copyfileobj(audio.file, buffer)
+
+    # 파일 확장자 사용하여 오디오 형식 지정
+    file_extension = audio.filename.split(".")[-1]
+    
+    # 오디오 처리
+    audio_data = AudioSegment.from_file(audio_path, format="m4a")
+    audio_data.export(audio_path, format="wav")
+    
+    result = recognize_speech(str(audio_path))
+    if result == "음성 인식을 할 수 없습니다.":
+        return {"message" : result, 'status' : 400, 'data' : None}
+
+    headers = {'AUTH-TOKEN': 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwicm9sZXMiOlsiUk9MRV9BRE1JTiJdLCJpYXQiOjE2Nzk0ODUzMTMsImV4cCI6MTY4MDc4MTMxM30.FGt7kCSx_jCjoWknclZylNDBnxZCU7Re7-mxIEiFyk8'}
+    response = requests.get('http://localhost:8080/api/v1/db/ingredient/'+ result, headers=headers)
+    data = response.json()
+    isIn = data['status']
+
+    if isIn == 200:
+        return {'message' : result+'은(는) 있는 재료입니다.', 'status' : 200, 'data' : result}
+
+    else :
+        return {'message' : result+'은(는) 없는 재료입니다.', 'status' : 204, 'data' : result}
+
+def recognize_speech(file_path):
+    recognizer = sr.Recognizer()
+    with sr.AudioFile(file_path) as source:
+        audio = recognizer.record(source)
+    try:
+        text = recognizer.recognize_google(audio, language="ko-KR")
+    except sr.UnknownValueError:
+        text = "음성 인식을 할 수 없습니다."
+    return text
