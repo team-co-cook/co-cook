@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:math';
 import 'dart:async';
 import 'package:dio/dio.dart';
@@ -50,7 +51,7 @@ class _CookScreenBodyState extends State<CookScreenBody>
   late FlutterTts flutterTts;
 
   @override
-  void initState() {
+  void initState() async {
     super.initState();
 
     flutterTts = FlutterTts();
@@ -123,7 +124,6 @@ class _CookScreenBodyState extends State<CookScreenBody>
     Response? response =
         await searchService.getDetailStep(recipeIdx: recipeIdx);
     if (response?.statusCode == 200) {
-      print(response!.data['data']['steps']);
       if (response!.data['data'] != null) {
         setState(() {
           dataList = response.data['data']['steps'];

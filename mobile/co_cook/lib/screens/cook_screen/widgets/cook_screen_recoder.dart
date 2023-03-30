@@ -29,6 +29,10 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
   /////////////////////////////////////////////////////////////////////////////
   ///PicoVioce
   ///
+  late List apiKeys;
+  late int apiKeyIndex;
+  int maxIndex = 3;
+
   final List<String> keywordAssets = Platform.isAndroid
       ? [
           "assets/keywords/cocook_ko_android.ppn",
@@ -42,13 +46,49 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
   late PorcupineManager _porcupineManager;
 
   void createPorcupineManager() async {
-    _porcupineManager = await PorcupineManager.fromKeywordPaths(
-      dotenv.env['PICOVOICE_API_KEY'] ?? "",
-      keywordAssets, // os별 분기처리 해야됨!!
-      _wakeWordCallback,
-      modelPath: "assets/keywords/porcupine_params_ko.pv",
-    );
-    await _porcupineManager.start();
+    print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+    print(dotenv.env['PICOVOICE_API_KEY']);
+    apiKeys = [
+      dotenv.env['PICOVOICE_API_KEY_1'],
+      dotenv.env['PICOVOICE_API_KEY_2'],
+      dotenv.env['PICOVOICE_API_KEY_3'],
+      dotenv.env['PICOVOICE_API_KEY_4']
+    ];
+
+    try {
+      // PorcupineManager를 생성하고 키워드 검출을 시작합니다.
+      _porcupineManager = await PorcupineManager.fromKeywordPaths(
+          apiKeys[apiKeyIndex],
+          keywordAssets, // os별 분기처리 해야됨!!
+          _wakeWordCallback,
+          modelPath: "assets/keywords/porcupine_params_ko.pv",
+          sensitivities: [0.8, 0.8] // 기본값은 0.5 높을수록 더 잘 응답한다. 오답일 경우도 늘어난다.
+          );
+      await _porcupineManager.start();
+    } catch (e) {
+      if (e is PorcupineActivationLimitException) {
+        // 다음 인덱스를 사용합니다.
+        apiKeyIndex++;
+
+        // 최대 인덱스에 도달하면 다시 0번 인덱스로 돌아갑니다.
+        if (apiKeyIndex > maxIndex) {
+          apiKeyIndex = 0;
+        }
+
+        // PorcupineManager를 생성하고 키워드 검출을 시작합니다.
+        _porcupineManager = await PorcupineManager.fromKeywordPaths(
+            apiKeys[apiKeyIndex],
+            keywordAssets, // os별 분기처리 해야됨!!
+            _wakeWordCallback,
+            modelPath: "assets/keywords/porcupine_params_ko.pv",
+            sensitivities: [0.8, 0.8] // 기본값은 0.5 높을수록 더 잘 응답한다. 오답일 경우도 늘어난다.
+            );
+        await _porcupineManager.start();
+      } else {
+        // 다른 예외는 다시 throw합니다.
+        throw e;
+      }
+    }
   }
 
   _wakeWordCallback(int value) async {
@@ -60,6 +100,7 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
     } else if (value == 1) {
       // 성운 키워드에 대한 작업 수행
       print('성운');
+      await _porcupineManager.stop().then((value) => _startRecord());
     }
   }
 
@@ -78,12 +119,17 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
 
   @override
   void initState() {
+    super.initState();
+
     setTempDir();
     setState(() {
       _audioPlayer = AudioPlayer();
     });
     createPorcupineManager();
-    super.initState();
+
+    // 오늘자 기준 키  인덱스 설정
+    DateTime now = DateTime.now();
+    apiKeyIndex = now.day % 4;
   }
 
   Future<void> setTempDir() async {
