@@ -3,8 +3,8 @@ import Mockup from "../common/Mockup";
 import splashImg from "../../assets/image/splashImg.png";
 import recipeScreen from "../../assets/image/recipeScreen.png";
 import themeScreen from "../../assets/image/themeScreen.png";
-import voiceScreen from "../../assets/videos/voiceScreen.webm";
-import homeScreen from "../../assets/videos/homeScreen.webm";
+import voiceScreen from "../../assets/videos/voiceScreen.mp4";
+import homeScreen from "../../assets/videos/homeScreen.mp4";
 import { useEffect, useState } from "react";
 
 function HeaderMockup() {
@@ -22,23 +22,25 @@ function HeaderMockup() {
   }, []);
 
   return (
-    <StyledHeaderMockup scrollLocation={scrollLocation}>
-      <div className="move-mockup">
-        <Mockup isVideo={false} screen={themeScreen}></Mockup>
-      </div>
-      <div>
-        <Mockup isVideo={true} screen={homeScreen}></Mockup>
-      </div>
-      <div className="move-mockup">
-        <Mockup isVideo={false} screen={splashImg}></Mockup>
-      </div>
-      <div>
-        <Mockup isVideo={true} screen={voiceScreen}></Mockup>
-      </div>
-      <div className="move-mockup">
-        <Mockup isVideo={false} screen={recipeScreen}></Mockup>
-      </div>
-    </StyledHeaderMockup>
+    <div>
+      <StyledHeaderMockup scrollLocation={scrollLocation}>
+        <div className="move-mockup">
+          <Mockup isVideo={false} screen={themeScreen}></Mockup>
+        </div>
+        <div>
+          <Mockup isVideo={true} screen={homeScreen}></Mockup>
+        </div>
+        <div className="move-mockup">
+          <Mockup isVideo={false} screen={splashImg}></Mockup>
+        </div>
+        <div>
+          <Mockup isVideo={true} screen={voiceScreen}></Mockup>
+        </div>
+        <div className="move-mockup">
+          <Mockup isVideo={false} screen={recipeScreen}></Mockup>
+        </div>
+      </StyledHeaderMockup>
+    </div>
   );
 }
 

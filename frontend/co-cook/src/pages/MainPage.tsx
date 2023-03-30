@@ -20,8 +20,12 @@ function MainPage() {
 export default MainPage;
 
 const StyledMainPage = styled.div`
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   padding-inline: 24px;
+  overflow-x: hidden;
+  width: 100vw;
+  box-sizing: border-box;
 `;

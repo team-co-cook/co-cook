@@ -14,11 +14,12 @@ function Mockup(props: Iprops) {
         {props.isVideo ? (
           <video
             className="mockup-screen-img"
-            src={props.screen}
             autoPlay={true}
             loop={true}
             muted={true}
-          ></video>
+          >
+            <source src={props.screen} type="video/mp4"></source>
+          </video>
         ) : (
           <img className="mockup-screen-img" src={props.screen} alt="screen" />
         )}
@@ -30,9 +31,10 @@ function Mockup(props: Iprops) {
 export default Mockup;
 
 const StyledMockup = styled.div`
+  z-index: -2;
   width: 100%;
-  height: 100%;
   position: relative;
+  aspect-ratio: 1/2.19;
   .mockup-img {
     mix-blend-mode: darken;
     position: absolute;
