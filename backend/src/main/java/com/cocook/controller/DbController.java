@@ -100,13 +100,4 @@ public class DbController {
         return new ResponseEntity<>("ok", HttpStatus.OK);
     }
 
-    @GetMapping("/ingredient/{ingredientName}")
-    public ResponseEntity<ApiResponse<String>> checkIngredient(@PathVariable("ingredientName") String ingredientName) {
-        if (ingredientService.checkIngredient(ingredientName).isEmpty()) {
-            return ApiResponse.noContent("없는 재료입니다.");
-        } else {
-            return ApiResponse.ok(null);
-        }
-    }
-
 }
