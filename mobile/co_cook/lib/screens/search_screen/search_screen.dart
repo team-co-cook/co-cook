@@ -28,7 +28,7 @@ class _SearchScreenState extends State<SearchScreen> {
       TextEditingController();
 
   List dataList = [];
-  List trendWord = ['두부', '감자'];
+  List trendWord = [];
 
   @override
   void initState() {
@@ -41,10 +41,9 @@ class _SearchScreenState extends State<SearchScreen> {
     SearchService searchService = SearchService();
     Response? response = await searchService.getTrendList();
     if (response?.statusCode == 200) {
-      Map? decodeRes = await jsonDecode(response.toString());
-      if (decodeRes != null) {
+      if (response!.data['data'] != null) {
         setState(() {
-          dataList = decodeRes["data"];
+          trendWord = response!.data['data'];
         });
       }
     }
@@ -63,10 +62,9 @@ class _SearchScreenState extends State<SearchScreen> {
     SearchService searchService = SearchService();
     Response? response = await searchService.getSearchList(keyword: keyword);
     if (response?.statusCode == 200) {
-      Map? decodeRes = await jsonDecode(response.toString());
-      if (decodeRes != null) {
+      if (response!.data['data'] != null) {
         setState(() {
-          dataList = decodeRes["data"]["recipeListResDto"];
+          dataList = response.data['data']["recipeListResDto"];
         });
       }
     }
