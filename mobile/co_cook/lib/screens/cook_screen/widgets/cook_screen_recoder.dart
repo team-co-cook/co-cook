@@ -19,7 +19,9 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:co_cook/widgets/sound_meter/sound_meter.dart';
 
 class CookScreenRecoder extends StatefulWidget {
-  const CookScreenRecoder({Key? key}) : super(key: key);
+  const CookScreenRecoder({Key? key, required this.controlNotifier})
+      : super(key: key);
+  final ValueNotifier<String> controlNotifier;
 
   @override
   State<CookScreenRecoder> createState() => _CookScreenRecoderState();
@@ -30,7 +32,7 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
   ///PicoVioce
   ///
   late List apiKeys;
-  late int apiKeyIndex;
+  int apiKeyIndex = 0;
   int maxIndex = 3;
 
   final List<String> keywordAssets = Platform.isAndroid
@@ -204,10 +206,11 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
   Future<void> postAudio(String path) async {
     // API 요청
     AudioService searchService = AudioService();
-    Response? response = await searchService.postAudio(path);
+    Response? response = await searchService.postAudioDJ(path);
     if (response?.statusCode == 200) {
       if (response != null) {
         print("전송 성공 : ${response.data}");
+        widget.controlNotifier.value = response.data['result'];
       }
     }
   }
