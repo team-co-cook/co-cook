@@ -46,8 +46,6 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
   late PorcupineManager _porcupineManager;
 
   void createPorcupineManager() async {
-    print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
-    print(dotenv.env['PICOVOICE_API_KEY']);
     apiKeys = [
       dotenv.env['PICOVOICE_API_KEY_1'],
       dotenv.env['PICOVOICE_API_KEY_2'],
