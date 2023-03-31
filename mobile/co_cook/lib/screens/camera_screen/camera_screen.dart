@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:co_cook/screens/image_result_screen/image_result_screen.dart';
 import 'package:co_cook/services/image_service.dart';
 import 'package:camera/camera.dart';
 import 'package:co_cook/screens/camera_screen/widgets/camera_result.dart';
@@ -15,8 +16,9 @@ import 'package:transparent_image/transparent_image.dart';
 import 'package:zoom_tap_animation/zoom_tap_animation.dart';
 
 class CameraScreen extends StatefulWidget {
-  const CameraScreen({super.key, this.setWordAndSearch});
+  const CameraScreen({super.key, this.setWordAndSearch, this.isNext = false});
   final setWordAndSearch;
+  final isNext;
 
   @override
   State<CameraScreen> createState() => _CameraScreenState();
@@ -30,6 +32,7 @@ class _CameraScreenState extends State<CameraScreen> {
   bool isProcess = false;
   late String tmpImgPath;
   XFile? imgFile;
+  late String _imageWord;
 
   void _getTmpImgPath() async {
     Directory tmpPath = await getTemporaryDirectory();
@@ -45,7 +48,13 @@ class _CameraScreenState extends State<CameraScreen> {
     await Future.delayed(Duration(seconds: 1));
     bool state = await getImgData();
     if (state) {
-      Navigator.pop(context);
+      if (widget.isNext) {
+        Route imageResult = MaterialPageRoute(
+            builder: (context) => ImageResultScreen(searchWord: _imageWord));
+        Navigator.pushReplacement(context, imageResult);
+      } else {
+        Navigator.pop(context);
+      }
     } else {
       _searchFail();
     }
@@ -62,7 +71,13 @@ class _CameraScreenState extends State<CameraScreen> {
       bool state = await getImgData();
       print(state);
       if (state) {
-        Navigator.pop(context);
+        if (widget.isNext) {
+          Route imageResult = MaterialPageRoute(
+              builder: (context) => ImageResultScreen(searchWord: _imageWord));
+          Navigator.pushReplacement(context, imageResult);
+        } else {
+          Navigator.pop(context);
+        }
       } else {
         _searchFail();
       }
@@ -137,9 +152,15 @@ class _CameraScreenState extends State<CameraScreen> {
     print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!$response');
     if (response?.statusCode == 200) {
       if (response!.data != null) {
-        setState(() {
-          widget.setWordAndSearch(response.data);
-        });
+        if (widget.isNext) {
+          setState(() {
+            _imageWord = response.data;
+          });
+        } else {
+          setState(() {
+            widget.setWordAndSearch(response.data);
+          });
+        }
         return true;
       } else {
         return false;
