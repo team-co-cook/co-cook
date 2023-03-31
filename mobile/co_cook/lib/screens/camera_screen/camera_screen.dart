@@ -118,6 +118,7 @@ class _CameraScreenState extends State<CameraScreen> {
         }
       }
     });
+    await _cameraController.lockCaptureOrientation();
   }
 
   Future<bool> getImgData() async {
@@ -188,7 +189,14 @@ class _CameraScreenState extends State<CameraScreen> {
                         File(imgFile!.path),
                         fit: BoxFit.cover,
                       )
-                    : CameraPreview(_cameraController))
+                    : Transform.scale(
+                        scale: 1.0,
+                        child: AspectRatio(
+                          aspectRatio: _cameraController.value.aspectRatio,
+                          child: CameraPreview(_cameraController),
+                        ),
+                      ),
+              )
             : Container(),
         Positioned(
           child: Center(
