@@ -75,6 +75,13 @@ android {
             // end of 코드난독화 및 사이즈 축소
         }
     }
+
+    // tflite
+    aaptOptions {
+        noCompress 'tflite'
+        noCompress 'lite'
+    }
+
 }
 
 flutter {
@@ -83,4 +90,5 @@ flutter {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    // compile 'org.tensorflow:tensorflow-lite-select-tf-ops:+'
 }

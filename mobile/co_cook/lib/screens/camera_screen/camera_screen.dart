@@ -36,6 +36,7 @@ class _CameraScreenState extends State<CameraScreen> {
   late String tmpImgPath;
   XFile? imgFile;
   late String _imageWord;
+  bool _isCapturing = false;
 
   void _getTmpImgPath() async {
     Directory tmpPath = await getTemporaryDirectory();
@@ -43,6 +44,11 @@ class _CameraScreenState extends State<CameraScreen> {
   }
 
   Future<void> _takePhoto() async {
+    if (!_cameraController.value.isInitialized) {
+      print("Camera is not initialized yet.");
+      return;
+    }
+
     try {
       _cameraController.pausePreview();
       imgFile = await _cameraController.takePicture();
@@ -71,6 +77,8 @@ class _CameraScreenState extends State<CameraScreen> {
     } catch (e) {
       print("Error: $e");
       _searchFail();
+    } finally {
+      _isCapturing = false;
     }
   }
 
