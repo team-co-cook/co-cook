@@ -228,7 +228,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                                   .width /
                                               4),
                                       SizedBox(
-                                        width: 30,
+                                        width: 32,
                                         child: Text(
                                           '${index + 1}위',
                                           style: CustomTextStyles()

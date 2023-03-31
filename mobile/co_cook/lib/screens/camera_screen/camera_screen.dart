@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:co_cook/services/image_service.dart';
 import 'package:camera/camera.dart';
+import 'package:flutter/services.dart';
 import 'package:co_cook/screens/camera_screen/widgets/camera_result.dart';
 import 'package:co_cook/styles/colors.dart';
 import 'package:co_cook/styles/shadows.dart';
@@ -162,6 +163,11 @@ class _CameraScreenState extends State<CameraScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // 화면 회전 고정
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
     return Scaffold(
       body: Stack(children: [
         isCameraInitialized
