@@ -55,6 +55,7 @@ class _CookScreenState extends State<CookScreen> {
   @override
   void dispose() {
     super.dispose();
+    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   }
 
   void shutdownCook(BuildContext context) async {

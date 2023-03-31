@@ -171,7 +171,7 @@ class _VoiceSearchScreenState extends State<VoiceSearchScreen> {
   Future<void> postAudio(String path) async {
     // API 요청
     AudioService searchService = AudioService();
-    Response? response = await searchService.postAudio(path);
+    Response? response = await searchService.postAudioIngredient(path);
     if (response?.statusCode == 200 &&
         response != null &&
         !_reciveIngredientList.contains(response.data["result"])) {
