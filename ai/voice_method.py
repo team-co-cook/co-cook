@@ -13,7 +13,7 @@ model = load_model('model.h5')
 def cut_voice(file_path):
     # Load audio data
     y, sample_rate = librosa.load(file_path, sr=None)
-
+    
     # Compute the energy of each frame
     frame_size = 0.025 # seconds
     frame_stride = 0.01 # seconds
@@ -74,6 +74,7 @@ def extract_features(audio, sample_rate, flag=0):
     return mel_spec_processed
 
 def result(file_path):
+    print(file_path)
     audio, sample_rate = cut_voice(file_path)
     new_features = extract_features(audio, sample_rate)
     new_features_reshaped = np.reshape(new_features, (1, new_features.shape[0], 1))

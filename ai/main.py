@@ -55,8 +55,9 @@ async def upload_audio1(audio: UploadFile = File(...)):
     audio_data.export(audio_path, format="wav")
     
     result = recognize_speech(str(audio_path))
-
-    return {"filename": audio.filename, "path": str(audio_path), "result" : result}
+    if result != '다음' and result != '다시' and result != '이전' and result != '타이머':
+        return {"message": "명령어가 아닙니다", "status": 204, "result" : result}
+    return {"message": "성공", "status": 200, "result" : result}
 
 
 # @app.post("/upload/dj")
@@ -102,14 +103,17 @@ async def upload_audio2(audio: UploadFile = File(...)):
     formatted_date_time = time.strftime('%Y%m%d%H%M')
     save_path = Path("uploaded_files_dj/"+ formatted_date)
     save_path.mkdir(exist_ok=True)
-
+    
     # 오디오 파일을 저장할 경로 지정
     audio_path = save_path / (formatted_date_time+'_'+ audio.filename)
-
+    print(audio_path)
     # 파일 저장
     with audio_path.open("wb") as buffer:
         shutil.copyfileobj(audio.file, buffer)
 
+    # 오디오 처리
+    audio_data = AudioSegment.from_file(audio_path, format="m4a")
+    audio_data.export(audio_path, format="wav")
     # 저장한 파일에서 라벨 추론
     label = vm.result(audio_path)
     result = ""
