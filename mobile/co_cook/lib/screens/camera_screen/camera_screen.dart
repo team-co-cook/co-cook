@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 import 'package:co_cook/screens/image_result_screen/image_result_screen.dart';
 import 'package:co_cook/services/image_service.dart';
 import 'package:camera/camera.dart';
@@ -14,6 +15,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:transparent_image/transparent_image.dart';
 import 'package:zoom_tap_animation/zoom_tap_animation.dart';
+import 'package:image_crop/image_crop.dart';
+import 'package:image/image.dart' as img;
 
 class CameraScreen extends StatefulWidget {
   const CameraScreen({super.key, this.setWordAndSearch, this.isNext = false});
@@ -46,6 +49,11 @@ class _CameraScreenState extends State<CameraScreen> {
       isProcess = true;
     });
     await Future.delayed(Duration(seconds: 1));
+
+    // 이미지 크롭
+    File croppedImageFile = await _cropImage(File(imgFile!.path));
+    imgFile = XFile(croppedImageFile.path);
+
     bool state = await getImgData();
     if (state) {
       if (widget.isNext) {
@@ -134,6 +142,39 @@ class _CameraScreenState extends State<CameraScreen> {
       }
     });
     await _cameraController.lockCaptureOrientation();
+  }
+
+// 이미지를 정중앙에서 정사각형으로 크롭
+  Future<File> _cropImage(File imageFile) async {
+    final decodedImage =
+        await decodeImageFromList(await imageFile.readAsBytes());
+    final int originalWidth = decodedImage.width;
+    final int originalHeight = decodedImage.height;
+
+    int offsetX, offsetY, squareSideLength;
+    if (originalWidth > originalHeight) {
+      squareSideLength = originalHeight;
+      offsetX = (originalWidth - originalHeight) ~/ 2;
+      offsetY = 0;
+    } else {
+      squareSideLength = originalWidth;
+      offsetX = 0;
+      offsetY = (originalHeight - originalWidth) ~/ 2;
+    }
+
+    final imageBytes = img.decodeImage(await imageFile.readAsBytes())!;
+
+    final croppedImage = img.copyCrop(imageBytes,
+        x: offsetX,
+        y: offsetY,
+        width: squareSideLength,
+        height: squareSideLength);
+
+    final result =
+        await File(imageFile.path.replaceFirst('.png', '_cropped.png'))
+            .writeAsBytes(await img.encodePng(croppedImage));
+
+    return result;
   }
 
   Future<bool> getImgData() async {
