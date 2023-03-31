@@ -43,27 +43,33 @@ class _CameraScreenState extends State<CameraScreen> {
   }
 
   Future<void> _takePhoto() async {
-    _cameraController.pausePreview();
-    imgFile = await _cameraController.takePicture();
-    setState(() {
-      isProcess = true;
-    });
-    await Future.delayed(Duration(seconds: 1));
+    try {
+      _cameraController.pausePreview();
+      imgFile = await _cameraController.takePicture();
 
-    // 이미지 크롭
-    File croppedImageFile = await _cropImage(File(imgFile!.path));
-    imgFile = XFile(croppedImageFile.path);
+      setState(() {
+        isProcess = true;
+      });
+      await Future.delayed(Duration(seconds: 1));
 
-    bool state = await getImgData();
-    if (state) {
-      if (widget.isNext) {
-        Route imageResult = MaterialPageRoute(
-            builder: (context) => ImageResultScreen(searchWord: _imageWord));
-        Navigator.pushReplacement(context, imageResult);
+      // 이미지 크롭
+      File croppedImageFile = await _cropImage(File(imgFile!.path));
+      imgFile = XFile(croppedImageFile.path);
+
+      bool state = await getImgData();
+      if (state) {
+        if (widget.isNext) {
+          Route imageResult = MaterialPageRoute(
+              builder: (context) => ImageResultScreen(searchWord: _imageWord));
+          Navigator.pushReplacement(context, imageResult);
+        } else {
+          Navigator.pop(context);
+        }
       } else {
-        Navigator.pop(context);
+        _searchFail();
       }
-    } else {
+    } catch (e) {
+      print("Error: $e");
       _searchFail();
     }
   }
