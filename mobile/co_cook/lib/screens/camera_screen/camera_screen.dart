@@ -50,6 +50,7 @@ class _CameraScreenState extends State<CameraScreen> {
     }
 
     try {
+      _isCapturing = true;
       _cameraController.pausePreview();
       imgFile = await _cameraController.takePicture();
 
@@ -343,7 +344,7 @@ class _CameraScreenState extends State<CameraScreen> {
                       child: const CircularProgressIndicator(
                           color: CustomColors.monotoneLight))
                   : ZoomTapAnimation(
-                      onTap: () => _takePhoto(),
+                      onTap: _isCapturing ? null : () => _takePhoto(),
                       child: const Icon(
                         Icons.circle,
                         size: 60,
