@@ -5,7 +5,7 @@ from tensorflow.keras.optimizers import Adam
 from PIL import Image
 
 # 모델 로드
-model = keras.models.load_model('DenseNet201_0330.h5')
+model = keras.models.load_model('DenseNet201_0331.h5')
 
 # labels 설정
 labels = {0: '000', 1: '001', 2: '002', 3: '003', 4: '004', 5: '005',
@@ -66,8 +66,8 @@ result = {'000': '갈비구이', '001': '갈치구이', '002': '고등어구이'
         '140': '고추튀김', '141': '새우튀김', '142': '오징어튀김', '143': '약과', '144': '약식', 
         '145': '한과', '146': '멍게', '147': '산낙지', '148': '물회', '149': '육회'}
 
-async def find_image(file_path):
-        image = Image.open(file_path)
+async def find_image(file):
+        image = Image.open(file)
 
         # 이미지 전처리
         image = image.resize((224, 224))
