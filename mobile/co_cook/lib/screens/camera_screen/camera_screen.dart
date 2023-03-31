@@ -44,8 +44,15 @@ class _CameraScreenState extends State<CameraScreen> {
   }
 
   Future<void> _takePhoto() async {
-    _cameraController.pausePreview();
-    imgFile = await _cameraController.takePicture();
+    await _cameraController.pausePreview();
+
+    try {
+      imgFile = await _cameraController.takePicture();
+    } on CameraException catch (e) {
+      print('error: $e');
+      return;
+    }
+
     setState(() {
       isProcess = true;
     });
