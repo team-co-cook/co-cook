@@ -17,7 +17,7 @@ import os
 import soundfile as sf
 import requests
 
-logging.basicConfig(filename='app.log', level=logging.INFO, format='%(asctime)s - %(levelname)s: %(message)s')
+logging.basicConfig(filename='app.log', level=logging.DEBUG, format='%(asctime)s - %(levelname)s: %(message)s')
 
 app = FastAPI()
 
@@ -34,7 +34,7 @@ async def hello():
     return{"message" : "hello"}
 
 @app.post("/upload")
-async def upload_audio(audio: UploadFile = File(...)):
+async def upload_audio1(audio: UploadFile = File(...)):
     # 저장할 디렉토리 지정
     today = datetime.date.today()
     formatted_date = today.strftime('%m%d%Y')
@@ -58,18 +58,9 @@ async def upload_audio(audio: UploadFile = File(...)):
 
     return {"filename": audio.filename, "path": str(audio_path), "result" : result}
 
-def recognize_speech(file_path):
-    recognizer = sr.Recognizer()
-    with sr.AudioFile(file_path) as source:
-        audio = recognizer.record(source)
-    try:
-        text = recognizer.recognize_google(audio, language="ko-KR")
-    except sr.UnknownValueError:
-        text = "음성 인식을 할 수 없습니다."
-    return text
 
 @app.post("/upload/dj")
-async def upload_audio(audio: UploadFile = File(...)):
+async def upload_audio2(audio: UploadFile = File(...)):
     # 저장할 디렉토리 지정
     today = datetime.date.today()
     formatted_date = today.strftime('%m%d%Y')
@@ -103,7 +94,7 @@ async def upload_audio(audio: UploadFile = File(...)):
     return {"message": "조회 성공", "status" : 200, "result" : result}
 
 @app.post("/upload/ingredient")
-async def upload_audio(audio: UploadFile = File(...)):
+async def upload_audio3(audio: UploadFile = File(...)):
     # 저장할 디렉토리 지정
     today = datetime.date.today()
     formatted_date = today.strftime('%m%d%Y')

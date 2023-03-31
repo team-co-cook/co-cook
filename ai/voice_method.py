@@ -9,6 +9,7 @@ with open('label_encoder.pkl', 'rb') as f:
 
 # 모델 파일 로드
 model = load_model('model.h5')
+
 def cut_voice(file_path):
     # Load audio data
     y, sample_rate = librosa.load(file_path, sr=None)
