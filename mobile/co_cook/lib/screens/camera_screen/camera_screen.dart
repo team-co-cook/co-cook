@@ -74,10 +74,10 @@ class _CameraScreenState extends State<CameraScreen> {
 
   Future<void> _selectPhoto() async {
     _cameraController.pausePreview();
+    imgFile = await _picker.pickImage(source: ImageSource.gallery);
     setState(() {
       isProcess = true;
     });
-    imgFile = await _picker.pickImage(source: ImageSource.gallery);
     if (imgFile != null) {
       print('이미지 검색 중');
       bool state = await getImgData();
