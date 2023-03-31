@@ -15,9 +15,15 @@ import 'package:co_cook/services/audio_service.dart';
 import 'package:co_cook/widgets/sound_meter/sound_meter.dart';
 
 class CookScreenRecoder extends StatefulWidget {
-  const CookScreenRecoder({Key? key, required this.controlNotifier})
+  const CookScreenRecoder(
+      {Key? key,
+      required this.controlNotifier,
+      required this.isPowerMode,
+      required this.setPowerMode})
       : super(key: key);
   final ValueNotifier<String> controlNotifier;
+  final bool isPowerMode;
+  final Function setPowerMode;
 
   @override
   State<CookScreenRecoder> createState() => _CookScreenRecoderState();
@@ -43,20 +49,26 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
   }
 
   late Stream<Map<dynamic, dynamic>> recognitionStream;
-  String tfliteResult = '';
+  late StreamSubscription<Map<dynamic, dynamic>> _recognitionSubscription;
+  String result = '';
 
-  Future<void> startWakeWordRecord() async {
+  void startWakeWordRecord() {
     recognitionStream = TfliteAudio.startAudioRecognition(
         sampleRate: 44100,
-        bufferSize: 10000,
-        numOfInferences: 10,
-        detectionThreshold: 0.5);
-    recognitionStream.listen((event) {
-      setState(() {
-        tfliteResult = event["recognitionResult"];
-      });
-    }).onDone(() {
-      startWakeWordRecord();
+        bufferSize: 20000,
+        numOfInferences: 100000,
+        detectionThreshold: 0.1);
+    _recognitionSubscription = recognitionStream.listen((event) {
+      if (event["recognitionResult"] == '2 코쿡') {
+        TfliteAudio.stopAudioRecognition();
+        _recognitionSubscription.cancel();
+        _startRecord();
+      } else if (event["recognitionResult"] == '1 성운') {
+        TfliteAudio.stopAudioRecognition();
+        _recognitionSubscription.cancel();
+        widget.setPowerMode(true);
+        _startRecord();
+      }
     });
   }
 
@@ -107,35 +119,35 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
             _isRecording = true;
           });
           startTimer();
-        }).then((_) {
-          Future.delayed(const Duration(milliseconds: 3000)).then((_) {
-            if (ampl > -10) {
-              // 계속 말하는 중이면 더 기다리기
-              return Future.delayed(const Duration(milliseconds: 500));
-            }
-            // 말 안하는 중이면 null return해서 종료
-            return null;
-          }).then((_) {
-            // 녹음 종료
-            _stopRecord().then((_) {
-              _isRecording = false;
-              if (_isSay) {
-                // 사용자가 말 했을 때
-                postAudio('${cookTempDir.path}/$audioFilePk.m4a');
-                _audioPlayer.play(
-                    DeviceFileSource('${cookTempDir.path}/$audioFilePk.m4a'));
-                setState(() {
-                  _isSay = false;
-                });
-              } else {
-                // 안했을 때
-                _audioPlayer.play(AssetSource('audios/ai_cancel.mp3'));
-              }
-            }).then((value) {
-              audioFilePk++;
-              print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        });
+
+        await Future.delayed(const Duration(milliseconds: 2000)).then((_) {
+          if (ampl > -10) {
+            // 계속 말하는 중이면 더 기다리기
+            return Future.delayed(const Duration(milliseconds: 500));
+          }
+          // 말 안하는 중이면 null return해서 종료
+          return null;
+        });
+        // 녹음 종료
+        await _stopRecord().then((_) async {
+          _isRecording = false;
+          if (_isSay) {
+            // 사용자가 말 했을 때
+            await Future.delayed(const Duration(milliseconds: 500));
+            await postAudio('${cookTempDir.path}/$audioFilePk.m4a');
+            setState(() {
+              _isSay = false;
             });
-          });
+            startWakeWordRecord();
+          } else {
+            // 안했을 때
+            _audioPlayer.play(AssetSource('audios/ai_cancel.mp3'));
+            startWakeWordRecord();
+          }
+        }).then((value) {
+          audioFilePk++;
+          widget.setPowerMode(false);
         });
       }
     } else {
@@ -147,10 +159,16 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
   Future<void> postAudio(String path) async {
     // API 요청
     AudioService searchService = AudioService();
-    Response? response = await searchService.postAudioDJ(path);
+    Response? response = widget.isPowerMode
+        ? await searchService.postAudio(path)
+        : await searchService.postAudioDJ(path);
+    print(response);
     if (response?.statusCode == 200) {
       if (response != null) {
         print("전송 성공 : ${response.data}");
+        setState(() {
+          result = response.data['result'];
+        });
         widget.controlNotifier.value = response.data['result'];
       }
     }
@@ -207,7 +225,7 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
       cookTempDir.listSync().forEach((file) => file.deleteSync());
     }
     TfliteAudio.stopAudioRecognition();
-
+    _recognitionSubscription.cancel();
     super.dispose();
   }
 
@@ -216,10 +234,6 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
     return Container(
       child: Row(
         children: [
-          Text(tfliteResult),
-          TextButton(onPressed: startWakeWordRecord, child: Text("시작")),
-          TextButton(
-              onPressed: TfliteAudio.stopAudioRecognition, child: Text("종료")),
           SoundMeter(
               volume: _isRecording ? volume0to(100).toDouble() : 0,
               isSpeak: _isRecording,

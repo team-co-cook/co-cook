@@ -21,11 +21,13 @@ class CookScreenBody extends StatefulWidget {
       {Key? key,
       required this.recipeIdx,
       required this.recipeName,
-      required this.controlNotifier})
+      required this.controlNotifier,
+      required this.isPowerMode})
       : super(key: key);
   final int recipeIdx;
   final String recipeName;
   final ValueNotifier<String> controlNotifier;
+  final bool isPowerMode;
 
   @override
   State<CookScreenBody> createState() => _CookScreenBodyState();
@@ -156,23 +158,27 @@ class _CookScreenBodyState extends State<CookScreenBody>
         valueListenable: widget.controlNotifier,
         builder: (context, value, child) {
           switch (value) {
-            case 'replay':
+            case '다시':
               // 슬라이드를 다시 시작합니다.
+              widget.controlNotifier.value = '';
               break;
-            case 'next':
+            case '다음':
               // 슬라이드를 다음으로 이동합니다.
               recipeCardPageController.nextPage(
                   duration: const Duration(milliseconds: 300),
                   curve: Curves.easeOut);
+              widget.controlNotifier.value = '';
               break;
-            case 'before':
+            case '이전':
               // 슬라이드를 이전으로 이동합니다.
               recipeCardPageController.previousPage(
                   duration: const Duration(milliseconds: 300),
                   curve: Curves.easeOut);
+              widget.controlNotifier.value = '';
               break;
-            case 'timer':
+            case '타이머':
               // 타이머를 설정합니다.
+              widget.controlNotifier.value = '';
               break;
             default:
             // 기본 상태 처리
@@ -188,7 +194,9 @@ class _CookScreenBodyState extends State<CookScreenBody>
                     child: Container(
                       width: double.infinity,
                       height: double.infinity,
-                      color: CustomColors.redLight,
+                      color: widget.isPowerMode
+                          ? Color.fromARGB(255, 35, 35, 35)
+                          : CustomColors.redLight,
                     ),
                   ),
                   Opacity(
@@ -263,7 +271,8 @@ class _CookScreenBodyState extends State<CookScreenBody>
                                                           .size
                                                           .height /
                                                       4,
-                                                  decoration: BoxDecoration(
+                                                  decoration:
+                                                      const BoxDecoration(
                                                     borderRadius:
                                                         BorderRadius.only(
                                                       bottomLeft:
