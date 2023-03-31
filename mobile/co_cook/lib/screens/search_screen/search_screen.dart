@@ -198,12 +198,14 @@ class _SearchScreenState extends State<SearchScreen> {
               SliverFillRemaining(
                 hasScrollBody: false,
                 child: isSearch
-                    ? Center(
-                        child: Text('검색 결과가 존재하지 않습니다.',
-                            style: CustomTextStyles().body1.copyWith(
-                                  color: CustomColors.monotoneGray,
-                                )),
-                      )
+                    ? dataList.isEmpty
+                        ? Center(
+                            child: Text('검색 결과가 존재하지 않습니다.',
+                                style: CustomTextStyles().body1.copyWith(
+                                      color: CustomColors.monotoneGray,
+                                    )),
+                          )
+                        : Container()
                     : Stack(
                         children: [
                           Column(

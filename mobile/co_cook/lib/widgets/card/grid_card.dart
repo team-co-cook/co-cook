@@ -42,6 +42,16 @@ class _GridCardState extends State<GridCard> {
     });
   }
 
+  @override
+  void didUpdateWidget(GridCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.data != widget.data) {
+      setState(() {
+        isAdd = widget.data != null ? widget.data!["isFavorite"] : false;
+      });
+    }
+  }
+
   late bool isAdd;
 
   void toggleIsAdd() {

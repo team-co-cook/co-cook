@@ -144,46 +144,57 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
   }
 
   void _startRecord() async {
-    if (await _recorder.hasPermission() && !await _recorder.isRecording()) {
+    if (await _recorder.hasPermission()) {
       // 마이크 권한이 있을 때
-      // 녹음이 실행되고 있을 때
-      await _audioPlayer.play(AssetSource('audios/ai_activate.mp3'));
-      await Future.delayed(const Duration(microseconds: 300));
-      await _recorder
-          .start(
-        path: '${cookTempDir.path}/$audioFilePk.m4a',
-        encoder: AudioEncoder.aacLc,
-        bitRate: 128000,
-        samplingRate: 44100,
-      )
-          .then((_) {
-        setState(() {
-          _isRecording = true;
-        });
-        startTimer();
-      }).then((_) {
-        Future.delayed(const Duration(milliseconds: 3000)).then((_) {
-          // 녹음 종료
-          _stopRecord().then((_) {
-            _isRecording = false;
-            if (_isSay) {
-              // 사용자가 말 했을 때
-              postAudioDJ('${cookTempDir.path}/$audioFilePk.m4a');
-              _audioPlayer.play(
-                  DeviceFileSource('${cookTempDir.path}/$audioFilePk.m4a'));
-              setState(() {
-                _isSay = false;
-              });
-            } else {
-              // 안했을 때
-              _audioPlayer.play(AssetSource('audios/ai_cancel.mp3'));
+      if (!await _recorder.isRecording()) {
+        // 녹음이 실행되고 있을 때
+        await _audioPlayer.play(AssetSource('audios/ai_activate.mp3'));
+        await Future.delayed(const Duration(microseconds: 300));
+        await _recorder
+            .start(
+          path: '${cookTempDir.path}/$audioFilePk.m4a',
+          encoder: AudioEncoder.aacLc,
+          bitRate: 128000,
+          samplingRate: 44100,
+        )
+            .then((_) {
+          setState(() {
+            _isRecording = true;
+          });
+          startTimer();
+        }).then((_) {
+          Future.delayed(const Duration(milliseconds: 3000)).then((_) {
+            if (ampl > -10) {
+              // 계속 말하는 중이면 더 기다리기
+              return Future.delayed(const Duration(milliseconds: 500));
             }
-          }).then((value) {
-            audioFilePk++;
-            _porcupineManager.start();
+            // 말 안하는 중이면 null return해서 종료
+            return null;
+          }).then((_) {
+            // 녹음 종료
+            _stopRecord().then((_) {
+              _isRecording = false;
+              if (_isSay) {
+                // 사용자가 말 했을 때
+                postAudioDJ('${cookTempDir.path}/$audioFilePk.m4a');
+                _audioPlayer.play(
+                    DeviceFileSource('${cookTempDir.path}/$audioFilePk.m4a'));
+                setState(() {
+                  _isSay = false;
+                });
+              } else {
+                // 안했을 때
+                _audioPlayer.play(AssetSource('audios/ai_cancel.mp3'));
+              }
+            }).then((value) {
+              audioFilePk++;
+              _porcupineManager.start();
+            });
           });
         });
-      });
+      }
+    } else {
+      // 마이크 권한이 없을 때
     }
   }
 
