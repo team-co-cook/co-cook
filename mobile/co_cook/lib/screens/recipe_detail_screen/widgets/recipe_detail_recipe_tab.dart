@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'dart:convert';
+import 'package:transparent_image/transparent_image.dart';
 
 import 'package:co_cook/services/detail_service.dart';
 import 'package:co_cook/styles/colors.dart';
@@ -28,9 +29,8 @@ class _RecipeDetailRecipeTabState extends State<RecipeDetailRecipeTab> {
     DetailService searchService = DetailService();
     Response? response =
         await searchService.getDetailStep(recipeIdx: recipeIdx);
-    print(response!.data['data']);
     if (response?.statusCode == 200) {
-      if (response != null) {
+      if (response?.data != null) {
         setState(() {
           data = response!.data['data'];
         });
@@ -69,11 +69,12 @@ class _RecipeDetailRecipeTabState extends State<RecipeDetailRecipeTab> {
                                   aspectRatio: 16 / 10, // 비율 설정
                                   child: ClipRRect(
                                     borderRadius: BorderRadius.circular(16.0),
-                                    child: Image.network(
-                                      data['steps'][index]
-                                          ['imgPath'], // 이미지 URL
-                                      fit: BoxFit.cover, // 이미지를 박스 크기에 맞게 조정
-                                    ),
+                                    child: FadeInImage.memoryNetwork(
+                                        fadeInDuration:
+                                            const Duration(milliseconds: 200),
+                                        fit: BoxFit.cover,
+                                        placeholder: kTransparentImage,
+                                        image: data['steps'][index]['imgPath']),
                                   ),
                                 ),
                                 Container(

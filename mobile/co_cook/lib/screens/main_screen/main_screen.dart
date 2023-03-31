@@ -25,7 +25,7 @@ class _MainScreenState extends State<MainScreen> {
   final GlobalKey<FavoriteDirectState> _favoriteDirectKey =
       GlobalKey<FavoriteDirectState>(); // favorite 키 가져오기
 
-  void _onTap(int index) {
+  void onTap(int index) {
     setState(() {
       _currentIndex = index;
     });
@@ -37,7 +37,7 @@ class _MainScreenState extends State<MainScreen> {
       body: Stack(children: [
         Container(
           child: [
-            const HomeScreen(),
+            HomeScreen(),
             VoiceSearchScreen(),
             SearchScreen(),
             UserScreen(),
@@ -53,7 +53,7 @@ class _MainScreenState extends State<MainScreen> {
       ]),
       bottomNavigationBar: BottomNavBar(
           currentIndex: _currentIndex,
-          onTap: _onTap,
+          onTap: onTap,
           panelController: _mainPanelController),
     );
   }

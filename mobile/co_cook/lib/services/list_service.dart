@@ -64,6 +64,17 @@ class ListService {
     }
   }
 
+  // 내가 찜한 레시피
+  Future<Response?> getIngredientList({required String ingredients}) async {
+    try {
+      Dio _dio = await _getDio(); // 새로운 Dio 객체 생성
+      return await _dio.get('/list/ingredients?ingredients=$ingredients');
+    } on DioError catch (e) {
+      // DioError 처리
+      return e.response; // DioError가 발생한 경우에도 무조건 리턴
+    }
+  }
+
   // 분기용 함수 ListScreen으로 갈 때, 아래 함수도 같이 보낸다.
   DataFetcher getThemeDataFetcher(String themeName) {
     return ({required String difficulty, required int time}) {

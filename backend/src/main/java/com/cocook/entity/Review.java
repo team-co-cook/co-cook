@@ -40,6 +40,8 @@ public class Review extends BaseEntity {
 
     private String imgPath;
 
+    private String resizedImgPath;
+
     private Integer runningTime;
 
     private Integer reportCnt;

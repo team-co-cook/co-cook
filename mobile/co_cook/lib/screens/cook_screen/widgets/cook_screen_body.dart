@@ -1,19 +1,20 @@
-import 'dart:async';
-import 'package:co_cook/screens/review_screen/review_screen.dart';
-import 'package:co_cook/styles/shadows.dart';
-import 'package:dio/dio.dart';
+import 'dart:io';
 import 'dart:math';
-
-import 'package:flutter_tts/flutter_tts.dart';
-import 'package:co_cook/services/detail_service.dart';
-import 'package:flutter/material.dart';
-import 'package:co_cook/styles/colors.dart';
-import 'package:co_cook/styles/text_styles.dart';
+import 'dart:async';
+import 'package:dio/dio.dart';
 import 'package:flutter/services.dart';
-import 'package:transparent_image/transparent_image.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 import 'package:word_break_text/word_break_text.dart';
-import 'package:zoom_tap_animation/zoom_tap_animation.dart';
-import 'cook_screen_timer.dart';
+import 'package:transparent_image/transparent_image.dart';
+
+import 'package:co_cook/styles/colors.dart';
+import 'package:co_cook/styles/shadows.dart';
+import 'package:co_cook/styles/text_styles.dart';
+
+import 'package:co_cook/services/detail_service.dart';
+import 'package:co_cook/screens/review_screen/review_screen.dart';
+import 'package:co_cook/screens/cook_screen/widgets/cook_screen_timer.dart';
 
 class CookScreenBody extends StatefulWidget {
   const CookScreenBody(
@@ -47,9 +48,14 @@ class _CookScreenBodyState extends State<CookScreenBody>
   AnimationController? _waveAnimationController;
   Animation? _waveAnimation;
 
+  late FlutterTts flutterTts;
+
   @override
-  void initState() {
+  void initState() async {
     super.initState();
+
+    flutterTts = FlutterTts();
+
     _waveAnimationController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 10),
@@ -70,6 +76,8 @@ class _CookScreenBodyState extends State<CookScreenBody>
       setState(() {
         _recipeCardPage = recipeCardPageController.page ?? 0;
 
+        flutterTts.stop();
+
         // debounce를 사용하여 TTS 호출을 처리
         if (_debounce?.isActive ?? false) _debounce?.cancel();
         _debounce = Timer(const Duration(milliseconds: 300), () {
@@ -81,10 +89,11 @@ class _CookScreenBodyState extends State<CookScreenBody>
           }
         });
 
-        if (_recipeCardPage.ceil() == dataList.length + 1) {
+        if (_recipeCardPage > dataList.length) {
+          print(_recipeCardPage);
           setState(() {
             _completeCardPage =
-                (dataList.length - _recipeCardPage).clamp(0.0, 1.0);
+                (dataList.length + 1 - _recipeCardPage).clamp(0, 1);
           });
         }
         if (_recipeCardPage.floor() == dataList.length + 1) {
@@ -99,12 +108,11 @@ class _CookScreenBodyState extends State<CookScreenBody>
   void dispose() {
     recipeCardPageController.dispose();
     _waveAnimationController?.dispose();
+    flutterTts.stop();
     super.dispose();
   }
 
   Future<void> speakText(String text) async {
-    FlutterTts flutterTts = FlutterTts();
-
     // 한국어 TTS 사용 예시
     await flutterTts.setLanguage("ko-KR");
     await flutterTts.speak(text);
@@ -116,7 +124,6 @@ class _CookScreenBodyState extends State<CookScreenBody>
     Response? response =
         await searchService.getDetailStep(recipeIdx: recipeIdx);
     if (response?.statusCode == 200) {
-      print(response!.data['data']['steps']);
       if (response!.data['data'] != null) {
         setState(() {
           dataList = response.data['data']['steps'];
@@ -198,10 +205,16 @@ class _CookScreenBodyState extends State<CookScreenBody>
                                         Container(
                                           decoration: BoxDecoration(
                                             image: DecorationImage(
-                                              image: NetworkImage(
-                                                  _firstData['recipeImgPath']),
-                                              fit: BoxFit.cover,
-                                            ),
+                                                image: _firstData[
+                                                            'recipeImgPath'] !=
+                                                        null
+                                                    ? NetworkImage(_firstData[
+                                                                'recipeImgPath']
+                                                            as String)
+                                                        as ImageProvider
+                                                    : const AssetImage(
+                                                        'assets/images/background/white_background.jpg'),
+                                                fit: BoxFit.cover),
                                             borderRadius:
                                                 BorderRadius.circular(16.0),
                                           ),
@@ -231,7 +244,7 @@ class _CookScreenBodyState extends State<CookScreenBody>
                                         Positioned.fill(
                                           child: Center(
                                             child: Text(
-                                                _firstData['recipeName'],
+                                                _firstData['recipeName'] ?? '',
                                                 style: CustomTextStyles()
                                                     .title1
                                                     .copyWith(

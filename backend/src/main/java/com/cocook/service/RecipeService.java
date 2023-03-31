@@ -8,13 +8,20 @@ import com.cocook.dto.review.ReviewResDto;
 import com.cocook.entity.*;
 import com.cocook.repository.*;
 import com.cocook.util.S3Uploader;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.ListOperations;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.SetOperations;
+import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.persistence.EntityNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Service
 
@@ -34,17 +41,22 @@ public class RecipeService {
     private final AmountService amountService;
     private final S3Uploader s3Uploader;
     private final JwtTokenProvider jwtTokenProvider;
+    private final RedisTemplate<String, String> redisTemplate;
 
-    @Autowired
-    public RecipeService(RecipeRepository recipeRepository, CategoryRepository categoryRepository, IngredientRepository ingredientRepository,
-                         StepRepository stepRepository, ThemeRepository themeRepository, TagService tagService, StepService stepService,
-                         IngredientService ingredientService, AmountService amountService, S3Uploader s3Uploader, FavoriteRepository favoriteRepository,
-                         JwtTokenProvider jwtTokenProvider, ReviewRepository reviewRepository, AmountRepository amountRepository, LikeRepository likeRepository) {
+
+    public RecipeService(RecipeRepository recipeRepository, CategoryRepository categoryRepository,
+                         IngredientRepository ingredientRepository, StepRepository stepRepository,
+                         ThemeRepository themeRepository, FavoriteRepository favoriteRepository,
+                         ReviewRepository reviewRepository, AmountRepository amountRepository,
+                         LikeRepository likeRepository, TagService tagService, StepService stepService,
+                         IngredientService ingredientService, AmountService amountService, S3Uploader s3Uploader,
+                         JwtTokenProvider jwtTokenProvider, RedisTemplate<String, String> redisTemplate) {
         this.recipeRepository = recipeRepository;
         this.categoryRepository = categoryRepository;
         this.ingredientRepository = ingredientRepository;
         this.stepRepository = stepRepository;
         this.themeRepository = themeRepository;
+        this.favoriteRepository = favoriteRepository;
         this.reviewRepository = reviewRepository;
         this.amountRepository = amountRepository;
         this.likeRepository = likeRepository;
@@ -53,17 +65,17 @@ public class RecipeService {
         this.ingredientService = ingredientService;
         this.amountService = amountService;
         this.s3Uploader = s3Uploader;
-        this.favoriteRepository = favoriteRepository;
         this.jwtTokenProvider = jwtTokenProvider;
+        this.redisTemplate = redisTemplate;
     }
 
     public void makeRecipe (RecipeDetailReqDto recipeDetail,
-                List<IngredientReqDto> ingredients,
-                String categoryName,
-                List<String> themeNames,
-                List<StepReqDto> steps,
-                MultipartFile recipeImg,
-                List<MultipartFile> stepImgs) {
+                            List<IngredientReqDto> ingredients,
+                            String categoryName,
+                            List<String> themeNames,
+                            List<StepReqDto> steps,
+                            MultipartFile recipeImg,
+                            List<MultipartFile> stepImgs) {
 
         Category category = categoryRepository.getCategoryByCategoryName(categoryName);
 
@@ -102,8 +114,21 @@ public class RecipeService {
     public RecipeInfoResDto getRecipeInfo(Long recipeIdx, String authToken) {
         Long userIdx = jwtTokenProvider.getUserIdx(authToken);
         Recipe recipe = recipeRepository.findRecipeById(recipeIdx);
+
+        if (recipe == null) {
+            throw new EntityNotFoundException("해당 레시피가 존재하지 않습니다.");
+        }
+
         Favorite favorite = favoriteRepository.findByUserIdAndRecipeId(userIdx, recipeIdx);
         boolean isFavorite = favorite != null;
+
+        ZSetOperations<String, String> zSetOperations = redisTemplate.opsForZSet();
+        Long length = zSetOperations.size(userIdx.toString());
+        zSetOperations.add(userIdx.toString(), recipeIdx.toString(), System.currentTimeMillis());
+        if (length != null && length >= 10) {
+            zSetOperations.removeRange(userIdx.toString(), 0, 0);
+        }
+
         return RecipeInfoResDto.builder()
                 .recipeName(recipe.getRecipeName())
                 .recipeImgPath(recipe.getImgPath())
@@ -163,8 +188,7 @@ public class RecipeService {
         List<ReviewResDto> recipeReviews = new ArrayList<>();
         for (Review review : userReview) {
             LikeReview foundLiked = likeRepository.findByUserIdAndReviewId(user.getId(), review.getId());
-            boolean isLiked = false;
-            if (foundLiked != null) { isLiked = true; }
+            boolean isLiked = foundLiked != null;
             ReviewResDto recipeReview = new ReviewResDto(review.getId(), user.getId(), review.getCreatedDate(), user.getNickname(), review.getContent(), review.getImgPath(),
                     review.getLikeCnt(), review.getCommentCnt(), review.getRunningTime(), isLiked);
             recipeReviews.add(recipeReview);
@@ -176,13 +200,13 @@ public class RecipeService {
             }
             Long userIdx = review.getUser().getId();
             LikeReview foundLiked = likeRepository.findByUserIdAndReviewId(user.getId(), review.getId());
-            boolean isLiked = false;
-            if (foundLiked != null) { isLiked = true; }
-            ReviewResDto recipeReview = new ReviewResDto(review.getId(), userIdx, review.getCreatedDate(), userNickname, review.getContent(), review.getImgPath(),
+            boolean isLiked = foundLiked != null;
+            ReviewResDto recipeReview = new ReviewResDto(review.getId(), userIdx, review.getCreatedDate(), userNickname, review.getContent(), review.getResizedImgPath(),
                     review.getLikeCnt(), review.getCommentCnt(), review.getRunningTime(), isLiked);
             recipeReviews.add(recipeReview);
         }
         return new ReviewListResDto(recipeReviews);
 
     }
+
 }

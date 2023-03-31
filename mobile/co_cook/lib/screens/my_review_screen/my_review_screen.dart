@@ -31,9 +31,8 @@ class _MyReviewScreenState extends State<MyReviewScreen> {
     // API 요청
     AuthService authService = AuthService();
     Response? response = await authService.getMyReview();
-    print(response!.data['data']);
     if (response?.statusCode == 200) {
-      if (response.data['data'] != null) {
+      if (response?.data['data'] != null) {
         setState(() {
           listData = response!.data['data'];
         });
@@ -49,6 +48,7 @@ class _MyReviewScreenState extends State<MyReviewScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          automaticallyImplyLeading: false,
           backgroundColor: CustomColors.monotoneLight,
           elevation: 0.5,
           title: const SizedBox.shrink(),

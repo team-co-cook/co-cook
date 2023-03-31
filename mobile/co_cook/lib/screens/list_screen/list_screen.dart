@@ -2,6 +2,7 @@ import 'package:co_cook/styles/shadows.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'dart:convert';
+import 'package:transparent_image/transparent_image.dart';
 
 import 'package:co_cook/styles/colors.dart';
 import 'package:co_cook/styles/text_styles.dart';
@@ -37,8 +38,7 @@ class _ListScreenState extends State<ListScreen> {
     getListData();
   }
 
-  List dataList = [];
-  bool isLoad = false;
+  List? dataList;
 
   Future<void> getListData() async {
     Response? response =
@@ -48,7 +48,6 @@ class _ListScreenState extends State<ListScreen> {
       if (decodeRes != null) {
         setState(() {
           dataList = decodeRes["data"]["recipeListResDto"];
-          isLoad = true;
         });
       }
     }
@@ -107,17 +106,18 @@ class _ListScreenState extends State<ListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          automaticallyImplyLeading: false,
           backgroundColor: CustomColors.monotoneLight,
           elevation: 0,
           toolbarHeight: 120,
-          automaticallyImplyLeading: false,
           flexibleSpace: Stack(
             children: [
               FlexibleSpaceBar(
-                background: Image.network(
-                  widget.imgPath,
-                  fit: BoxFit.cover,
-                ),
+                background: FadeInImage.memoryNetwork(
+                    fadeInDuration: const Duration(milliseconds: 200),
+                    fit: BoxFit.cover,
+                    placeholder: kTransparentImage,
+                    image: widget.imgPath),
               ),
               Positioned(
                 top: MediaQuery.of(context).padding.top,
@@ -199,34 +199,29 @@ class _ListScreenState extends State<ListScreen> {
               ),
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: dataList.isNotEmpty
-                      ? ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: dataList.length,
-                          physics: const BouncingScrollPhysics(
-                              parent: AlwaysScrollableScrollPhysics()),
-                          padding: const EdgeInsets.all(16),
-                          itemBuilder: (BuildContext context, int index) {
-                            return Container(
-                              margin: const EdgeInsets.only(bottom: 16),
-                              child: ListCard(data: dataList[index]),
-                            );
-                          })
-                      : isLoad
-                          ? Container(
-                              child: Center(
-                                child: Text(
-                                  '해당하는 음식이 없어요',
-                                  style: CustomTextStyles().body1.copyWith(
-                                      color: CustomColors.monotoneBlack),
-                                ),
+                    padding: const EdgeInsets.all(8),
+                    child: dataList == null || dataList!.isNotEmpty
+                        ? ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: dataList?.length ?? 5,
+                            physics: const BouncingScrollPhysics(
+                                parent: AlwaysScrollableScrollPhysics()),
+                            padding: const EdgeInsets.all(16),
+                            itemBuilder: (BuildContext context, int index) {
+                              return Container(
+                                margin: const EdgeInsets.only(bottom: 16),
+                                child: ListCard(data: dataList?[index]),
+                              );
+                            })
+                        : Container(
+                            child: Center(
+                              child: Text(
+                                '해당하는 음식이 없어요',
+                                style: CustomTextStyles().body1.copyWith(
+                                    color: CustomColors.monotoneBlack),
                               ),
-                            )
-                          : const Center(
-                              child: CircularProgressIndicator(
-                                  color: CustomColors.redPrimary)),
-                ),
+                            ),
+                          )),
               ),
             ],
           ),

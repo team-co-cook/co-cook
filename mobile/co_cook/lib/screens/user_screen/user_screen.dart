@@ -23,7 +23,7 @@ class UserScreen extends StatefulWidget {
 }
 
 class _UserScreenState extends State<UserScreen> {
-  String _nickname = 'username';
+  String _nickname = '';
   final PanelController _nickPanelController = PanelController();
 
   @override
@@ -57,6 +57,7 @@ class _UserScreenState extends State<UserScreen> {
     return Stack(children: [
       Scaffold(
         appBar: AppBar(
+          automaticallyImplyLeading: false,
           backgroundColor: CustomColors.monotoneLight,
           elevation: 0.5,
           toolbarHeight: 100,
@@ -86,7 +87,7 @@ class _UserScreenState extends State<UserScreen> {
         ),
         body: Container(
           child: Padding(
-            padding: EdgeInsets.fromLTRB(20, 20, 0, 0),
+            padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -119,7 +120,7 @@ class _UserScreenState extends State<UserScreen> {
                   text: '회원탈퇴',
                   color: CustomColors.redPrimary,
                   onPressed: () {
-                    withdrawal(context);
+                    showWithdrawalConfirmDialog(context);
                   },
                 ),
                 CustomTextButton(
@@ -142,35 +143,151 @@ class _UserScreenState extends State<UserScreen> {
   }
 }
 
-class CustomTextButton extends StatelessWidget {
-  CustomTextButton(
-      {super.key, required this.text, required this.color, this.onPressed});
+class CustomTextButton extends StatefulWidget {
+  CustomTextButton({
+    Key? key,
+    required this.text,
+    required this.color,
+    this.onPressed,
+  }) : super(key: key);
 
   final String text;
   final Color color;
   final void Function()? onPressed;
 
   @override
+  _CustomTextButtonState createState() => _CustomTextButtonState();
+}
+
+class _CustomTextButtonState extends State<CustomTextButton> {
+  Color _backgroundColor = Colors.transparent;
+
+  @override
   Widget build(BuildContext context) {
-    return TextButton(
-      onPressed: onPressed,
-      child: Text(
-        text,
-        style: CustomTextStyles().subtitle1.copyWith(color: color),
-      ),
-      style: ButtonStyle(
-        overlayColor: MaterialStateProperty.all<Color>(
-            Colors.transparent), // 기본 터치 효과를 없애는 코드
+    return GestureDetector(
+      onTapDown: (_) {
+        setState(() {
+          _backgroundColor = widget.color.withOpacity(0.2);
+        });
+      },
+      onTapCancel: () {
+        setState(() {
+          _backgroundColor = Colors.transparent;
+        });
+      },
+      onTapUp: (_) {
+        setState(() {
+          _backgroundColor = Colors.transparent;
+        });
+      },
+      onTap: widget.onPressed,
+      child: Container(
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: _backgroundColor,
+          borderRadius: BorderRadius.circular(8.0),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Text(
+            widget.text,
+            style: CustomTextStyles().subtitle1.copyWith(color: widget.color),
+          ),
+        ),
       ),
     );
   }
+}
+
+Future<void> showWithdrawalConfirmDialog(BuildContext context) async {
+  return showDialog<void>(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text('탈퇴하시겠습니까?',
+            style: CustomTextStyles()
+                .body1
+                .copyWith(color: CustomColors.monotoneBlack)),
+        content: Text('작성한 댓글과 한줄평은 삭제되지 않습니다.',
+            style: CustomTextStyles()
+                .body1
+                .copyWith(color: CustomColors.monotoneBlack)),
+        actions: [
+          TextButton(
+            child: Text('취소',
+                style: CustomTextStyles()
+                    .body1
+                    .copyWith(color: CustomColors.monotoneBlack)),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.transparent,
+              shadowColor: Colors.transparent,
+              elevation: 0,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+          ),
+          TextButton(
+            child: Text('확인',
+                style: CustomTextStyles()
+                    .body1
+                    .copyWith(color: CustomColors.redPrimary)),
+            onPressed: () {
+              withdrawal(context);
+              Navigator.of(context).pop();
+            },
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.transparent,
+              shadowColor: Colors.transparent,
+              elevation: 0,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+          ),
+        ],
+      );
+    },
+  );
+}
+
+Future<void> showWithdrawalCompleteDialog(BuildContext context) async {
+  return showDialog<void>(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text('탈퇴 완료되었습니다',
+            style: CustomTextStyles()
+                .body1
+                .copyWith(color: CustomColors.monotoneBlack)),
+        actions: [
+          TextButton(
+            child: Text('확인',
+                style: CustomTextStyles()
+                    .body1
+                    .copyWith(color: CustomColors.monotoneBlack)),
+            onPressed: () {
+              Route login =
+                  MaterialPageRoute(builder: (context) => const LoginScreen());
+              Navigator.pushReplacement(context, login);
+            },
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.transparent,
+              shadowColor: Colors.transparent,
+              elevation: 0,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+          ),
+        ],
+      );
+    },
+  );
 }
 
 // 구글 로그인 정보 지우기
 Future<void> signOutGoogle() async {
   final GoogleSignIn googleSignIn = GoogleSignIn(); // 구글 로그인 함수 불러오기
   await googleSignIn.signOut();
-  print('로그아웃!');
+  // print('로그아웃!');
 }
 
 // 전체 로그아웃 호출 함수
@@ -178,7 +295,7 @@ void logOut({required BuildContext context}) async {
   final prefs = await SharedPreferences.getInstance();
   final success = await prefs.remove('userData');
   signOutGoogle();
-  print('로그인 정보 삭제 완료!');
+  // print('로그인 정보 삭제 완료!');
   Route login = MaterialPageRoute(builder: (context) => const LoginScreen());
   Navigator.pushReplacement(context, login);
 }
@@ -196,10 +313,8 @@ void withdrawal(BuildContext context) async {
   AuthService _apiService = AuthService();
   Response? response = await _apiService.withdrawal(userIdx);
 
-  if (response?.data['status'] == 204) {
-    // print('로그인으로 이동!');
-    Route login = MaterialPageRoute(builder: (context) => const LoginScreen());
-    Navigator.pushReplacement(context, login);
+  if (response?.statusCode == 204) {
+    showWithdrawalCompleteDialog(context);
   }
 }
 
