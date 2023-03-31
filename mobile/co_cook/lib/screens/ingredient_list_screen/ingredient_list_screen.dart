@@ -59,23 +59,32 @@ class _IngredientListScreenState extends State<IngredientListScreen> {
   }
 
   // 재료 버튼 생성
-  Row _buildIngredientButtons() {
-    return Row(
-      children: widget.ingredients.map((ingredient) {
-        return Padding(
-          padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
-          child: ButtonToggle(
-              label: ingredient,
-              isToggleOn: ingredientIsToggle[ingredient] == true,
-              onPressed: () {
-                setState(() {
-                  ingredientIsToggle[ingredient] =
-                      !ingredientIsToggle[ingredient]!;
-                  getListData();
-                });
-              }),
-        );
-      }).toList(),
+  Widget _buildIngredientButtons() {
+    return SingleChildScrollView(
+      physics:
+          const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+      scrollDirection: Axis.horizontal,
+      child: Container(
+        width: MediaQuery.of(context).size.width,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: widget.ingredients.map((ingredient) {
+            return Padding(
+              padding: const EdgeInsets.fromLTRB(0, 0, 16, 8),
+              child: ButtonToggle(
+                  label: ingredient,
+                  isToggleOn: ingredientIsToggle[ingredient] == true,
+                  onPressed: () {
+                    setState(() {
+                      ingredientIsToggle[ingredient] =
+                          !ingredientIsToggle[ingredient]!;
+                      getListData();
+                    });
+                  }),
+            );
+          }).toList(),
+        ),
+      ),
     );
   }
 
@@ -121,6 +130,8 @@ class _IngredientListScreenState extends State<IngredientListScreen> {
             Expanded(
               child: dataList.isNotEmpty
                   ? ListView.custom(
+                      physics: const BouncingScrollPhysics(
+                          parent: AlwaysScrollableScrollPhysics()),
                       childrenDelegate: SliverChildListDelegate(
                         [
                           Center(
