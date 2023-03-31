@@ -187,15 +187,13 @@ async def upload_img(image: UploadFile = File(...)):
     save_path = Path("uploaded_files_hs/"+ formatted_date)
     save_path.mkdir(exist_ok=True)
 
-    # mp3 파일을 저장할 경로 지정
+    # image 파일을 저장할 경로 지정
     image_path = save_path / (formatted_date_time+'_'+ image.filename)
     print(image_path)
     # 파일 저장
     with image_path.open("wb") as buffer:
         shutil.copyfileobj(image.file, buffer)
-        result = await im.find_image(image_path)
-    
-    # os.remove(image_path)
+        result = await im.find_image(image.file)
     
     return result
 
