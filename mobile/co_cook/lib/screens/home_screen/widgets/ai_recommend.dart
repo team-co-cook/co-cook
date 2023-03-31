@@ -1,6 +1,12 @@
+import 'package:co_cook/screens/image_result_screen/image_result_screen.dart';
+import 'package:co_cook/services/image_service.dart';
+import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:co_cook/utils/route.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:zoom_tap_animation/zoom_tap_animation.dart';
+import 'dart:io';
 
 import 'package:co_cook/styles/colors.dart';
 import 'package:co_cook/styles/text_styles.dart';
@@ -15,6 +21,9 @@ class AiRecommend extends StatefulWidget {
 }
 
 class _AiRecommendState extends State<AiRecommend> {
+  XFile? imgFile;
+  final GlobalKey _voiceCardKey = GlobalKey();
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -128,9 +137,14 @@ class _AiRecommendState extends State<AiRecommend> {
 
   Widget AiRecommendPhotoCard() {
     return ZoomTapAnimation(
+      key: _voiceCardKey,
       end: 0.98,
       onTap: () {
-        pushScreen(context, CameraScreen(isNext: true));
+        if (Platform.isAndroid) {
+          _showPopupMenu(_voiceCardKey);
+        } else {
+          pushScreen(context, CameraScreen(isNext: true));
+        }
       },
       child: Stack(children: [
         Container(
@@ -188,5 +202,94 @@ class _AiRecommendState extends State<AiRecommend> {
                         ])))),
       ]),
     );
+  }
+
+  Future<void> _getImage(ImageSource source) async {
+    final pickedFile = await ImagePicker().pickImage(source: source);
+    if (pickedFile == null) {
+      return;
+    }
+    imgFile = XFile(pickedFile.path);
+
+    getImgData();
+  }
+
+  Future getImgData() async {
+    String fileName = imgFile!.path.split('/').last;
+    MultipartFile multipartFile =
+        await MultipartFile.fromFile(imgFile!.path, filename: fileName);
+    print(fileName);
+
+    FormData formData = FormData.fromMap({
+      "image": multipartFile,
+    });
+
+    // API 요청
+    ImageService searchService = ImageService();
+    Response? response = await searchService.postImage(formData);
+    print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!$response');
+    if (response?.statusCode == 200) {
+      if (response!.data != null) {
+        Route imageResult = MaterialPageRoute(
+            builder: (context) => ImageResultScreen(searchWord: response.data));
+        Navigator.push(context, imageResult);
+      }
+    }
+  }
+
+  Widget _buildAndroidButton() {
+    return PopupMenuButton<ImageSource>(
+      color: CustomColors.monotoneLight,
+      itemBuilder: (BuildContext context) => [
+        const PopupMenuItem(
+          child: Text('카메라'),
+          value: ImageSource.camera,
+        ),
+        const PopupMenuItem(
+          child: Text('갤러리'),
+          value: ImageSource.gallery,
+        ),
+      ],
+      onSelected: _getImage,
+      icon: const Icon(CupertinoIcons.camera, color: CustomColors.monotoneGray),
+    );
+  }
+
+  void _showPopupMenu(GlobalKey key) async {
+    final RenderBox? button =
+        key.currentContext?.findRenderObject() as RenderBox?;
+    final RenderBox overlay =
+        Overlay.of(context)!.context.findRenderObject() as RenderBox;
+
+    if (button != null) {
+      final RelativeRect position = RelativeRect.fromRect(
+        Rect.fromPoints(
+          button.localToGlobal(Offset.zero, ancestor: overlay),
+          button.localToGlobal(button.size.bottomRight(Offset.zero),
+              ancestor: overlay),
+        ),
+        Offset.zero & overlay.size,
+      );
+
+      final result = await showMenu(
+        context: context,
+        position: position,
+        items: [
+          PopupMenuItem(
+            child: const Text('카메라'),
+            value: ImageSource.camera,
+          ),
+          PopupMenuItem(
+            child: const Text('갤러리'),
+            value: ImageSource.gallery,
+          ),
+        ],
+        elevation: 8.0,
+      );
+
+      if (result != null) {
+        _getImage(result);
+      }
+    }
   }
 }
