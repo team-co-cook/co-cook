@@ -15,6 +15,7 @@ configurations {
 
 repositories {
     mavenCentral()
+    maven { url 'https://jitpack.io' }
 }
 
 dependencies {
@@ -33,12 +34,22 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
-    // Deeplearning4j Word2Vec
-    implementation 'org.deeplearning4j:deeplearning4j-core:1.0.0-beta7'
     implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'    
+    implementation 'org.springframework:spring-context:5.3.14'
+    // https://mvnrepository.com/artifact/org.deeplearning4j/deeplearning4j-core
+    implementation 'com.github.vinhkhuc:jfasttext:0.4'
 
 }
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+bootJar {
+    exclude 'wiki.ko.bin'
+}
+
+jar {
+    exclude 'wiki.ko.bin'
 }
