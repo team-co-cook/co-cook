@@ -19,7 +19,9 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:co_cook/widgets/sound_meter/sound_meter.dart';
 
 class CookScreenRecoder extends StatefulWidget {
-  const CookScreenRecoder({Key? key}) : super(key: key);
+  const CookScreenRecoder({Key? key, required this.controlNotifier})
+      : super(key: key);
+  final ValueNotifier<String> controlNotifier;
 
   @override
   State<CookScreenRecoder> createState() => _CookScreenRecoderState();
@@ -30,7 +32,7 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
   ///PicoVioce
   ///
   late List apiKeys;
-  late int apiKeyIndex;
+  int apiKeyIndex = 0;
   int maxIndex = 3;
 
   final List<String> keywordAssets = Platform.isAndroid
@@ -46,8 +48,6 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
   late PorcupineManager _porcupineManager;
 
   void createPorcupineManager() async {
-    print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
-    print(dotenv.env['PICOVOICE_API_KEY']);
     apiKeys = [
       dotenv.env['PICOVOICE_API_KEY_1'],
       dotenv.env['PICOVOICE_API_KEY_2'],
@@ -126,10 +126,6 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
       _audioPlayer = AudioPlayer();
     });
     createPorcupineManager();
-
-    // 오늘자 기준 키  인덱스 설정
-    DateTime now = DateTime.now();
-    apiKeyIndex = now.day % 4;
   }
 
   Future<void> setTempDir() async {
@@ -180,7 +176,7 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
               _isRecording = false;
               if (_isSay) {
                 // 사용자가 말 했을 때
-                postAudio('${cookTempDir.path}/$audioFilePk.m4a');
+                postAudioDJ('${cookTempDir.path}/$audioFilePk.m4a');
                 _audioPlayer.play(
                     DeviceFileSource('${cookTempDir.path}/$audioFilePk.m4a'));
                 setState(() {
@@ -203,13 +199,14 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
   }
 
   // 오디오 전송
-  Future<void> postAudio(String path) async {
+  Future<void> postAudioDJ(String path) async {
     // API 요청
     AudioService searchService = AudioService();
-    Response? response = await searchService.postAudio(path);
+    Response? response = await searchService.postAudioDJ(path);
     if (response?.statusCode == 200) {
       if (response != null) {
         print("전송 성공 : ${response.data}");
+        widget.controlNotifier.value = response.data['result'];
       }
     }
   }

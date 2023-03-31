@@ -27,8 +27,9 @@ class _SearchScreenState extends State<SearchScreen> {
   final TextEditingController _customTextFieldController =
       TextEditingController();
 
+  bool isSearch = false;
   List dataList = [];
-  List trendWord = ['두부', '감자'];
+  List trendWord = [];
 
   @override
   void initState() {
@@ -41,10 +42,9 @@ class _SearchScreenState extends State<SearchScreen> {
     SearchService searchService = SearchService();
     Response? response = await searchService.getTrendList();
     if (response?.statusCode == 200) {
-      Map? decodeRes = await jsonDecode(response.toString());
-      if (decodeRes != null) {
+      if (response!.data['data'] != null) {
         setState(() {
-          dataList = decodeRes["data"];
+          trendWord = response!.data['data'];
         });
       }
     }
@@ -63,10 +63,11 @@ class _SearchScreenState extends State<SearchScreen> {
     SearchService searchService = SearchService();
     Response? response = await searchService.getSearchList(keyword: keyword);
     if (response?.statusCode == 200) {
-      Map? decodeRes = await jsonDecode(response.toString());
-      if (decodeRes != null) {
+      if (response!.data['data'] != null) {
+        print(response.data['data']["recipeListResDto"]);
         setState(() {
-          dataList = decodeRes["data"]["recipeListResDto"];
+          dataList = response.data['data']["recipeListResDto"];
+          isSearch = true;
         });
       }
     }
@@ -136,6 +137,7 @@ class _SearchScreenState extends State<SearchScreen> {
                       setState(() {
                         _searchWord = '';
                         dataList = [];
+                        isSearch = false;
                       });
                       // 커스텀 텍스트 필드의 컨트롤러를 사용하여 텍스트 필드 값을 업데이트
                       _customTextFieldController.text = _searchWord!;
@@ -148,7 +150,8 @@ class _SearchScreenState extends State<SearchScreen> {
                   ),
                 IconButton(
                   color: CustomColors.monotoneGray,
-                  onPressed: () => pushScreen(context, CameraScreen()),
+                  onPressed: () => pushScreen(
+                      context, CameraScreen(setWordAndSearch: _clickSearch)),
                   icon: Icon(CupertinoIcons.camera),
                   // 기본 효과 제거
                   splashRadius: 0.01,
@@ -194,8 +197,15 @@ class _SearchScreenState extends State<SearchScreen> {
               ),
               SliverFillRemaining(
                 hasScrollBody: false,
-                child: dataList.isNotEmpty
-                    ? SizedBox.shrink()
+                child: isSearch
+                    ? dataList.isEmpty
+                        ? Center(
+                            child: Text('검색 결과가 존재하지 않습니다.',
+                                style: CustomTextStyles().body1.copyWith(
+                                      color: CustomColors.monotoneGray,
+                                    )),
+                          )
+                        : Container()
                     : Stack(
                         children: [
                           Column(
@@ -212,15 +222,24 @@ class _SearchScreenState extends State<SearchScreen> {
                                   int index = entry.key;
                                   String word = entry.value;
                                   return Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
-                                      Text(
-                                        '${index + 1}위',
-                                        style: CustomTextStyles()
-                                            .body1
-                                            .copyWith(
-                                              color: CustomColors.monotoneGray,
-                                            ),
+                                      SizedBox(
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width /
+                                              4),
+                                      SizedBox(
+                                        width: 32,
+                                        child: Text(
+                                          '${index + 1}위',
+                                          style: CustomTextStyles()
+                                              .body1
+                                              .copyWith(
+                                                color:
+                                                    CustomColors.monotoneGray,
+                                              ),
+                                        ),
                                       ),
                                       SizedBox(width: 8.0),
                                       CommonButton(

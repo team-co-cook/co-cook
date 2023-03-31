@@ -171,18 +171,31 @@ class _VoiceSearchScreenState extends State<VoiceSearchScreen> {
   Future<void> postAudio(String path) async {
     // API 요청
     AudioService searchService = AudioService();
-    Response? response = await searchService.postAudio(path);
-    if (response?.statusCode == 200 &&
-        response != null &&
-        !_reciveIngredientList.contains(response.data["result"])) {
-      setState(() {
-        _loadIngreciveIngredientCount--;
-        _reciveIngredientList.insert(0, response.data["result"]);
-      });
+    Response? response = await searchService.postAudioIngredient(path);
+    if (response?.statusCode == 200 && response != null) {
+      print(response.data);
+      if (!_reciveIngredientList.contains(response.data["data"])) {
+        setState(() {
+          _loadIngreciveIngredientCount--;
+          _reciveIngredientList.insert(0, response.data["data"]);
+        });
+      } else {
+        setState(() {
+          _loadIngreciveIngredientCount--;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text("이미 존재하는 재료입니다."),
+          duration: Duration(seconds: 1),
+        ));
+      }
     } else {
       setState(() {
         _loadIngreciveIngredientCount--;
       });
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("다시 말해주세요!"),
+        duration: Duration(seconds: 1),
+      ));
     }
   }
 

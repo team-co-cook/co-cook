@@ -32,6 +32,16 @@ class _ListCardState extends State<ListCard> {
     });
   }
 
+  @override
+  void didUpdateWidget(ListCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.data != widget.data) {
+      setState(() {
+        isAdd = widget.data != null ? widget.data!["isFavorite"] : false;
+      });
+    }
+  }
+
   late bool isAdd;
 
   void toggleIsAdd() {
