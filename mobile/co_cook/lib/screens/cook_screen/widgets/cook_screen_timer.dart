@@ -6,19 +6,17 @@ import 'package:co_cook/styles/text_styles.dart';
 import 'package:zoom_tap_animation/zoom_tap_animation.dart';
 
 class CookScreenTimer extends StatefulWidget {
-  CookScreenTimer({
-    super.key,
-    required this.time,
-    required this.play,
-  });
+  const CookScreenTimer(
+      {required this.key, required this.time, required this.play});
   final int time;
   final bool play;
+  final GlobalKey<CookScreenTimerState> key; // 글로벌 키 추가
 
   @override
-  State<CookScreenTimer> createState() => _CookScreenTimerState();
+  State<CookScreenTimer> createState() => CookScreenTimerState();
 }
 
-class _CookScreenTimerState extends State<CookScreenTimer> {
+class CookScreenTimerState extends State<CookScreenTimer> {
   late int _currentSeconds;
   late Timer? _timer;
   bool _isPlay = false;

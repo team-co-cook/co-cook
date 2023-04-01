@@ -37,6 +37,7 @@ class _CookScreenBodyState extends State<CookScreenBody>
     with SingleTickerProviderStateMixin {
   List dataList = [];
   Map _firstData = {};
+  List<GlobalKey<CookScreenTimerState>> timerKeys = [];
 
   final PageController recipeCardPageController =
       PageController(viewportFraction: 0.7);
@@ -134,6 +135,11 @@ class _CookScreenBodyState extends State<CookScreenBody>
         setState(() {
           dataList = response.data['data']['steps'];
         });
+
+        // 타미머 글로벌 키 리스트 초기화
+        for (int i = 0; i < dataList.length; i++) {
+          timerKeys.add(GlobalKey<CookScreenTimerState>());
+        }
       }
     }
   }
@@ -185,6 +191,14 @@ class _CookScreenBodyState extends State<CookScreenBody>
               break;
             case '타이머':
               // 타이머를 설정합니다.
+              if (_recipeCardPage > 0 &&
+                  _recipeCardPage <= dataList.length + 1) {
+                if (dataList[_recipeCardPage.floor() - 1]["timer"] != null) {
+                  timerKeys[_recipeCardPage.floor() - 1]
+                      .currentState
+                      ?.startTimer();
+                }
+              }
               widget.controlNotifier.value = '';
               break;
             default:
@@ -447,6 +461,9 @@ class _CookScreenBodyState extends State<CookScreenBody>
                                                                         "timer"] !=
                                                                     null
                                                                 ? CookScreenTimer(
+                                                                    key: timerKeys[
+                                                                        index -
+                                                                            1], // GlobalKey 전달
                                                                     time: dataList[
                                                                             index -
                                                                                 1]
