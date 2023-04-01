@@ -21,8 +21,9 @@ class AiRecommend extends StatefulWidget {
 }
 
 class _AiRecommendState extends State<AiRecommend> {
+  // 사진 검색용 변수
   XFile? imgFile;
-  final GlobalKey _voiceCardKey = GlobalKey();
+  bool _isImageSearchLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -137,11 +138,10 @@ class _AiRecommendState extends State<AiRecommend> {
 
   Widget AiRecommendPhotoCard() {
     return ZoomTapAnimation(
-      key: _voiceCardKey,
       end: 0.98,
       onTap: () {
         if (Platform.isAndroid) {
-          _showPopupMenu(_voiceCardKey);
+          _getImage(ImageSource.camera);
         } else {
           pushScreen(context, CameraScreen(isNext: true));
         }
@@ -204,12 +204,17 @@ class _AiRecommendState extends State<AiRecommend> {
     );
   }
 
+  /////////////////////////////// 사진 검색용 코드입니다.
+
   Future<void> _getImage(ImageSource source) async {
     final pickedFile = await ImagePicker().pickImage(source: source);
     if (pickedFile == null) {
       return;
     }
     imgFile = XFile(pickedFile.path);
+
+    // 로딩 스피너 표시
+    _showLoadingSpinner(context);
 
     getImgData();
   }
@@ -230,6 +235,9 @@ class _AiRecommendState extends State<AiRecommend> {
     print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!$response');
     if (response?.statusCode == 200) {
       if (response!.data != null) {
+        // 로딩 스피너 닫기
+        Navigator.of(context).pop();
+        // 이미지 결과 페이지로 이동
         Route imageResult = MaterialPageRoute(
             builder: (context) => ImageResultScreen(searchWord: response.data));
         Navigator.push(context, imageResult);
@@ -237,59 +245,15 @@ class _AiRecommendState extends State<AiRecommend> {
     }
   }
 
-  Widget _buildAndroidButton() {
-    return PopupMenuButton<ImageSource>(
-      color: CustomColors.monotoneLight,
-      itemBuilder: (BuildContext context) => [
-        const PopupMenuItem(
-          child: Text('카메라'),
-          value: ImageSource.camera,
-        ),
-        const PopupMenuItem(
-          child: Text('갤러리'),
-          value: ImageSource.gallery,
-        ),
-      ],
-      onSelected: _getImage,
-      icon: const Icon(CupertinoIcons.camera, color: CustomColors.monotoneGray),
+  void _showLoadingSpinner(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Center(
+          child: CircularProgressIndicator(color: CustomColors.redPrimary),
+        );
+      },
     );
-  }
-
-  void _showPopupMenu(GlobalKey key) async {
-    final RenderBox? button =
-        key.currentContext?.findRenderObject() as RenderBox?;
-    final RenderBox overlay =
-        Overlay.of(context)!.context.findRenderObject() as RenderBox;
-
-    if (button != null) {
-      final RelativeRect position = RelativeRect.fromRect(
-        Rect.fromPoints(
-          button.localToGlobal(Offset.zero, ancestor: overlay),
-          button.localToGlobal(button.size.bottomRight(Offset.zero),
-              ancestor: overlay),
-        ),
-        Offset.zero & overlay.size,
-      );
-
-      final result = await showMenu(
-        context: context,
-        position: position,
-        items: [
-          PopupMenuItem(
-            child: const Text('카메라'),
-            value: ImageSource.camera,
-          ),
-          PopupMenuItem(
-            child: const Text('갤러리'),
-            value: ImageSource.gallery,
-          ),
-        ],
-        elevation: 8.0,
-      );
-
-      if (result != null) {
-        _getImage(result);
-      }
-    }
   }
 }
