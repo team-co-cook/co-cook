@@ -29,7 +29,7 @@ class CookScreenTimerState extends State<CookScreenTimer> {
 
   @override
   void dispose() {
-    _endTimer();
+    _disposeTimer();
     super.dispose();
   }
 
@@ -52,6 +52,15 @@ class CookScreenTimerState extends State<CookScreenTimer> {
         _isPlay = false;
         _currentSeconds = widget.time;
       });
+    }
+  }
+
+  void _disposeTimer() {
+    if (_isPlay && mounted) {
+      print("타이머 종료");
+      _timer?.cancel();
+      _isPlay = false;
+      _currentSeconds = widget.time;
     }
   }
 
