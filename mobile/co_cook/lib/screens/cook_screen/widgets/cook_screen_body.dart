@@ -152,6 +152,12 @@ class _CookScreenBodyState extends State<CookScreenBody>
     }
   }
 
+  void replayTts() {
+    if (currentTtsIndex < dataList.length && currentTtsIndex >= 0) {
+      speakText(dataList[currentTtsIndex]["content"]);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<String>(
@@ -159,7 +165,8 @@ class _CookScreenBodyState extends State<CookScreenBody>
         builder: (context, value, child) {
           switch (value) {
             case '다시':
-              // 슬라이드를 다시 시작합니다.
+              // 슬라이드 tts를 다시 시작합니다.
+              replayTts();
               widget.controlNotifier.value = '';
               break;
             case '다음':

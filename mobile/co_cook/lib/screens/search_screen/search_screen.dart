@@ -137,7 +137,6 @@ class _SearchScreenState extends State<SearchScreen> {
     // API 요청
     ImageService searchService = ImageService();
     Response? response = await searchService.postImage(formData);
-    print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!$response');
     if (response?.statusCode == 200) {
       if (response!.data != null) {
         _clickSearch(response.data);

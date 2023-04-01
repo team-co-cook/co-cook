@@ -6,7 +6,11 @@ import 'package:co_cook/styles/text_styles.dart';
 import 'package:zoom_tap_animation/zoom_tap_animation.dart';
 
 class CookScreenTimer extends StatefulWidget {
-  const CookScreenTimer({super.key, required this.time, required this.play});
+  CookScreenTimer({
+    super.key,
+    required this.time,
+    required this.play,
+  });
   final int time;
   final bool play;
 
@@ -31,7 +35,7 @@ class _CookScreenTimerState extends State<CookScreenTimer> {
     super.dispose();
   }
 
-  void _startTimer() {
+  void startTimer() {
     if (!_isPlay) {
       setState(() {
         _isPlay = true;
@@ -81,7 +85,7 @@ class _CookScreenTimerState extends State<CookScreenTimer> {
     return Container(
       padding: const EdgeInsets.only(left: 8.0, right: 8.0),
       child: ZoomTapAnimation(
-        onTap: () => _startTimer(),
+        onTap: () => startTimer(),
         end: 0.98,
         child: Container(
           width: double.infinity,
