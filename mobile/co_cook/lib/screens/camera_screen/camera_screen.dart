@@ -36,7 +36,7 @@ class _CameraScreenState extends State<CameraScreen> {
   late String tmpImgPath;
   XFile? imgFile;
   late String _imageWord;
-  bool _isCapturing = false;
+  bool _isComplete = false;
 
   void _getTmpImgPath() async {
     Directory tmpPath = await getTemporaryDirectory();
@@ -44,55 +44,55 @@ class _CameraScreenState extends State<CameraScreen> {
   }
 
   Future<void> _takePhoto() async {
-    if (!_cameraController.value.isInitialized) {
-      print("Camera is not initialized yet.");
+    await _cameraController.pausePreview();
+
+    try {
+      imgFile = await _cameraController.takePicture();
+    } on CameraException catch (e) {
+      print('error: $e');
       return;
     }
 
-    try {
-      _cameraController.pausePreview();
-      imgFile = await _cameraController.takePicture();
+    setState(() {
+      isProcess = true;
+    });
+    await Future.delayed(Duration(seconds: 1));
 
+    // 이미지 크롭
+    File croppedImageFile = await _cropImage(File(imgFile!.path));
+    imgFile = XFile(croppedImageFile.path);
+
+    bool state = await getImgData();
+    if (state) {
       setState(() {
-        isProcess = true;
+        _isComplete = true;
       });
-      await Future.delayed(Duration(seconds: 1));
-
-      // 이미지 크롭
-      File croppedImageFile = await _cropImage(File(imgFile!.path));
-      imgFile = XFile(croppedImageFile.path);
-
-      bool state = await getImgData();
-      if (state) {
-        if (widget.isNext) {
-          Route imageResult = MaterialPageRoute(
-              builder: (context) => ImageResultScreen(searchWord: _imageWord));
-          Navigator.pushReplacement(context, imageResult);
-        } else {
-          Navigator.pop(context);
-        }
+      if (widget.isNext) {
+        Route imageResult = MaterialPageRoute(
+            builder: (context) => ImageResultScreen(searchWord: _imageWord));
+        Navigator.pushReplacement(context, imageResult);
       } else {
-        _searchFail();
+        Navigator.pop(context);
       }
-    } catch (e) {
-      print("Error: $e");
+    } else {
       _searchFail();
-    } finally {
-      _isCapturing = false;
     }
   }
 
   Future<void> _selectPhoto() async {
     _cameraController.pausePreview();
+    imgFile = await _picker.pickImage(source: ImageSource.gallery);
     setState(() {
       isProcess = true;
     });
-    imgFile = await _picker.pickImage(source: ImageSource.gallery);
     if (imgFile != null) {
       print('이미지 검색 중');
       bool state = await getImgData();
       print(state);
       if (state) {
+        setState(() {
+          _isComplete = true;
+        });
         if (widget.isNext) {
           Route imageResult = MaterialPageRoute(
               builder: (context) => ImageResultScreen(searchWord: _imageWord));
@@ -288,15 +288,17 @@ class _CameraScreenState extends State<CameraScreen> {
                       (isProcess ? 0.7 : 0.8),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    border: isProcess
-                        ? Border.all(
-                            color: Color.fromARGB(67, 0, 0, 0),
-                            width: MediaQuery.sizeOf(context).height / 2,
-                            strokeAlign: BorderSide.strokeAlignOutside)
-                        : Border.all(
-                            color: CustomColors.monotoneLight,
-                            width: 1,
-                            strokeAlign: BorderSide.strokeAlignOutside),
+                    border: _isComplete
+                        ? null
+                        : isProcess
+                            ? Border.all(
+                                color: Color.fromARGB(67, 0, 0, 0),
+                                width: MediaQuery.sizeOf(context).height / 2,
+                                strokeAlign: BorderSide.strokeAlignOutside)
+                            : Border.all(
+                                color: CustomColors.monotoneLight,
+                                width: 1,
+                                strokeAlign: BorderSide.strokeAlignOutside),
                   ),
                 ),
                 Container(

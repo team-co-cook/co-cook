@@ -38,12 +38,16 @@ PODS:
     - AppAuth/Core (~> 1.6)
     - GTMSessionFetcher/Core (< 3.0, >= 1.5)
   - GTMSessionFetcher/Core (2.3.0)
+  - image_crop (0.0.1):
+    - Flutter
   - image_picker_ios (0.0.1):
     - Flutter
   - ios-voice-processor (1.0.3)
   - path_provider_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
+  - PlainPocketFFT (0.0.9)
+  - PocketFFT (0.0.1)
   - Porcupine-iOS (2.1.2):
     - ios-voice-processor (~> 1.0.2)
   - porcupine_flutter (2.1.6):
@@ -51,6 +55,15 @@ PODS:
     - Porcupine-iOS (~> 2.1.2)
   - record (0.0.1):
     - Flutter
+  - RosaKit (0.0.11):
+    - PlainPocketFFT (~> 0.0.9)
+    - PocketFFT (~> 0.0.1)
+  - RxCocoa (6.5.0):
+    - RxRelay (= 6.5.0)
+    - RxSwift (= 6.5.0)
+  - RxRelay (6.5.0):
+    - RxSwift (= 6.5.0)
+  - RxSwift (6.5.0)
   - sensors (0.0.1):
     - Flutter
   - sensors_plus (0.0.1):
@@ -60,6 +73,19 @@ PODS:
   - shared_preferences_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
+  - TensorFlowLiteC (2.6.0):
+    - TensorFlowLiteC/Core (= 2.6.0)
+  - TensorFlowLiteC/Core (2.6.0)
+  - TensorFlowLiteSwift (2.6.0):
+    - TensorFlowLiteSwift/Core (= 2.6.0)
+  - TensorFlowLiteSwift/Core (2.6.0):
+    - TensorFlowLiteC (= 2.6.0)
+  - tflite_audio (0.3.0):
+    - Flutter
+    - RosaKit
+    - RxCocoa (= 6.5.0)
+    - RxSwift (= 6.5.0)
+    - TensorFlowLiteSwift (~> 2.6.0)
 
 DEPENDENCIES:
   - audioplayers_darwin (from `.symlinks/plugins/audioplayers_darwin/ios`)
@@ -72,6 +98,7 @@ DEPENDENCIES:
   - flutter_voice_processor (from `.symlinks/plugins/flutter_voice_processor/ios`)
   - gallery_saver (from `.symlinks/plugins/gallery_saver/ios`)
   - google_sign_in_ios (from `.symlinks/plugins/google_sign_in_ios/ios`)
+  - image_crop (from `.symlinks/plugins/image_crop/ios`)
   - image_picker_ios (from `.symlinks/plugins/image_picker_ios/ios`)
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
   - porcupine_flutter (from `.symlinks/plugins/porcupine_flutter/ios`)
@@ -80,6 +107,7 @@ DEPENDENCIES:
   - sensors_plus (from `.symlinks/plugins/sensors_plus/ios`)
   - share_plus (from `.symlinks/plugins/share_plus/ios`)
   - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
+  - tflite_audio (from `.symlinks/plugins/tflite_audio/ios`)
 
 SPEC REPOS:
   trunk:
@@ -89,7 +117,15 @@ SPEC REPOS:
     - GTMAppAuth
     - GTMSessionFetcher
     - ios-voice-processor
+    - PlainPocketFFT
+    - PocketFFT
     - Porcupine-iOS
+    - RosaKit
+    - RxCocoa
+    - RxRelay
+    - RxSwift
+    - TensorFlowLiteC
+    - TensorFlowLiteSwift
 
 EXTERNAL SOURCES:
   audioplayers_darwin:
@@ -112,6 +148,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/gallery_saver/ios"
   google_sign_in_ios:
     :path: ".symlinks/plugins/google_sign_in_ios/ios"
+  image_crop:
+    :path: ".symlinks/plugins/image_crop/ios"
   image_picker_ios:
     :path: ".symlinks/plugins/image_picker_ios/ios"
   path_provider_foundation:
@@ -128,6 +166,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/share_plus/ios"
   shared_preferences_foundation:
     :path: ".symlinks/plugins/shared_preferences_foundation/darwin"
+  tflite_audio:
+    :path: ".symlinks/plugins/tflite_audio/ios"
 
 SPEC CHECKSUMS:
   AppAuth: 8fca6b5563a5baef2c04bee27538025e4ceb2add
@@ -145,16 +185,26 @@ SPEC CHECKSUMS:
   GoogleSignIn: 5651ce3a61e56ca864160e79b484cd9ed3f49b7a
   GTMAppAuth: 0ff230db599948a9ad7470ca667337803b3fc4dd
   GTMSessionFetcher: 3a63d75eecd6aa32c2fc79f578064e1214dfdec2
+  image_crop: e0a67085d3ebf3cf46ca46d61c53a082507b0bc3
   image_picker_ios: 4a8aadfbb6dc30ad5141a2ce3832af9214a705b5
   ios-voice-processor: 65b25a8db69ea25ffba0eeef37bae71a982f34cc
   path_provider_foundation: c68054786f1b4f3343858c1e1d0caaded73f0be9
+  PlainPocketFFT: 3763f37fba0737e457ed1a3b9b7bfa70c00ff213
+  PocketFFT: cdbe7ef5b7cd08520655d85d03d701b5ba35fdec
   Porcupine-iOS: 884f40edadf4b72fac6fae768d3247bdb48841f7
   porcupine_flutter: b1f28f08b9da19bcba7adb38e6231b55ebdd0558
   record: cae05d8dd3cdb1dea3511b20e5a5811a1ae00d0d
+  RosaKit: 6e28b09f5eb990148a401e0c4b4ff0c207bd6569
+  RxCocoa: 94f817b71c07517321eb4f9ad299112ca8af743b
+  RxRelay: 1de1523e604c72b6c68feadedd1af3b1b4d0ecbd
+  RxSwift: 5710a9e6b17f3c3d6e40d6e559b9fa1e813b2ef8
   sensors: 84eb7a30e47a649e4172b71d6e81be614c280336
   sensors_plus: 5717760720f7e6acd96fdbd75b7428f5ad755ec2
   share_plus: 056a1e8ac890df3e33cb503afffaf1e9b4fbae68
   shared_preferences_foundation: 986fc17f3d3251412d18b0265f9c64113a8c2472
+  TensorFlowLiteC: 869f93708210ed939fc40f40c772a120b7f964d1
+  TensorFlowLiteSwift: 78bc548132d2cae55643f3238359a24a6eb92b88
+  tflite_audio: 015c689256a19a84fad384c11c24f250756c8726
 
 PODFILE CHECKSUM: f9420bd595da8fbce156b547dcd3368afc5226ff
 

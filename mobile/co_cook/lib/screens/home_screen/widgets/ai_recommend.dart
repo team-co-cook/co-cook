@@ -1,6 +1,12 @@
+import 'package:co_cook/screens/image_result_screen/image_result_screen.dart';
+import 'package:co_cook/services/image_service.dart';
+import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:co_cook/utils/route.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:zoom_tap_animation/zoom_tap_animation.dart';
+import 'dart:io';
 
 import 'package:co_cook/styles/colors.dart';
 import 'package:co_cook/styles/text_styles.dart';
@@ -15,6 +21,10 @@ class AiRecommend extends StatefulWidget {
 }
 
 class _AiRecommendState extends State<AiRecommend> {
+  // 사진 검색용 변수
+  XFile? imgFile;
+  bool _isImageSearchLoading = false;
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -130,7 +140,11 @@ class _AiRecommendState extends State<AiRecommend> {
     return ZoomTapAnimation(
       end: 0.98,
       onTap: () {
-        pushScreen(context, CameraScreen(isNext: true));
+        if (Platform.isAndroid) {
+          _getImage(ImageSource.camera);
+        } else {
+          pushScreen(context, CameraScreen(isNext: true));
+        }
       },
       child: Stack(children: [
         Container(
@@ -187,6 +201,59 @@ class _AiRecommendState extends State<AiRecommend> {
                           )
                         ])))),
       ]),
+    );
+  }
+
+  /////////////////////////////// 사진 검색용 코드입니다.
+
+  Future<void> _getImage(ImageSource source) async {
+    final pickedFile = await ImagePicker().pickImage(source: source);
+    if (pickedFile == null) {
+      return;
+    }
+    imgFile = XFile(pickedFile.path);
+
+    // 로딩 스피너 표시
+    _showLoadingSpinner(context);
+
+    getImgData();
+  }
+
+  Future getImgData() async {
+    String fileName = imgFile!.path.split('/').last;
+    MultipartFile multipartFile =
+        await MultipartFile.fromFile(imgFile!.path, filename: fileName);
+    print(fileName);
+
+    FormData formData = FormData.fromMap({
+      "image": multipartFile,
+    });
+
+    // API 요청
+    ImageService searchService = ImageService();
+    Response? response = await searchService.postImage(formData);
+    print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!$response');
+    if (response?.statusCode == 200) {
+      if (response!.data != null) {
+        // 로딩 스피너 닫기
+        Navigator.of(context).pop();
+        // 이미지 결과 페이지로 이동
+        Route imageResult = MaterialPageRoute(
+            builder: (context) => ImageResultScreen(searchWord: response.data));
+        Navigator.push(context, imageResult);
+      }
+    }
+  }
+
+  void _showLoadingSpinner(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Center(
+          child: CircularProgressIndicator(color: CustomColors.redPrimary),
+        );
+      },
     );
   }
 }
