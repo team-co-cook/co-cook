@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:wakelock/wakelock.dart';
 import 'package:audio_session/audio_session.dart';
 
 import 'package:co_cook/screens/cook_screen/widgets/cook_screen_body.dart';
@@ -13,6 +12,7 @@ import 'package:co_cook/styles/text_styles.dart';
 import 'package:flutter/services.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 import 'package:co_cook/services/detail_service.dart';
+import 'package:shimmer/shimmer.dart';
 
 class CookScreen extends StatefulWidget {
   const CookScreen({super.key, required this.recipeIdx});
@@ -36,8 +36,13 @@ class _CookScreenState extends State<CookScreen> {
     startAccelerometerListener();
     super.initState();
     getDetailBasic(widget.recipeIdx);
-    Wakelock.enable();
     activateAudioSession();
+  }
+
+  Future<void> activateAudioSession() async {
+    final session = await AudioSession.instance;
+    await session.configure(AudioSessionConfiguration.speech());
+    await session.setActive(true);
   }
 
   void startAccelerometerListener() {
@@ -57,22 +62,22 @@ class _CookScreenState extends State<CookScreen> {
     });
   }
 
-  Future<void> activateAudioSession() async {
-    final session = await AudioSession.instance;
-    await session.configure(AudioSessionConfiguration.speech());
-    await session.setActive(true);
-  }
-
-  Future<void> deactivateAudioSession() async {
-    await session.setActive(false);
+  bool isPowerMode = false;
+  void setPowerMode(mode) {
+    setState(() {
+      isPowerMode = mode;
+    });
   }
 
   @override
   void dispose() {
     super.dispose();
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-    Wakelock.disable();
     deactivateAudioSession();
+  }
+
+  Future<void> deactivateAudioSession() async {
+    await session.setActive(false);
   }
 
   void shutdownCook(BuildContext context) async {
@@ -105,36 +110,61 @@ class _CookScreenState extends State<CookScreen> {
               backgroundColor: CustomColors.monotoneLight,
               elevation: 0.5,
               toolbarHeight: 60,
-              flexibleSpace: SafeArea(
-                child: Container(
-                  alignment: Alignment.center,
-                  margin: const EdgeInsets.only(left: 40.0, right: 40.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      _recipeData['recipeName'] != null
-                          ? Text(_recipeData['recipeName'],
-                              style: const CustomTextStyles().title2.copyWith(
-                                    color: CustomColors.monotoneBlack,
-                                  ))
-                          : Text(''),
-                      CookScreenRecoder(controlNotifier: controlNotifier),
-                      CommonButton(
-                          label: "종료",
-                          color: ButtonType.red,
-                          onPressed: () {
-                            showCloseConfirmDialog(context, shutdownCook);
-                          })
-                    ],
+              flexibleSpace: Stack(children: [
+                isPowerMode
+                    ? Positioned(
+                        top: 0,
+                        left: 0,
+                        bottom: 0,
+                        right: 0,
+                        child: Shimmer.fromColors(
+                            baseColor: Color.fromARGB(255, 23, 23, 23),
+                            highlightColor: CustomColors.redPrimary,
+                            child: Container(
+                              width: double.infinity,
+                              height: double.infinity,
+                              color: Colors.white,
+                            )),
+                      )
+                    : Container(),
+                SafeArea(
+                  child: Container(
+                    alignment: Alignment.center,
+                    margin: const EdgeInsets.only(left: 40.0, right: 40.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        _recipeData['recipeName'] != null
+                            ? Text(_recipeData['recipeName'],
+                                style: const CustomTextStyles().title2.copyWith(
+                                      color: isPowerMode
+                                          ? const Color.fromARGB(
+                                              255, 255, 255, 255)
+                                          : CustomColors.monotoneBlack,
+                                    ))
+                            : Text(''),
+                        CookScreenRecoder(
+                            controlNotifier: controlNotifier,
+                            isPowerMode: isPowerMode,
+                            setPowerMode: setPowerMode),
+                        CommonButton(
+                            label: "종료",
+                            color: ButtonType.red,
+                            onPressed: () {
+                              showCloseConfirmDialog(context, shutdownCook);
+                            }),
+                      ],
+                    ),
                   ),
                 ),
-              ),
+              ]),
             ),
             body: _recipeData['recipeName'] != null
                 ? CookScreenBody(
                     controlNotifier: controlNotifier,
                     recipeIdx: widget.recipeIdx,
-                    recipeName: _recipeData['recipeName'])
+                    recipeName: _recipeData['recipeName'],
+                    isPowerMode: isPowerMode)
                 : Container());
   }
 }

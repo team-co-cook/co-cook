@@ -36,6 +36,7 @@ public class SecurityConfig {
                 .and()
                 .authorizeRequests()
                 .antMatchers("/api/v1/account/**").permitAll()
+                .antMatchers("/api/v1/search/**").permitAll()
                 .antMatchers("/api/v1/db/**").access("hasRole('ROLE_ADMIN')")
                 .antMatchers("/**").access("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
                 .and()

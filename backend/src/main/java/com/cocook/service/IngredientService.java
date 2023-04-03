@@ -6,6 +6,8 @@ import com.cocook.repository.IngredientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class IngredientService {
 
@@ -24,7 +26,7 @@ public class IngredientService {
         return ingredient;
     }
 
-    public Ingredient checkIngredient(String ingredientName) {
-        return ingredientRepository.getIngredientByIngredientName(ingredientName);
+    public List<Ingredient> checkIngredient(String ingredientName) {
+        return ingredientRepository.findIngredientsBySearchKeyword(ingredientName);
     }
 }

@@ -21,11 +21,13 @@ class CookScreenBody extends StatefulWidget {
       {Key? key,
       required this.recipeIdx,
       required this.recipeName,
-      required this.controlNotifier})
+      required this.controlNotifier,
+      required this.isPowerMode})
       : super(key: key);
   final int recipeIdx;
   final String recipeName;
   final ValueNotifier<String> controlNotifier;
+  final bool isPowerMode;
 
   @override
   State<CookScreenBody> createState() => _CookScreenBodyState();
@@ -35,6 +37,7 @@ class _CookScreenBodyState extends State<CookScreenBody>
     with SingleTickerProviderStateMixin {
   List dataList = [];
   Map _firstData = {};
+  List<GlobalKey<CookScreenTimerState>> timerKeys = [];
 
   final PageController recipeCardPageController =
       PageController(viewportFraction: 0.7);
@@ -132,6 +135,11 @@ class _CookScreenBodyState extends State<CookScreenBody>
         setState(() {
           dataList = response.data['data']['steps'];
         });
+
+        // 타미머 글로벌 키 리스트 초기화
+        for (int i = 0; i < dataList.length; i++) {
+          timerKeys.add(GlobalKey<CookScreenTimerState>());
+        }
       }
     }
   }
@@ -150,29 +158,48 @@ class _CookScreenBodyState extends State<CookScreenBody>
     }
   }
 
+  void replayTts() {
+    if (currentTtsIndex < dataList.length && currentTtsIndex >= 0) {
+      speakText(dataList[currentTtsIndex]["content"]);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<String>(
         valueListenable: widget.controlNotifier,
         builder: (context, value, child) {
           switch (value) {
-            case 'replay':
-              // 슬라이드를 다시 시작합니다.
+            case '다시':
+              // 슬라이드 tts를 다시 시작합니다.
+              replayTts();
+              widget.controlNotifier.value = '';
               break;
-            case 'next':
+            case '다음':
               // 슬라이드를 다음으로 이동합니다.
               recipeCardPageController.nextPage(
                   duration: const Duration(milliseconds: 300),
                   curve: Curves.easeOut);
+              widget.controlNotifier.value = '';
               break;
-            case 'before':
+            case '이전':
               // 슬라이드를 이전으로 이동합니다.
               recipeCardPageController.previousPage(
                   duration: const Duration(milliseconds: 300),
                   curve: Curves.easeOut);
+              widget.controlNotifier.value = '';
               break;
-            case 'timer':
+            case '타이머':
               // 타이머를 설정합니다.
+              if (_recipeCardPage > 0 &&
+                  _recipeCardPage <= dataList.length + 1) {
+                if (dataList[_recipeCardPage.floor() - 1]["timer"] != null) {
+                  timerKeys[_recipeCardPage.floor() - 1]
+                      .currentState
+                      ?.startTimer();
+                }
+              }
+              widget.controlNotifier.value = '';
               break;
             default:
             // 기본 상태 처리
@@ -188,7 +215,9 @@ class _CookScreenBodyState extends State<CookScreenBody>
                     child: Container(
                       width: double.infinity,
                       height: double.infinity,
-                      color: CustomColors.redLight,
+                      color: widget.isPowerMode
+                          ? Color.fromARGB(255, 35, 35, 35)
+                          : CustomColors.redLight,
                     ),
                   ),
                   Opacity(
@@ -263,7 +292,8 @@ class _CookScreenBodyState extends State<CookScreenBody>
                                                           .size
                                                           .height /
                                                       4,
-                                                  decoration: BoxDecoration(
+                                                  decoration:
+                                                      const BoxDecoration(
                                                     borderRadius:
                                                         BorderRadius.only(
                                                       bottomLeft:
@@ -431,6 +461,9 @@ class _CookScreenBodyState extends State<CookScreenBody>
                                                                         "timer"] !=
                                                                     null
                                                                 ? CookScreenTimer(
+                                                                    key: timerKeys[
+                                                                        index -
+                                                                            1], // GlobalKey 전달
                                                                     time: dataList[
                                                                             index -
                                                                                 1]

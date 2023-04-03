@@ -58,7 +58,7 @@ class _TimeRecommendState extends State<TimeRecommend> {
                         ))
                 : CustomShimmer(
                     width: 160,
-                    height: 32,
+                    height: 20,
                   ),
             Container(
               margin: const EdgeInsets.only(top: 8),

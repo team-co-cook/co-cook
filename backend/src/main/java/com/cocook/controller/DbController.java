@@ -100,13 +100,4 @@ public class DbController {
         return new ResponseEntity<>("ok", HttpStatus.OK);
     }
 
-    @GetMapping("/ingredient/{ingredientName}")
-    public ResponseEntity<ApiResponse<Object>> checkIngredient(@RequestHeader("AUTH-TOKEN") String authToken, @PathVariable("ingredientName") String ingredientName) {
-        if (ingredientService.checkIngredient(ingredientName) != null) {
-            return ApiResponse.ok(null);
-        } else {
-            return ApiResponse.notFound("없는 재료", null);
-        }
-    }
-
 }
