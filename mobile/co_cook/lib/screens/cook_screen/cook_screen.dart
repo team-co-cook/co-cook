@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:wakelock/wakelock.dart';
 
 import 'package:co_cook/screens/cook_screen/widgets/cook_screen_body.dart';
 import 'package:co_cook/screens/cook_screen/widgets/cook_screen_recoder.dart';
@@ -33,6 +34,7 @@ class _CookScreenState extends State<CookScreen> {
     startAccelerometerListener();
     super.initState();
     getDetailBasic(widget.recipeIdx);
+    Wakelock.enable();
   }
 
   void startAccelerometerListener() {
@@ -56,6 +58,7 @@ class _CookScreenState extends State<CookScreen> {
   void dispose() {
     super.dispose();
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+    Wakelock.disable();
   }
 
   void shutdownCook(BuildContext context) async {

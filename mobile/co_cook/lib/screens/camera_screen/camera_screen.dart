@@ -44,19 +44,23 @@ class _CameraScreenState extends State<CameraScreen> {
 
   Future<void> _takePhoto() async {
     try {
+      print('debug step1');
       _cameraController.pausePreview();
+      print('debug step2');
       imgFile = await _cameraController.takePicture();
-
+      print('debug step3');
       setState(() {
         isProcess = true;
       });
+      print('debug step4');
       await Future.delayed(Duration(seconds: 1));
-
+      print('debug step5');
       // 이미지 크롭
       File croppedImageFile = await _cropImage(File(imgFile!.path));
       imgFile = XFile(croppedImageFile.path);
-
+      print('debug step6');
       bool state = await getImgData();
+      print('debug step7');
       if (state) {
         if (widget.isNext) {
           Route imageResult = MaterialPageRoute(
