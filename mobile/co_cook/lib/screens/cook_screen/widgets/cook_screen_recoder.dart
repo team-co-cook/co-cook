@@ -137,10 +137,12 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
             setState(() {
               _isSay = false;
             });
+            loadWakeWordModel();
             startWakeWordRecord();
           } else {
             // 안했을 때
             _audioPlayer.play(AssetSource('audios/ai_cancel.mp3'));
+            loadWakeWordModel();
             startWakeWordRecord();
           }
         }).then((value) {
