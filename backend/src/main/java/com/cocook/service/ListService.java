@@ -184,9 +184,13 @@ public class ListService {
         return new RecipeListResDto(newRecipes);
     }
 
-    public List<RecipeWithIngredientResDto> getRecipesByIngredients(String authToken, List<String> ingredientNames) {
+    public List<RecipeWithIngredientResDto> getRecipesByIngredients(String authToken, List<String> ingredients) {
         Long userIdx = jwtTokenProvider.getUserIdx(authToken);
-        List<RecipesContainingIngredientsCnt> recipesContainingIngredientsCnts = recipeRepository.findRecipesByIngredients(ingredientNames, userIdx);
+        List<String> notBlankIngredients = new ArrayList<>();
+        for (String ingredient : ingredients) {
+            notBlankIngredients.add(ingredient.replace(" ", ""));
+        }
+        List<RecipesContainingIngredientsCnt> recipesContainingIngredientsCnts = recipeRepository.findRecipesByIngredients(notBlankIngredients, userIdx);
         List<RecipeWithIngredientResDto> recipeWithIngredientResDtos = new ArrayList<>();
         for (RecipesContainingIngredientsCnt r : recipesContainingIngredientsCnts) {
             Boolean isFavorite = r.getIsFavorite() == 1;
