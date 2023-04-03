@@ -39,6 +39,17 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
     startWakeWordRecord();
   }
 
+  @override
+  void dispose() {
+    _diposeRecord();
+    if (cookTempDir.existsSync()) {
+      cookTempDir.listSync().forEach((file) => file.deleteSync());
+    }
+    TfliteAudio.stopAudioRecognition();
+    _recognitionSubscription.cancel();
+    super.dispose();
+  }
+
   Future<void> loadWakeWordModel() async {
     await TfliteAudio.loadModel(
         model: 'assets/models/wake_word.tflite',
@@ -73,7 +84,7 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
   /////////////////////////////////////////////////////////////////////////////
   ///Recoder
   ///
-  Record _recorder = Record(); // 녹음 라이브러리
+  final Record _recorder = Record(); // 녹음 라이브러리
   late Directory cookTempDir; // 음성파일이 저장될 임시디렉토리
   Timer? _recordingTimer; // 마이크 볼륨 추적할 타이머
   bool _isRecording = false; // 녹음 여부
@@ -137,14 +148,16 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
             setState(() {
               _isSay = false;
             });
-            loadWakeWordModel();
-            startWakeWordRecord();
           } else {
             // 안했을 때
             _audioPlayer.play(AssetSource('audios/ai_cancel.mp3'));
-            loadWakeWordModel();
-            startWakeWordRecord();
           }
+
+          // 재시작
+          loadWakeWordModel();
+          setTempDir();
+          _audioPlayer = AudioPlayer();
+          startWakeWordRecord();
         }).then((value) {
           audioFilePk++;
           widget.setPowerMode(false);
@@ -166,19 +179,15 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
     if (response?.statusCode == 200) {
       if (response != null) {
         print("전송 성공 : ${response.data}");
-        setState(() {
-          result = response.data['result'];
-        });
+        result = response.data['result'];
         widget.controlNotifier.value = response.data['result'];
       }
     }
   }
 
   Future<bool> _stopRecord() async {
-    setState(() {
-      volume = 0.0;
-      ampl = 0.0;
-    });
+    volume = 0.0;
+    ampl = 0.0;
     _recordingTimer?.cancel();
     _recorder.stop();
     return true;
@@ -217,17 +226,6 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
   }
 
   /////////////////////////////////////////////////////////////////////////////
-
-  @override
-  void dispose() {
-    _diposeRecord();
-    if (cookTempDir.existsSync()) {
-      cookTempDir.listSync().forEach((file) => file.deleteSync());
-    }
-    TfliteAudio.stopAudioRecognition();
-    _recognitionSubscription.cancel();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {

@@ -5,7 +5,6 @@ import 'package:co_cook/screens/splash_screen/splash_screen.dart';
 
 Future main() async {
   await dotenv.load(fileName: ".env");
-  await dotenv.load(fileName: ".env.local");
 
   runApp(const Main());
 }

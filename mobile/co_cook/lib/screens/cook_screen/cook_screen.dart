@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:audio_session/audio_session.dart';
 
 import 'package:co_cook/screens/cook_screen/widgets/cook_screen_body.dart';
 import 'package:co_cook/screens/cook_screen/widgets/cook_screen_recoder.dart';
@@ -28,7 +27,6 @@ class _CookScreenState extends State<CookScreen> {
   late StreamSubscription<AccelerometerEvent> _accelerometerSub;
   bool isRotated = false;
   Map _recipeData = {};
-  late AudioSession session;
 
   @override
   void initState() {
@@ -36,13 +34,6 @@ class _CookScreenState extends State<CookScreen> {
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     startAccelerometerListener();
     getDetailBasic(widget.recipeIdx);
-    activateAudioSession();
-  }
-
-  Future<void> activateAudioSession() async {
-    session = await AudioSession.instance;
-    await session.configure(AudioSessionConfiguration.speech());
-    await session.setActive(true);
   }
 
   void startAccelerometerListener() {
@@ -73,11 +64,6 @@ class _CookScreenState extends State<CookScreen> {
   void dispose() {
     super.dispose();
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-    deactivateAudioSession();
-  }
-
-  Future<void> deactivateAudioSession() async {
-    await session.setActive(false);
   }
 
   void shutdownCook(BuildContext context) async {
