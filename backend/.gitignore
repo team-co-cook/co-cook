@@ -38,3 +38,6 @@ out/
 
 ###properties###
 /src/main/resources/private.properties
+
+### model ###
+/src/main/resources/wiki.ko.bin

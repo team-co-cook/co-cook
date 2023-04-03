@@ -6,15 +6,17 @@ import 'package:co_cook/styles/text_styles.dart';
 import 'package:zoom_tap_animation/zoom_tap_animation.dart';
 
 class CookScreenTimer extends StatefulWidget {
-  const CookScreenTimer({super.key, required this.time, required this.play});
+  const CookScreenTimer(
+      {required this.key, required this.time, required this.play});
   final int time;
   final bool play;
+  final GlobalKey<CookScreenTimerState> key; // 글로벌 키 추가
 
   @override
-  State<CookScreenTimer> createState() => _CookScreenTimerState();
+  State<CookScreenTimer> createState() => CookScreenTimerState();
 }
 
-class _CookScreenTimerState extends State<CookScreenTimer> {
+class CookScreenTimerState extends State<CookScreenTimer> {
   late int _currentSeconds;
   late Timer? _timer;
   bool _isPlay = false;
@@ -27,11 +29,11 @@ class _CookScreenTimerState extends State<CookScreenTimer> {
 
   @override
   void dispose() {
-    _endTimer();
+    _disposeTimer();
     super.dispose();
   }
 
-  void _startTimer() {
+  void startTimer() {
     if (!_isPlay) {
       setState(() {
         _isPlay = true;
@@ -50,6 +52,15 @@ class _CookScreenTimerState extends State<CookScreenTimer> {
         _isPlay = false;
         _currentSeconds = widget.time;
       });
+    }
+  }
+
+  void _disposeTimer() {
+    if (_isPlay && mounted) {
+      print("타이머 종료");
+      _timer?.cancel();
+      _isPlay = false;
+      _currentSeconds = widget.time;
     }
   }
 
@@ -81,7 +92,7 @@ class _CookScreenTimerState extends State<CookScreenTimer> {
     return Container(
       padding: const EdgeInsets.only(left: 8.0, right: 8.0),
       child: ZoomTapAnimation(
-        onTap: () => _startTimer(),
+        onTap: () => startTimer(),
         end: 0.98,
         child: Container(
           width: double.infinity,

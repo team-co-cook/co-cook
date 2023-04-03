@@ -12,8 +12,10 @@ import com.cocook.util.WordSimilarity;
 import com.github.jfasttext.JFastText;
 import lombok.AllArgsConstructor;
 
+import org.joda.time.DateTime;
 import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,8 @@ import org.springframework.stereotype.Service;
 
 
 import javax.persistence.EntityNotFoundException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -91,41 +95,74 @@ public class ListService {
         }
         Long userIdx = jwtTokenProvider.getUserIdx(authToken);
         List<Recipe> foundRecipes = recipeRepository.findByRecipeNameContainingOrderByIdDesc(keyword);
-        Set<RecipeDetailResDto> newRecipes = new HashSet<>();
-
-        for (Recipe recipe : foundRecipes) {
-            RecipeDetailResDto recipeDetailResDto = getRecipeDetailDtoWithIsFavorite(userIdx, recipe);
-            newRecipes.add(recipeDetailResDto);
-
-            ZSetOperations<String, String> zSetOperations = redisTemplate.opsForZSet();
-            zSetOperations.incrementScore("searchHistorySet", recipe.getRecipeName(), 1);
-            ListOperations<String, String> listOperations = redisTemplate.opsForList();
-            Long length = listOperations.size("searchHistoryList");
-            if (length == null || length < 1000) {
-                listOperations.rightPush("searchHistoryList", recipe.getRecipeName());
-            } else {
-                listOperations.leftPop("searchHistoryList");
-                listOperations.rightPush("searchHistoryList", recipe.getRecipeName());
-                zSetOperations.incrementScore("searchHistorySet", recipe.getRecipeName(), -1);
-                Double score = zSetOperations.score("searchHistorySet", recipe.getRecipeName());
-                if (score != null && score == 0) {
-                    zSetOperations.remove("searchHistorySet", recipe.getRecipeName());
-                }
-            }
-        }
 
         List<Recipe> relatedRecipes = recipeRepository.findAll();
         List<Float> keywordVector = fastText.getVector(keyword);
         relatedRecipes.sort(Comparator.comparingDouble(recipe -> -wordSimilarity.getCosineSimilarity(fastText, keywordVector, recipe.getRecipeName())));
         for (Recipe recipe : relatedRecipes) {
-            if ((wordSimilarity.getCosineSimilarity(fastText, keywordVector, recipe.getRecipeName()) > 0.7)) {
-                RecipeDetailResDto recipeDetailResDto = getRecipeDetailDtoWithIsFavorite(userIdx, recipe);
-                newRecipes.add(recipeDetailResDto);
+            if ((wordSimilarity.getCosineSimilarity(fastText, keywordVector, recipe.getRecipeName()) > 0.75)) {
+                if (!foundRecipes.contains(recipe)){
+                    foundRecipes.add(recipe);
+                }
+            } else { break; }
+        }
+
+        List<RecipeDetailResDto> newRecipes = new ArrayList<>();
+        ZSetOperations<String, String> zSetOperations = redisTemplate.opsForZSet();
+        ListOperations<String, String> listOperations = redisTemplate.opsForList();
+        ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
+        Integer current = LocalDateTime.now().getHour();
+        if (valueOperations.get("recent") == null) {
+            valueOperations.set("recent", current.toString());
+        }
+        Integer recent = Integer.valueOf(valueOperations.get("recent"));
+
+        if (current != recent) {
+            Integer diff = current - recent;
+            if (diff < 0) {
+                diff = 24 + diff;
+            }
+            valueOperations.set("recent", current.toString());
+            Integer pastCounts = 0;
+            for (int i = 0; i < diff; i++) {
+                Integer count = 0;
+                if (listOperations.size("searchCountsList") == 24) {
+                    count = Integer.parseInt(listOperations.leftPop("searchCountsList"));
+                }
+                pastCounts += count;
+                listOperations.rightPush("searchCountsList", "0");
+            }
+            while (pastCounts > 0) {
+                String target = listOperations.leftPop("searchHistoryList");
+                zSetOperations.incrementScore("searchHistorySet", target, -1);
+                Double score = zSetOperations.score("searchHistorySet", target);
+                if (score != null && score == 0) {
+                    zSetOperations.remove("searchHistorySet", target);
+                }
+                pastCounts -= 1;
             }
         }
-        List<RecipeDetailResDto> resultRecipe = List.copyOf(newRecipes);
+        Integer currentCounts = 0;
+        if (listOperations.size("searchCountsList") != null) {
+            if (listOperations.size("searchCountsList") != 0L) {
+                System.out.println(listOperations.size("searchCountsList"));
+                currentCounts = Integer.parseInt(listOperations.rightPop("searchCountsList"));
+            }
+        }
 
-        return new RecipeListResDto(resultRecipe);
+        for (Recipe recipe : foundRecipes) {
+            RecipeDetailResDto recipeDetailResDto = getRecipeDetailDtoWithIsFavorite(userIdx, recipe);
+            newRecipes.add(recipeDetailResDto);
+            zSetOperations.incrementScore("searchHistorySet", recipe.getRecipeName(), 1);
+            if (recipe.getCategory().getCategoryName() == "메인 요리") {
+                zSetOperations.incrementScore("searchHistorySet", recipe.getRecipeName(), 1);
+            }
+            listOperations.rightPush("searchHistoryList", recipe.getRecipeName());
+            currentCounts += 1;
+        }
+        listOperations.rightPush("searchCountsList", currentCounts.toString());
+
+        return new RecipeListResDto(newRecipes);
     }
 
     public RecipeListResDto getRecipesByFavorite(String authToken) {
@@ -147,9 +184,13 @@ public class ListService {
         return new RecipeListResDto(newRecipes);
     }
 
-    public List<RecipeWithIngredientResDto> getRecipesByIngredients(String authToken, List<String> ingredientNames) {
+    public List<RecipeWithIngredientResDto> getRecipesByIngredients(String authToken, List<String> ingredients) {
         Long userIdx = jwtTokenProvider.getUserIdx(authToken);
-        List<RecipesContainingIngredientsCnt> recipesContainingIngredientsCnts = recipeRepository.findRecipesByIngredients(ingredientNames, userIdx);
+        List<String> notBlankIngredients = new ArrayList<>();
+        for (String ingredient : ingredients) {
+            notBlankIngredients.add(ingredient.replace(" ", ""));
+        }
+        List<RecipesContainingIngredientsCnt> recipesContainingIngredientsCnts = recipeRepository.findRecipesByIngredients(notBlankIngredients, userIdx);
         List<RecipeWithIngredientResDto> recipeWithIngredientResDtos = new ArrayList<>();
         for (RecipesContainingIngredientsCnt r : recipesContainingIngredientsCnts) {
             Boolean isFavorite = r.getIsFavorite() == 1;

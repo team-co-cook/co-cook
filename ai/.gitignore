@@ -24,7 +24,7 @@ archive.zip
 *~
 .*.sw?
 
-uploaded_files
+uploaded_files*
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
