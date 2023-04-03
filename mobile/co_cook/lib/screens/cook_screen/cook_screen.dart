@@ -32,15 +32,15 @@ class _CookScreenState extends State<CookScreen> {
 
   @override
   void initState() {
+    super.initState();
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     startAccelerometerListener();
-    super.initState();
     getDetailBasic(widget.recipeIdx);
     activateAudioSession();
   }
 
   Future<void> activateAudioSession() async {
-    final session = await AudioSession.instance;
+    session = await AudioSession.instance;
     await session.configure(AudioSessionConfiguration.speech());
     await session.setActive(true);
   }
