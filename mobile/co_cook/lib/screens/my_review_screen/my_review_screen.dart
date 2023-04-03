@@ -31,9 +31,8 @@ class _MyReviewScreenState extends State<MyReviewScreen> {
     // API 요청
     AuthService authService = AuthService();
     Response? response = await authService.getMyReview();
-    print(response!.data['data']);
     if (response?.statusCode == 200) {
-      if (response.data['data'] != null) {
+      if (response?.data['data'] != null) {
         setState(() {
           listData = response!.data['data'];
         });
@@ -49,6 +48,7 @@ class _MyReviewScreenState extends State<MyReviewScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          automaticallyImplyLeading: false,
           backgroundColor: CustomColors.monotoneLight,
           elevation: 0.5,
           title: const SizedBox.shrink(),
@@ -81,18 +81,16 @@ class _MyReviewScreenState extends State<MyReviewScreen> {
         body: listData.isNotEmpty
             ? Container(
                 color: CustomColors.monotoneLight,
-                child: Stack(children: [
-                  ListView.builder(
-                    shrinkWrap: true,
-                    padding: EdgeInsets.fromLTRB(24.0, 24.0, 24.0, 24.0),
-                    physics: NeverScrollableScrollPhysics(),
-                    itemCount: listData.length,
-                    itemBuilder: (context, index) => RecipeComment(
-                        panelController: _panelController,
-                        review: listData[index],
-                        reGet: reGet),
-                  ),
-                ]),
+                child: ListView.builder(
+                  padding: EdgeInsets.fromLTRB(24.0, 24.0, 24.0, 24.0),
+                  physics: const BouncingScrollPhysics(
+                      parent: AlwaysScrollableScrollPhysics()),
+                  itemCount: listData.length,
+                  itemBuilder: (context, index) => RecipeComment(
+                      panelController: _panelController,
+                      review: listData[index],
+                      reGet: reGet),
+                ),
               )
             : Container());
   }

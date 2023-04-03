@@ -16,7 +16,7 @@ class FavoriteScreen extends StatefulWidget {
 }
 
 class _FavoriteScreenState extends State<FavoriteScreen> {
-  List dataList = [];
+  List? dataList;
 
   @override
   void initState() {
@@ -30,7 +30,6 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
     Response? response = await searchService.getFavoriteList();
     if (response?.statusCode == 200) {
       Map? decodeRes = await jsonDecode(response.toString());
-      print(decodeRes);
       if (decodeRes != null) {
         setState(() {
           dataList = decodeRes["data"]['recipeListResDto'];
@@ -43,6 +42,7 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: CustomColors.monotoneLight,
         elevation: 0.5,
         title: const SizedBox.shrink(), // Remove the original title
@@ -74,24 +74,30 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
       ),
       body: Container(
         child: Padding(
-          padding: const EdgeInsets.all(8),
-          child: dataList.isNotEmpty
-              ? ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: dataList.length,
-                  physics: const BouncingScrollPhysics(
-                      parent: AlwaysScrollableScrollPhysics()),
-                  padding: const EdgeInsets.all(16),
-                  itemBuilder: (BuildContext context, int index) {
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: 16),
-                      child: ListCard(data: dataList[index]),
-                    );
-                  })
-              : const Center(
-                  child: CircularProgressIndicator(
-                      color: CustomColors.redPrimary)),
-        ),
+            padding: const EdgeInsets.all(8),
+            child: dataList == null || dataList!.isNotEmpty
+                ? ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: dataList?.length ?? 5,
+                    physics: const BouncingScrollPhysics(
+                        parent: AlwaysScrollableScrollPhysics()),
+                    padding: const EdgeInsets.all(16),
+                    itemBuilder: (BuildContext context, int index) {
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 16),
+                        child: ListCard(data: dataList?[index]),
+                      );
+                    })
+                : Container(
+                    child: Center(
+                      child: Text(
+                        '찜한 음식이 없어요',
+                        style: CustomTextStyles()
+                            .body1
+                            .copyWith(color: CustomColors.monotoneBlack),
+                      ),
+                    ),
+                  )),
       ),
     );
   }

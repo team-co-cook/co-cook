@@ -115,7 +115,6 @@ class _ReviewScreenState extends State<ReviewScreen> {
     String fileName = _image!.path.split('/').last;
     MultipartFile multipartFile =
         await MultipartFile.fromFile(_image!.path, filename: fileName);
-    // 여기서 'reviewImg'는 서버에서 요구하는 파일의 키값입니다. 서버 요구에 따라 적절하게 변경해 주세요.
 
     // API 요청
     DetailService apiService = DetailService();
@@ -130,10 +129,10 @@ class _ReviewScreenState extends State<ReviewScreen> {
     // reviewData와 multipartFile을 함께 전송하기 위해 FormData를 사용합니다.
     FormData formData = FormData.fromMap({
       "reviewDetail": jsonString,
+      // 여기서 'reviewImg'는 서버에서 요구하는 파일의 키값입니다. 서버 요구에 따라 적절하게 변경해 주세요.
       "reviewImg": multipartFile,
     });
 
-    print(formData);
     Response? response = await apiService.createReview(formData);
     if (response?.statusCode == 200) {
       gotoPhotoCard(context, _text, _image!, widget.recipeName,
@@ -256,7 +255,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
                           label: '취소',
                           color: ButtonType.none,
                           onPressed: () {
-                            Navigator.pop(context);
+                            showCloseConfirmDialog(context);
                           }),
                     )
                   ],
@@ -281,4 +280,51 @@ void gotoPhotoCard(BuildContext context, String _text, XFile _image,
             recipeName: recipeName,
           ));
   Navigator.pushReplacement(context, photoCardScreen);
+}
+
+Future<void> showCloseConfirmDialog(BuildContext context) async {
+  return showDialog<void>(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        content: Text('한줄평을 저장하지 않으면 이 음식의 한줄평을 다시 남김 수 없습니다.',
+            style: CustomTextStyles()
+                .body1
+                .copyWith(color: CustomColors.monotoneBlack)),
+        actions: [
+          TextButton(
+            child: Text('취소',
+                style: CustomTextStyles()
+                    .body1
+                    .copyWith(color: CustomColors.monotoneBlack)),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.transparent,
+              shadowColor: Colors.transparent,
+              elevation: 0,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+          ),
+          TextButton(
+            child: Text('확인',
+                style: CustomTextStyles()
+                    .body1
+                    .copyWith(color: CustomColors.redPrimary)),
+            onPressed: () {
+              Navigator.of(context).pop();
+              Navigator.pop(context);
+            },
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.transparent,
+              shadowColor: Colors.transparent,
+              elevation: 0,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+          ),
+        ],
+      );
+    },
+  );
 }

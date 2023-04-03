@@ -45,15 +45,12 @@ class _IngredientListScreenState extends State<IngredientListScreen> {
     // 선택된 재료를 콤마로 구분된 스트링으로 변환
     String selectedIngredientsString = selectedIngredients.join(',');
 
-    print(selectedIngredientsString);
-
     // API 요청
     ListService apiService = ListService();
     Response? response = await apiService.getIngredientList(
         ingredients: selectedIngredientsString);
     if (response?.statusCode == 200) {
-      print(response!.data['data']);
-      if (response.data['data'] != null) {
+      if (response?.data['data'] != null) {
         setState(() {
           dataList = response!.data['data'];
         });
@@ -62,23 +59,32 @@ class _IngredientListScreenState extends State<IngredientListScreen> {
   }
 
   // 재료 버튼 생성
-  Row _buildIngredientButtons() {
-    return Row(
-      children: widget.ingredients.map((ingredient) {
-        return Padding(
-          padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
-          child: ButtonToggle(
-              label: ingredient,
-              isToggleOn: ingredientIsToggle[ingredient] == true,
-              onPressed: () {
-                setState(() {
-                  ingredientIsToggle[ingredient] =
-                      !ingredientIsToggle[ingredient]!;
-                  getListData();
-                });
-              }),
-        );
-      }).toList(),
+  Widget _buildIngredientButtons() {
+    return SingleChildScrollView(
+      physics:
+          const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+      scrollDirection: Axis.horizontal,
+      child: Container(
+        width: MediaQuery.of(context).size.width,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: widget.ingredients.map((ingredient) {
+            return Padding(
+              padding: const EdgeInsets.fromLTRB(0, 0, 16, 8),
+              child: ButtonToggle(
+                  label: ingredient,
+                  isToggleOn: ingredientIsToggle[ingredient] == true,
+                  onPressed: () {
+                    setState(() {
+                      ingredientIsToggle[ingredient] =
+                          !ingredientIsToggle[ingredient]!;
+                      getListData();
+                    });
+                  }),
+            );
+          }).toList(),
+        ),
+      ),
     );
   }
 
@@ -86,6 +92,7 @@ class _IngredientListScreenState extends State<IngredientListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: CustomColors.monotoneLight,
         elevation: 0.5,
         title: const SizedBox.shrink(),
@@ -123,6 +130,8 @@ class _IngredientListScreenState extends State<IngredientListScreen> {
             Expanded(
               child: dataList.isNotEmpty
                   ? ListView.custom(
+                      physics: const BouncingScrollPhysics(
+                          parent: AlwaysScrollableScrollPhysics()),
                       childrenDelegate: SliverChildListDelegate(
                         [
                           Center(

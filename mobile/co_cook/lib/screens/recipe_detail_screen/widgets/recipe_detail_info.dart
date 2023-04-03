@@ -28,9 +28,8 @@ class _RecipeDetailInfoTabState extends State<RecipeDetailInfoTab> {
     DetailService searchService = DetailService();
     Response? response =
         await searchService.getDetailInfo(recipeIdx: recipeIdx);
-    print(response!.data['data']);
     if (response?.statusCode == 200) {
-      if (response != null) {
+      if (response?.data != null) {
         setState(() {
           data = response!.data['data'];
         });
@@ -153,11 +152,11 @@ class _RecipeDetailInfoTabState extends State<RecipeDetailInfoTab> {
                             RecipeDetailInfoCard(
                                 title: '열량', value: '${data['calorie']}Kcal'),
                             RecipeDetailInfoCard(
-                                title: '탄수화물', value: '${data['calorie']}g'),
+                                title: '탄수화물', value: '${data['carb']}g'),
                             RecipeDetailInfoCard(
-                                title: '단백질', value: '${data['calorie']}g'),
+                                title: '단백질', value: '${data['protein']}g'),
                             RecipeDetailInfoCard(
-                                title: '지방', value: '${data['calorie']}g'),
+                                title: '지방', value: '${data['fat']}g'),
                           ],
                         ),
                       ),
