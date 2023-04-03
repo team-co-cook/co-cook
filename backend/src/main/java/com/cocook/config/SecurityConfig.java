@@ -1,6 +1,7 @@
 package com.cocook.config;
 
 import com.cocook.auth.JwtTokenProvider;
+import com.cocook.exception.CustomAccessDeniedHandler;
 import com.cocook.exception.CustomAuthenticationEntryPoint;
 import com.cocook.exception.CustomExceptionHandler;
 import com.cocook.filter.JwtAuthenticationFilter;
@@ -35,10 +36,12 @@ public class SecurityConfig {
                 .and()
                 .authorizeRequests()
                 .antMatchers("/api/v1/account/**").permitAll()
-                .antMatchers("/**").authenticated()
+                .antMatchers("/api/v1/db/**").access("hasRole('ROLE_ADMIN')")
+                .antMatchers("/**").access("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
                 .and()
                 .exceptionHandling()
                 .authenticationEntryPoint(new CustomAuthenticationEntryPoint())
+                .accessDeniedHandler(new CustomAccessDeniedHandler())
                 .and()
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
         return http.build();

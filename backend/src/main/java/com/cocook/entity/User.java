@@ -15,7 +15,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class User {
+public class User extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,8 +23,14 @@ public class User {
     private Long id;
     private String email;
     private String nickname;
-    private String roles; // USER, ADMIN
+    private String roles; // ROLE_USER, ROLE_ADMIN
     private Boolean isActive;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private List<Review> reviews = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private List<Comment> comments = new ArrayList<>();
 
     public List<String> getRoleList() {
         if (this.roles.length() > 0) {

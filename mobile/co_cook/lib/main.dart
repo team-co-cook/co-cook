@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-import 'styles/colors.dart';
-import 'styles/text_styles.dart';
+import 'package:co_cook/screens/splash_screen/splash_screen.dart';
 
-void main() {
+Future main() async {
+  await dotenv.load(fileName: ".env");
+  await dotenv.load(fileName: ".env.local");
+
   runApp(const Main());
 }
 
@@ -12,6 +15,8 @@ class Main extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return const MaterialApp(
+      home: SplashScreen(),
+    );
   }
 }

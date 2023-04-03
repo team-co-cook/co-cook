@@ -14,20 +14,20 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Recipe {
+public class Recipe extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "recipe_idx")
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_idx")
     private Category category;
 
     private String recipeName;
 
-    private Integer difficulty;
+    private String difficulty;
 
     private Integer runningTime;
 
@@ -43,13 +43,19 @@ public class Recipe {
 
     private Integer fat;
 
-//    @OneToMany(mappedBy = "recipe")
+    //    @OneToMany(mappedBy = "recipe")
 //    private List<Step> steps = new ArrayList<>();
 //
 //    @OneToMany(mappedBy = "recipe")
 //    private List<Amount> amounts = new ArrayList<>();
 //
-//    @OneToMany(mappedBy = "recipe")
-//    private List<Tag> tags = new ArrayList<>();
+    @OneToMany(mappedBy = "recipe", fetch = FetchType.LAZY)
+    private List<Review> reviews = new ArrayList<>();
+
+    @OneToMany(mappedBy = "recipe", fetch = FetchType.LAZY)
+    private List<Tag> tags = new ArrayList<>();
+
+    @OneToMany(mappedBy = "recipe", fetch = FetchType.LAZY)
+    private List<Favorite> favorites = new ArrayList<>();
 
 }

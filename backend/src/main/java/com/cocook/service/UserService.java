@@ -1,10 +1,16 @@
 package com.cocook.service;
 
 import com.cocook.auth.JwtTokenProvider;
+import com.cocook.dto.review.MyReview;
+import com.cocook.dto.review.MyReviewResDto;
+import com.cocook.dto.review.ReviewReqDto;
+import com.cocook.dto.review.ReviewResDto;
 import com.cocook.dto.user.GoogleOAuthResponseDto;
 import com.cocook.dto.user.LoginResponseDto;
 import com.cocook.dto.user.SignupRequestDto;
+import com.cocook.entity.Review;
 import com.cocook.entity.User;
+import com.cocook.repository.ReviewRepository;
 import com.cocook.repository.UserRepository;
 import lombok.AllArgsConstructor;
 
@@ -21,18 +27,16 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import javax.persistence.EntityNotFoundException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
+@AllArgsConstructor
 public class UserService {
 
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
-
-    @Autowired
-    public UserService(UserRepository userRepository, JwtTokenProvider jwtTokenProvider) {
-        this.userRepository = userRepository;
-        this.jwtTokenProvider = jwtTokenProvider;
-    }
+    private final ReviewRepository reviewRepository;
 
     public LoginResponseDto login(String access_token) {
 
@@ -43,14 +47,11 @@ public class UserService {
         GoogleOAuthResponseDto googleOAuthResponse = (GoogleOAuthResponseDto) response.getBody();
 
         String userEmail = googleOAuthResponse.getEmail();
-        User foundUser = userRepository.findByEmail(userEmail);
+        User foundUser = userRepository.findByEmailAndIsActiveTrue(userEmail);
         if (foundUser == null) {
             return new LoginResponseDto(null, googleOAuthResponse.getEmail(), null, null);
         }
-        if (!foundUser.getIsActive()) {
-            throw new EntityNotFoundException("삭제된 회원의 이메일입니다.");
-        }
-        String jwtToken = jwtTokenProvider.createToken(foundUser.getEmail(), foundUser.getRoleList());
+        String jwtToken = jwtTokenProvider.createToken(foundUser.getId(), foundUser.getRoleList());
         return new LoginResponseDto(foundUser.getId(), foundUser.getEmail(), foundUser.getNickname(), jwtToken);
     }
 
@@ -61,21 +62,35 @@ public class UserService {
             throw new AuthenticationServiceException("유효하지 않은 토큰입니다.");
         }
 
-        if (userRepository.findByEmail(signupRequestDto.getEmail()) != null) {
-            throw new DataIntegrityViolationException("이미 존재하는 이메일입니다.");
-        }
-
         if (userRepository.findByNickname(signupRequestDto.getNickname()) != null) {
             throw new DataIntegrityViolationException("이미 존재하는 닉네임입니다.");
+        }
+
+        User foundUser = userRepository.findByEmail(signupRequestDto.getEmail());
+        if (foundUser != null) {
+            if (foundUser.getIsActive()) {
+                throw new DataIntegrityViolationException("이미 존재하는 이메일입니다.");
+            } else {
+                foundUser.setIsActive(true);
+                foundUser.setEmail(signupRequestDto.getEmail());
+                foundUser.setNickname(signupRequestDto.getNickname());
+                User savedUser = userRepository.save(foundUser);
+                String jwtToken = jwtTokenProvider.createToken(savedUser.getId(), savedUser.getRoleList());
+                return new LoginResponseDto(savedUser.getId(), savedUser.getEmail(), savedUser.getNickname(), jwtToken);
+            }
         }
 
         User newUser = new User();
         newUser.setEmail(signupRequestDto.getEmail());
         newUser.setNickname(signupRequestDto.getNickname());
-        newUser.setRoles("ROLE_USER");
+        if (newUser.getNickname().equals("admin")) {
+            newUser.setRoles("ROLE_ADMIN");
+        } else {
+            newUser.setRoles("ROLE_USER");
+        }
         newUser.setIsActive(true);
         User savedUser = userRepository.save(newUser);
-        String jwtToken = jwtTokenProvider.createToken(savedUser.getEmail(), savedUser.getRoleList());
+        String jwtToken = jwtTokenProvider.createToken(savedUser.getId(), savedUser.getRoleList());
         return new LoginResponseDto(savedUser.getId(), savedUser.getEmail(), savedUser.getNickname(), jwtToken);
     }
 
@@ -116,5 +131,28 @@ public class UserService {
         return userRepository.save(foundUser).getNickname();
     }
 
+    public List<MyReviewResDto> getReviews(String token) {
+        Long foundUserIdx = jwtTokenProvider.getUserIdx(token);
+        List<MyReview> reviews = reviewRepository.findReviewsByUserIdOrderByIdDesc(foundUserIdx);
+        List<MyReviewResDto> myReviewResDtos = new ArrayList<>();
+        for (MyReview review : reviews) {
+            boolean isLiked;
+            isLiked = review.getIsLiked() == 1;
+            MyReviewResDto myReviewResDto = MyReviewResDto.builder()
+                    .reviewIdx(review.getReviewIdx())
+                    .content(review.getContent())
+                    .likeCnt(review.getLikeCnt())
+                    .runningTime(review.getRunningTime())
+                    .userIdx(review.getUserIdx())
+                    .createdAt(review.getCreatedAt())
+                    .userNickname(review.getUserNickname())
+                    .imgPath(review.getResizedImgPath())
+                    .isLiked(isLiked)
+                    .commentCnt(review.getCommentCnt())
+                    .recipeIdx(review.getRecipeIdx()).build();
+            myReviewResDtos.add(myReviewResDto);
+        }
+        return myReviewResDtos;
+    }
 
 }
