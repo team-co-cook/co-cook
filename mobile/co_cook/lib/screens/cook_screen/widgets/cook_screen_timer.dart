@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:audioplayers/audioplayers.dart';
 
 import 'package:flutter/material.dart';
 import 'package:co_cook/styles/colors.dart';
@@ -18,11 +19,13 @@ class _CookScreenTimerState extends State<CookScreenTimer> {
   late int _currentSeconds;
   late Timer? _timer;
   bool _isPlay = false;
+  late AudioPlayer audioPlayer;
 
   @override
   void initState() {
     super.initState();
     _currentSeconds = widget.time;
+    audioPlayer = AudioPlayer();
   }
 
   @override
