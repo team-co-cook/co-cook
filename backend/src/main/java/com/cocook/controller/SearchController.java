@@ -2,6 +2,8 @@ package com.cocook.controller;
 
 import com.cocook.dto.ApiResponse;
 import com.cocook.entity.Ingredient;
+import com.cocook.entity.InstallUrl;
+import com.cocook.repository.InstallUrlRepository;
 import com.cocook.service.IngredientService;
 import com.cocook.service.SearchService;
 import org.springframework.http.ResponseEntity;
@@ -15,10 +17,12 @@ public class SearchController {
 
     private final SearchService searchService;
     private final IngredientService ingredientService;
+    private final InstallUrlRepository installUrlRepository;
 
-    public SearchController(SearchService searchService, IngredientService ingredientService) {
+    public SearchController(SearchService searchService, IngredientService ingredientService, InstallUrlRepository installUrlRepository) {
         this.searchService = searchService;
         this.ingredientService = ingredientService;
+        this.installUrlRepository = installUrlRepository;
     }
 
     @GetMapping("/popular")
@@ -33,6 +37,11 @@ public class SearchController {
         } else {
             return ApiResponse.ok(null);
         }
+    }
+
+    @GetMapping("/url")
+    public ResponseEntity<ApiResponse<InstallUrl>> getUrl() {
+        return ApiResponse.ok(installUrlRepository.findInstallUrlById(1L));
     }
 
 }
