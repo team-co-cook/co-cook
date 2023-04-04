@@ -68,22 +68,24 @@ public class S3Uploader {
     }
 
     public String uploadResizedImage(MultipartFile multipartFile, String dirName) throws IOException {
-        BufferedImage inputImage = ImageIO.read(multipartFile.getInputStream());
-        int originWidth = inputImage.getWidth();
-        int originHeight = inputImage.getHeight();
-        int newWidth = 390;
-        int newHeight = (originHeight * newWidth) / originWidth;
-        Image resizeImage = inputImage.getScaledInstance(newWidth, newHeight, Image.SCALE_FAST);
-        BufferedImage newImage = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_RGB);
-        Graphics graphics = newImage.getGraphics();
-        graphics.drawImage(resizeImage, 0, 0, null);
-        graphics.dispose();
-        File newFile = new File(dirName + multipartFile.getOriginalFilename());
-        ImageIO.write(newImage, "jpg", newFile);
-        String fileName = dirName + "/" + UUID.randomUUID() + newFile.getName();
-        String uploadImageUrl = putS3(newFile, fileName);
-        removeNewFile(newFile);
-        return uploadImageUrl;
+        try (InputStream inputStream = multipartFile.getInputStream()) {
+            BufferedImage inputImage = ImageIO.read(inputStream);
+            int originWidth = inputImage.getWidth();
+            int originHeight = inputImage.getHeight();
+            int newWidth = 390;
+            int newHeight = (originHeight * newWidth) / originWidth;
+            Image resizeImage = inputImage.getScaledInstance(newWidth, newHeight, Image.SCALE_FAST);
+            BufferedImage newImage = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_RGB);
+            Graphics graphics = newImage.getGraphics();
+            graphics.drawImage(resizeImage, 0, 0, null);
+            graphics.dispose();
+            File newFile = new File(dirName + multipartFile.getOriginalFilename());
+            ImageIO.write(newImage, "jpg", newFile);
+            String fileName = dirName + "/" + UUID.randomUUID() + newFile.getName();
+            String uploadImageUrl = putS3(newFile, fileName);
+            removeNewFile(newFile);
+            return uploadImageUrl;
+        }
     }
 
 }
