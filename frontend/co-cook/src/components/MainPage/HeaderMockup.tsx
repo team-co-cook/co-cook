@@ -3,8 +3,8 @@ import Mockup from "../common/Mockup";
 import splashImg from "../../assets/image/splashImg.png";
 import recipeScreen from "../../assets/image/recipeScreen.png";
 import themeScreen from "../../assets/image/themeScreen.png";
-import voiceScreen from "../../assets/videos/voiceScreen.mp4";
-import homeScreen from "../../assets/videos/homeScreen.mp4";
+import voiceScreen from "../../assets/videos/voiceScreen.webm";
+import homeScreen from "../../assets/videos/homeScreen.webm";
 import { useEffect, useState } from "react";
 
 function HeaderMockup() {
