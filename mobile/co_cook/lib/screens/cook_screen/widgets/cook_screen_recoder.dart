@@ -39,12 +39,7 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
   @override
   void dispose() {
     super.dispose();
-    _stopRecord();
-    if (cookTempDir.existsSync()) {
-      cookTempDir.listSync().forEach((file) => file.deleteSync());
-    }
-    TfliteAudio.stopAudioRecognition();
-    _recognitionSubscription.cancel();
+    reset();
   }
 
   // initState()의 내용을 init() 함수로 변경
@@ -62,7 +57,7 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
       cookTempDir.listSync().forEach((file) => file.deleteSync());
     }
     TfliteAudio.stopAudioRecognition();
-    _recognitionSubscription.cancel();
+    _recognitionSubscription?.cancel();
   }
 
   ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -75,10 +70,16 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
   }
 
   late Stream<Map<dynamic, dynamic>> recognitionStream;
-  late StreamSubscription<Map<dynamic, dynamic>> _recognitionSubscription;
+  StreamSubscription<Map<dynamic, dynamic>>? _recognitionSubscription;
   String result = '';
 
   void startWakeWordRecord() {
+    if (_recognitionSubscription != null) {
+      _recognitionSubscription!.cancel();
+      _recognitionSubscription = null;
+      TfliteAudio.stopAudioRecognition();
+    }
+
     recognitionStream = TfliteAudio.startAudioRecognition(
         sampleRate: 44100,
         bufferSize: 20000,
@@ -86,15 +87,13 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
         detectionThreshold: 0.9);
     _recognitionSubscription = recognitionStream.listen((event) {
       if (event["recognitionResult"] == '2 헤이코쿡') {
-        TfliteAudio.stopAudioRecognition();
-        _startRecord();
         reset(); // 호출어 인식 후 reset() 호출
+        _startRecord();
         init(); // 호출어 인식 후 init() 호출
       } else if (event["recognitionResult"] == '1 야윤성운') {
-        TfliteAudio.stopAudioRecognition();
+        reset(); // 호출어 인식 후 reset() 호출
         widget.setPowerMode(true);
         _startRecord();
-        reset(); // 호출어 인식 후 reset() 호출
         init(); // 호출어 인식 후 init() 호출
       }
     });
@@ -129,8 +128,6 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
   }
 
   void _startRecord() async {
-    _recognitionSubscription.cancel(); // 구독취소
-
     if (await _recorder.hasPermission()) {
       // 마이크 권한이 있을 때
       if (!await _recorder.isRecording()) {
@@ -175,8 +172,6 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
           }
 
           // 재시작
-          loadWakeWordModel(); // 모델 재 삽입
-          await Future.delayed(const Duration(milliseconds: 500)); // 딜레이 추가
           startWakeWordRecord(); // 스트림 초기화 및 리스너 재설정
         }).then((value) {
           audioFilePk++;
@@ -206,8 +201,10 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
   }
 
   Future<bool> _stopRecord() async {
-    volume = 0.0;
-    ampl = 0.0;
+    setState(() {
+      volume = 0.0;
+      ampl = 0.0;
+    });
     _recordingTimer?.cancel();
     await _recorder.stop();
     return true;
