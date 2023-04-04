@@ -33,34 +33,22 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
   @override
   void initState() {
     super.initState();
-    init();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    reset();
-  }
-
-  // initState()의 내용을 init() 함수로 변경
-  void init() {
     loadWakeWordModel();
     setTempDir();
     _audioPlayer = AudioPlayer();
     startWakeWordRecord();
   }
 
-  // dispose()의 내용을 reset() 함수로 변경
-  void reset() {
-    _stopRecord();
+  @override
+  void dispose() {
+    _diposeRecord();
     if (cookTempDir.existsSync()) {
       cookTempDir.listSync().forEach((file) => file.deleteSync());
     }
     TfliteAudio.stopAudioRecognition();
-    _recognitionSubscription?.cancel();
+    _recognitionSubscription.cancel();
+    super.dispose();
   }
-
-  ///////////////////////////////////////////////////////////////////////////////////////////////
 
   Future<void> loadWakeWordModel() async {
     await TfliteAudio.loadModel(
@@ -70,31 +58,25 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
   }
 
   late Stream<Map<dynamic, dynamic>> recognitionStream;
-  StreamSubscription<Map<dynamic, dynamic>>? _recognitionSubscription;
+  late StreamSubscription<Map<dynamic, dynamic>> _recognitionSubscription;
   String result = '';
 
   void startWakeWordRecord() {
-    if (_recognitionSubscription != null) {
-      _recognitionSubscription!.cancel();
-      _recognitionSubscription = null;
-      TfliteAudio.stopAudioRecognition();
-    }
-
     recognitionStream = TfliteAudio.startAudioRecognition(
         sampleRate: 44100,
         bufferSize: 20000,
         numOfInferences: 100000,
-        detectionThreshold: 0.9);
+        detectionThreshold: 0.1);
     _recognitionSubscription = recognitionStream.listen((event) {
       if (event["recognitionResult"] == '2 헤이코쿡') {
-        reset(); // 호출어 인식 후 reset() 호출
+        TfliteAudio.stopAudioRecognition();
+        _recognitionSubscription.cancel();
         _startRecord();
-        init(); // 호출어 인식 후 init() 호출
       } else if (event["recognitionResult"] == '1 야윤성운') {
-        reset(); // 호출어 인식 후 reset() 호출
+        TfliteAudio.stopAudioRecognition();
+        _recognitionSubscription.cancel();
         widget.setPowerMode(true);
         _startRecord();
-        init(); // 호출어 인식 후 init() 호출
       }
     });
   }
@@ -102,7 +84,7 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
   /////////////////////////////////////////////////////////////////////////////
   ///Recoder
   ///
-  final Record _recorder = Record(); // 녹음 라이브러리
+  Record _recorder = Record(); // 녹음 라이브러리
   late Directory cookTempDir; // 음성파일이 저장될 임시디렉토리
   Timer? _recordingTimer; // 마이크 볼륨 추적할 타이머
   bool _isRecording = false; // 녹음 여부
@@ -166,13 +148,12 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
             setState(() {
               _isSay = false;
             });
+            startWakeWordRecord();
           } else {
             // 안했을 때
             _audioPlayer.play(AssetSource('audios/ai_cancel.mp3'));
+            startWakeWordRecord();
           }
-
-          // 재시작
-          startWakeWordRecord(); // 스트림 초기화 및 리스너 재설정
         }).then((value) {
           audioFilePk++;
           widget.setPowerMode(false);
@@ -194,7 +175,9 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
     if (response?.statusCode == 200) {
       if (response != null) {
         print("전송 성공 : ${response.data}");
-        result = response.data['result'];
+        setState(() {
+          result = response.data['result'];
+        });
         widget.controlNotifier.value = response.data['result'];
       }
     }
@@ -206,7 +189,13 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
       ampl = 0.0;
     });
     _recordingTimer?.cancel();
-    await _recorder.stop();
+    _recorder.stop();
+    return true;
+  }
+
+  Future<bool> _diposeRecord() async {
+    _recordingTimer?.cancel();
+    _recorder.stop();
     return true;
   }
 
@@ -235,8 +224,6 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
   int volume0to(int maxVolumeToDisplay) {
     return (volume * maxVolumeToDisplay).round().abs();
   }
-
-  /////////////////////////////////////////////////////////////////////////////
 
   @override
   Widget build(BuildContext context) {
