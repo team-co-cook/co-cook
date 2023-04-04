@@ -6,8 +6,8 @@ function Header() {
   return (
     <StyledHeader>
       <div>
-        <h1>코쿡과 함께하는</h1>
-        <h1>쉽고 편한 요리</h1>
+        <h1>코쿡과 함께</h1>
+        <h1>손쉬운 요리생활</h1>
       </div>
       <Link to={"/install"} className="nav-link">
         지금 다운로드 받기
@@ -48,6 +48,7 @@ const StyledHeader = styled.header`
     margin-bottom: 32px;
 
     & > h1 {
+      margin-top: 16px;
       word-break: keep-all;
       ${({ theme }) => theme.fontStyles.subtitle1}
       font-size: 3.5rem;
@@ -76,9 +77,9 @@ const StyledHeader = styled.header`
   }
   & > section {
     width: 100%;
-    height: 350px;
+    height: 400px;
     @media (min-width: 734px) {
-      height: 620px;
+      height: 520px;
     }
     @media (min-width: 1068px) {
       height: 700px;

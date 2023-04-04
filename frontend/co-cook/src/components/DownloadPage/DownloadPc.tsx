@@ -8,7 +8,7 @@ function DownloadPc() {
       <img className="app-icon" src={appIcon} alt="app-icon" />
       <h1>Android 및 iPhone에서 다운로드하세요</h1>
       <div className="qr-code">
-        <QRCodeSVG value={"http://localhost:5173/install"} />
+        <QRCodeSVG value={"http://j8b302.p.ssafy.io/install"} />
       </div>
     </StyledDownloadPc>
   );
