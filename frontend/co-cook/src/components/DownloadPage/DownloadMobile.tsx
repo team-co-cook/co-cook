@@ -142,9 +142,13 @@ function DownloadMobile() {
                     )
                     .then((res) => {
                       console.log(res);
+                      alert(
+                        "신청이 완료되었습니다. 등록 완료시 작성하신 이메일로 회신해드립니다."
+                      );
                     })
                     .catch((e) => {
                       console.log(e);
+                      alert("요청 실패");
                     });
                 }}
                 disabled={!agree || !allInput}
