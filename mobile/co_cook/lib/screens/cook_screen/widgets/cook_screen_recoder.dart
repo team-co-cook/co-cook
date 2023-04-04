@@ -39,7 +39,12 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
   @override
   void dispose() {
     super.dispose();
-    reset();
+    _stopRecord();
+    if (cookTempDir.existsSync()) {
+      cookTempDir.listSync().forEach((file) => file.deleteSync());
+    }
+    TfliteAudio.stopAudioRecognition();
+    _recognitionSubscription.cancel();
   }
 
   // initState()의 내용을 init() 함수로 변경
@@ -78,7 +83,7 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
         sampleRate: 44100,
         bufferSize: 20000,
         numOfInferences: 100000,
-        detectionThreshold: 0.1);
+        detectionThreshold: 0.9);
     _recognitionSubscription = recognitionStream.listen((event) {
       if (event["recognitionResult"] == '2 헤이코쿡') {
         TfliteAudio.stopAudioRecognition();

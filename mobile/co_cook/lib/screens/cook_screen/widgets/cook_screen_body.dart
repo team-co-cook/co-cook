@@ -351,7 +351,7 @@ class _CookScreenBodyState extends State<CookScreenBody>
                                                 child: Container(
                                                   child: Center(
                                                     child: _buildWaveText(
-                                                        '"코쿡, 다음"이라고 말해보세요.'),
+                                                        '"Hey 코쿡, 다음"이라고 말해보세요.'),
                                                   ),
                                                 ),
                                               ),
