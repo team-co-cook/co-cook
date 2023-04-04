@@ -33,7 +33,6 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
   @override
   void initState() {
     super.initState();
-    loadWakeWordModel();
     setTempDir();
     _audioPlayer = AudioPlayer();
     startWakeWordRecord();
@@ -45,16 +44,9 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
     if (cookTempDir.existsSync()) {
       cookTempDir.listSync().forEach((file) => file.deleteSync());
     }
-    TfliteAudio.stopAudioRecognition();
     _recognitionSubscription.cancel();
+    TfliteAudio.stopAudioRecognition();
     super.dispose();
-  }
-
-  Future<void> loadWakeWordModel() async {
-    await TfliteAudio.loadModel(
-        model: 'assets/models/wake_word.tflite',
-        label: 'assets/models/wake_word_labels.txt',
-        inputType: 'rawAudio');
   }
 
   late Stream<Map<dynamic, dynamic>> recognitionStream;
@@ -69,8 +61,8 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
         detectionThreshold: 0.1);
     _recognitionSubscription = recognitionStream.listen((event) {
       if (event["recognitionResult"] == '2 헤이코쿡') {
-        TfliteAudio.stopAudioRecognition();
         _recognitionSubscription.cancel();
+        TfliteAudio.stopAudioRecognition();
         _startRecord();
       } else if (event["recognitionResult"] == '1 야윤성운') {
         TfliteAudio.stopAudioRecognition();

@@ -11,6 +11,7 @@ import 'package:co_cook/widgets/sliding_up_panel/sliding_up_panel.dart';
 import 'package:co_cook/screens/home_screen/home_screen.dart';
 import 'package:co_cook/screens/user_screen/user_screen.dart';
 import 'package:co_cook/screens/search_screen/search_screen.dart';
+import 'package:tflite_audio/tflite_audio.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -20,6 +21,12 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
+  @override
+  void initState() {
+    super.initState();
+    loadWakeWordModel();
+  }
+
   int _currentIndex = 0;
   final PanelController _mainPanelController = PanelController();
   final GlobalKey<FavoriteDirectState> _favoriteDirectKey =
@@ -41,6 +48,13 @@ class _MainScreenState extends State<MainScreen> {
     } else {
       return true;
     }
+  }
+
+  Future<void> loadWakeWordModel() async {
+    await TfliteAudio.loadModel(
+        model: 'assets/models/wake_word.tflite',
+        label: 'assets/models/wake_word_labels.txt',
+        inputType: 'rawAudio');
   }
 
   @override
