@@ -74,7 +74,14 @@ public class HomeService {
         }
 
         List<Recipe> fourthRecommend;
-        fourthRecommend = recipeRepository.findByIdIn(List.of(6L, 20L, 22L));
+        if (timeSlot.equals("아침")) {
+            fourthRecommend = recipeRepository.findByIdIn(List.of(11L, 18L, 33L));
+        } else if (timeSlot.equals("점식") || timeSlot.equals("저녁")) {
+            fourthRecommend = recipeRepository.findByIdIn(List.of(6L, 20L, 22L));
+        } else {
+            fourthRecommend = recipeRepository.findByIdIn(List.of(25L, 28L, 47L));
+        }
+
         recommendRecipes.addAll(fourthRecommend);
 
         List<Recipe> notDuplicatedRecipes = new ArrayList<>();
