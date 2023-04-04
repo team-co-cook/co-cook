@@ -33,22 +33,34 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
   @override
   void initState() {
     super.initState();
+    init();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    reset();
+  }
+
+  // initState()의 내용을 init() 함수로 변경
+  void init() {
     loadWakeWordModel();
     setTempDir();
     _audioPlayer = AudioPlayer();
     startWakeWordRecord();
   }
 
-  @override
-  void dispose() {
+  // dispose()의 내용을 reset() 함수로 변경
+  void reset() {
     _stopRecord();
     if (cookTempDir.existsSync()) {
       cookTempDir.listSync().forEach((file) => file.deleteSync());
     }
     TfliteAudio.stopAudioRecognition();
     _recognitionSubscription.cancel();
-    super.dispose();
   }
+
+  ///////////////////////////////////////////////////////////////////////////////////////////////
 
   Future<void> loadWakeWordModel() async {
     await TfliteAudio.loadModel(
@@ -68,13 +80,17 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
         numOfInferences: 100000,
         detectionThreshold: 0.1);
     _recognitionSubscription = recognitionStream.listen((event) {
-      if (event["recognitionResult"] == '2 코쿡') {
+      if (event["recognitionResult"] == '2 헤이코쿡') {
         TfliteAudio.stopAudioRecognition();
         _startRecord();
-      } else if (event["recognitionResult"] == '1 성운') {
+        reset(); // 호출어 인식 후 reset() 호출
+        init(); // 호출어 인식 후 init() 호출
+      } else if (event["recognitionResult"] == '1 야윤성운') {
         TfliteAudio.stopAudioRecognition();
         widget.setPowerMode(true);
         _startRecord();
+        reset(); // 호출어 인식 후 reset() 호출
+        init(); // 호출어 인식 후 init() 호출
       }
     });
   }
