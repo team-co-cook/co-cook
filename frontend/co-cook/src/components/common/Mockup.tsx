@@ -4,11 +4,12 @@ import mockupImg from "../../assets/image/mockupImg.png";
 interface Iprops {
   isVideo: boolean;
   screen: string;
+  isRotate: boolean;
 }
 
 function Mockup(props: Iprops) {
   return (
-    <StyledMockup>
+    <StyledMockup isRotate={props.isRotate}>
       <img className="mockup-img" src={mockupImg} alt="" />
       <div className="mockup-screen">
         {props.isVideo ? (
@@ -30,9 +31,17 @@ function Mockup(props: Iprops) {
 
 export default Mockup;
 
-const StyledMockup = styled.div`
+const StyledMockup = styled.div<{ isRotate: boolean }>`
   z-index: -2;
-  width: 100%;
+  ${({ isRotate }) => (isRotate ? "transform: rotate(90deg);" : null)}
+
+  width: 150px;
+  @media (min-width: 734px) {
+    width: 220px;
+  }
+  @media (min-width: 1068px) {
+    width: 300px;
+  }
   position: relative;
   aspect-ratio: 1/2.19;
   .mockup-img {

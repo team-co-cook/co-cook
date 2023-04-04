@@ -4,6 +4,7 @@ import Header from "../components/MainPage/Header";
 import PhotoSearch from "../components/MainPage/PhotoSearch";
 import VoiceRecipe from "../components/MainPage/VoiceRecipe";
 import VoiceSearch from "../components/MainPage/VoiceSearch";
+import Footer from "../components/MainPage/Footer";
 
 function MainPage() {
   return (
@@ -13,6 +14,7 @@ function MainPage() {
       <VoiceRecipe />
       <VoiceSearch />
       <PhotoSearch />
+      <Footer />
     </StyledMainPage>
   );
 }

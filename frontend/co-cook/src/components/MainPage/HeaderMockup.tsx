@@ -23,21 +23,38 @@ function HeaderMockup() {
 
   return (
     <div>
-      <StyledHeaderMockup scrollLocation={scrollLocation}>
-        <div className="move-mockup">
-          <Mockup isVideo={false} screen={themeScreen}></Mockup>
+      <StyledHeaderMockup>
+        <div
+          className="move-mockup"
+          style={{ paddingTop: (64 / 400) * (400 - scrollLocation) }}
+        >
+          <Mockup
+            isVideo={false}
+            screen={themeScreen}
+            isRotate={false}
+          ></Mockup>
         </div>
         <div>
-          <Mockup isVideo={true} screen={homeScreen}></Mockup>
+          <Mockup isVideo={true} screen={homeScreen} isRotate={false}></Mockup>
         </div>
-        <div className="move-mockup">
-          <Mockup isVideo={false} screen={splashImg}></Mockup>
+        <div
+          className="move-mockup"
+          style={{ paddingTop: (64 / 400) * (400 - scrollLocation) }}
+        >
+          <Mockup isVideo={false} screen={splashImg} isRotate={false}></Mockup>
         </div>
         <div>
-          <Mockup isVideo={true} screen={voiceScreen}></Mockup>
+          <Mockup isVideo={true} screen={voiceScreen} isRotate={false}></Mockup>
         </div>
-        <div className="move-mockup">
-          <Mockup isVideo={false} screen={recipeScreen}></Mockup>
+        <div
+          className="move-mockup"
+          style={{ paddingTop: (64 / 400) * (400 - scrollLocation) }}
+        >
+          <Mockup
+            isVideo={false}
+            screen={recipeScreen}
+            isRotate={false}
+          ></Mockup>
         </div>
       </StyledHeaderMockup>
     </div>
@@ -46,7 +63,7 @@ function HeaderMockup() {
 
 export default HeaderMockup;
 
-const StyledHeaderMockup = styled.div<{ scrollLocation: number }>`
+const StyledHeaderMockup = styled.div`
   @keyframes fadeUp1 {
     0% {
       opacity: 0;
@@ -77,25 +94,18 @@ const StyledHeaderMockup = styled.div<{ scrollLocation: number }>`
   overflow: hidden;
 
   & > div {
-    width: 150px;
     height: 350px;
     margin: 8px;
     animation: fadeUp1 1s ease-out;
     @media (min-width: 734px) {
-      width: 220px;
       height: 520px;
     }
     @media (min-width: 1068px) {
-      width: 300px;
       height: 700px;
     }
   }
   .move-mockup {
     transition: all ease-out 0.2s;
     animation: fadeUp2 1s ease-out;
-
-    padding-top: calc(
-      64px / 400 * (400 - ${({ scrollLocation }) => scrollLocation})
-    );
   }
 `;
