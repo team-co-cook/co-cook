@@ -48,6 +48,7 @@ const StyledHeader = styled.header`
     margin-bottom: 32px;
 
     & > h1 {
+      margin-top: 16px;
       word-break: keep-all;
       ${({ theme }) => theme.fontStyles.subtitle1}
       font-size: 3.5rem;

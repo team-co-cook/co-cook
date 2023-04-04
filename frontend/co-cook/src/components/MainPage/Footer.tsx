@@ -1,9 +1,8 @@
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import cocookAi from "../../assets/image/cocookAi.png";
-import DownloadPage from "../../pages/DownloadPage";
 import { useInView } from "react-intersection-observer";
-import { ReactComponent as LogoRed } from "../../assets/logo/logoRed.svg";
+import { ReactComponent as LogoWhite } from "../../assets/logo/logoWhite.svg";
 
 function Footer() {
   const { ref, inView, entry } = useInView({
@@ -18,7 +17,7 @@ function Footer() {
       <h2>코쿡만의 음성AI 기술</h2>
       <p>AI로 손쉬운 요리를 경험하세요.</p>
       <div className="download">
-        <LogoRed className="nav-logo" />
+        <LogoWhite className="nav-logo" />
         <Link to={"/install"} className="nav-link">
           지금 다운로드 받기
         </Link>
@@ -83,29 +82,30 @@ const StyledFooter = styled.header<{ inView: boolean }>`
     }
   }
   .download {
+    width: 100vw;
+    background-color: ${({ theme }) => theme.Colors.RED_PRIMARY};
     margin-top: 100px;
+    padding-top: 24px;
+    padding-bottom: 80px;
     height: 200px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
   }
-  .spacer {
-    margin-bottom: 200px;
-  }
   .nav-link {
     padding: 12px 18px;
-    border: 1px solid ${({ theme }) => theme.Colors.RED_PRIMARY};
+    border: 1px solid ${({ theme }) => theme.Colors.MONOTONE_LIGHT};
     margin-bottom: 24px;
     border-radius: 16px;
-    color: ${({ theme }) => theme.Colors.RED_PRIMARY};
+    color: ${({ theme }) => theme.Colors.MONOTONE_LIGHT};
     text-decoration: none;
     ${({ theme }) => theme.fontStyles.button}
     cursor: pointer;
     transition: all 0.1s;
     &:hover {
-      background-color: ${({ theme }) => theme.Colors.RED_PRIMARY};
-      color: ${({ theme }) => theme.Colors.MONOTONE_LIGHT};
+      background-color: ${({ theme }) => theme.Colors.MONOTONE_LIGHT};
+      color: ${({ theme }) => theme.Colors.MONOTONE_BLACK};
     }
     &:active {
       scale: 0.95;
