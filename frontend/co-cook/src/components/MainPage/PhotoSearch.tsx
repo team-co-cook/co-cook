@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { useInView } from "react-intersection-observer";
 import Mockup from "../common/Mockup";
-import voiceSearch from "../../assets/videos/voiceSearch.mp4";
+import cameraSearch from "../../assets/videos/cameraSearch.webm";
 import { useEffect, useState } from "react";
 import cocookLens from "../../assets/image/cocookLens.png";
 
@@ -33,7 +33,11 @@ function PhotoSearch() {
             transform: `translateY(${scrollLocation}px)`,
           }}
         >
-          <Mockup isVideo={true} screen={voiceSearch} isRotate={false}></Mockup>
+          <Mockup
+            isVideo={true}
+            screen={cameraSearch}
+            isRotate={false}
+          ></Mockup>
         </div>
         <div>
           <img src={cocookLens} alt="" />

@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { useInView } from "react-intersection-observer";
 import Mockup from "../common/Mockup";
-import voiceSearch from "../../assets/videos/voiceSearch.mp4";
+import voiceSearch from "../../assets/videos/voiceSearch.webm";
 import { useEffect, useState } from "react";
 
 function VoiceSearch() {
@@ -57,7 +57,6 @@ const StyledVoiceSearch = styled.section<{
   & > div {
     display: flex;
     z-index: -3;
-    background-image: url(src/assets/image/refrigerator.jpg);
     width: 100%;
     height: 100%;
     background-size: cover;
@@ -76,7 +75,6 @@ const StyledVoiceSearch = styled.section<{
         height: 50%;
       }
       flex-shrink: 0;
-      text-shadow: #000000 2px 2px 16px;
 
       & > video {
         width: 100px;
@@ -91,7 +89,7 @@ const StyledVoiceSearch = styled.section<{
         ${({ theme }) => theme.fontStyles.subtitle2}
         font-size: 2.5rem;
         text-align: center;
-        color: ${({ theme }) => theme.Colors.MONOTONE_LIGHT};
+        color: ${({ theme }) => theme.Colors.MONOTONE_BLACK};
         margin-bottom: 16px;
         line-height: 1.2;
         ${({ inView }) =>
@@ -103,7 +101,7 @@ const StyledVoiceSearch = styled.section<{
         ${({ theme }) => theme.fontStyles.body1}
         font-size: 1rem;
         text-align: center;
-        color: ${({ theme }) => theme.Colors.MONOTONE_LIGHT};
+        color: ${({ theme }) => theme.Colors.MONOTONE_BLACK};
         animation: fadeUp1 0.5s ease-out;
         ${({ inView }) =>
           inView ? "animation: fadeUp1 0.5s ease-out;" : "opacity: 0;"}

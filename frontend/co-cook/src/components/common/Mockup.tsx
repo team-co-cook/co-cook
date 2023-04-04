@@ -19,7 +19,7 @@ function Mockup(props: Iprops) {
             loop={true}
             muted={true}
           >
-            <source src={props.screen} type="video/mp4"></source>
+            <source src={props.screen} type="video/webm"></source>
           </video>
         ) : (
           <img className="mockup-screen-img" src={props.screen} alt="screen" />
