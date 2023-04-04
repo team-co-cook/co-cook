@@ -74,7 +74,7 @@ public class HomeService {
         }
 
         List<Recipe> fourthRecommend;
-        fourthRecommend = recipeRepository.findByIdIn(List.of(6L, 20L, 22L, 23L));
+        fourthRecommend = recipeRepository.findByIdIn(List.of(6L, 20L, 22L));
         recommendRecipes.addAll(fourthRecommend);
 
         List<Recipe> notDuplicatedRecipes = new ArrayList<>();
