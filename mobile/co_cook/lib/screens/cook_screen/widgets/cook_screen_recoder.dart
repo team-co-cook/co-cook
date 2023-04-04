@@ -19,11 +19,13 @@ class CookScreenRecoder extends StatefulWidget {
       {Key? key,
       required this.controlNotifier,
       required this.isPowerMode,
-      required this.setPowerMode})
+      required this.setPowerMode,
+      required this.isTtsPlaying})
       : super(key: key);
   final ValueNotifier<String> controlNotifier;
   final bool isPowerMode;
   final Function setPowerMode;
+  final ValueNotifier<bool> isTtsPlaying;
 
   @override
   State<CookScreenRecoder> createState() => _CookScreenRecoderState();
@@ -36,18 +38,31 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
     setTempDir();
     _audioPlayer = AudioPlayer();
     startWakeWordRecord();
+    widget.isTtsPlaying.addListener(_onTtsPlayingChanged); // tts play 리스너
   }
 
   @override
   void dispose() {
+    super.dispose();
     _diposeRecord();
     if (cookTempDir.existsSync()) {
       cookTempDir.listSync().forEach((file) => file.deleteSync());
     }
     _recognitionSubscription.cancel();
     TfliteAudio.stopAudioRecognition();
-    super.dispose();
+    widget.isTtsPlaying.removeListener(_onTtsPlayingChanged); // tts play 리스너
   }
+
+  // tts play 리스너
+  void _onTtsPlayingChanged() {
+    if (widget.isTtsPlaying.value) {
+      _recognitionSubscription.pause();
+    } else {
+      _recognitionSubscription.resume();
+    }
+  }
+
+  ////////////////////////////////////////////////////////////////////////////
 
   late Stream<Map<dynamic, dynamic>> recognitionStream;
   late StreamSubscription<Map<dynamic, dynamic>> _recognitionSubscription;
@@ -65,8 +80,8 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
         TfliteAudio.stopAudioRecognition();
         _startRecord();
       } else if (event["recognitionResult"] == '1 야윤성운') {
-        TfliteAudio.stopAudioRecognition();
         _recognitionSubscription.cancel();
+        TfliteAudio.stopAudioRecognition();
         widget.setPowerMode(true);
         _startRecord();
       }

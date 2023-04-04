@@ -22,12 +22,14 @@ class CookScreenBody extends StatefulWidget {
       required this.recipeIdx,
       required this.recipeName,
       required this.controlNotifier,
-      required this.isPowerMode})
+      required this.isPowerMode,
+      required this.isTtsPlaying})
       : super(key: key);
   final int recipeIdx;
   final String recipeName;
   final ValueNotifier<String> controlNotifier;
   final bool isPowerMode;
+  final ValueNotifier<bool> isTtsPlaying;
 
   @override
   State<CookScreenBody> createState() => _CookScreenBodyState();
@@ -136,6 +138,16 @@ class _CookScreenBodyState extends State<CookScreenBody>
 
     // 언어 설정
     await flutterTts.setLanguage("ko-KR");
+
+    flutterTts.setStartHandler(() {
+      print("TTS started");
+      widget.isTtsPlaying.value = true;
+    });
+
+    flutterTts.setCompletionHandler(() {
+      print("TTS completed");
+      widget.isTtsPlaying.value = false;
+    });
   }
 
   Future<void> speakText(String text) async {
