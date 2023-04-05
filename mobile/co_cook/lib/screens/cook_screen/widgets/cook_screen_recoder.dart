@@ -58,7 +58,8 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
     if (widget.isTtsPlaying.value) {
       _recognitionSubscription.pause();
     } else {
-      _recognitionSubscription.resume();
+      Future.delayed(const Duration(milliseconds: 200))
+          .then((_) => {_recognitionSubscription.resume()});
     }
   }
 

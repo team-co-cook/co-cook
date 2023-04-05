@@ -36,6 +36,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
   XFile? _image; // 이미지를 저장
   int _runningTime = 0;
   late DateTime _endTime;
+  bool isSend = false;
 
   @override
   void initState() {
@@ -132,9 +133,12 @@ class _ReviewScreenState extends State<ReviewScreen> {
       // 여기서 'reviewImg'는 서버에서 요구하는 파일의 키값입니다. 서버 요구에 따라 적절하게 변경해 주세요.
       "reviewImg": multipartFile,
     });
-
+    setState(() {
+      isSend = true;
+    });
     Response? response = await apiService.createReview(formData);
     if (response?.statusCode == 200) {
+      isSend = false;
       gotoPhotoCard(context, _text, _image!, widget.recipeName,
           widget.startTime, _endTime);
     }
@@ -242,13 +246,15 @@ class _ReviewScreenState extends State<ReviewScreen> {
                     ),
                     SizedBox(height: 24),
                     Center(
-                      child: CommonButton(
-                          label: '저장',
-                          color: ButtonType.red,
-                          onPressed: () {
-                            CreateReview();
-                          }),
-                    ),
+                        child: isSend
+                            ? CircularProgressIndicator(
+                                color: CustomColors.redPrimary)
+                            : CommonButton(
+                                label: '저장',
+                                color: ButtonType.red,
+                                onPressed: () {
+                                  CreateReview();
+                                })),
                     SizedBox(height: 8),
                     Center(
                       child: CommonButton(
