@@ -1,10 +1,10 @@
 import styled from "styled-components";
 import Mockup from "../common/Mockup";
-import splashImg from "../../assets/image/splashImg.png";
-import recipeScreen from "../../assets/image/recipeScreen.png";
-import themeScreen from "../../assets/image/themeScreen.png";
-import voiceScreen from "../../assets/videos/voiceScreen.webm";
-import homeScreen from "../../assets/videos/homeScreen.webm";
+import splashImg from "@/image/splashImg.png";
+import recipeScreen from "@/image/recipeScreen.png";
+import themeScreen from "@/image/themeScreen.png";
+import voiceScreen from "@/videos/voiceScreen.mp4";
+import homeScreen from "@/videos/homeScreen.mp4";
 import { useEffect, useState } from "react";
 
 function HeaderMockup() {
@@ -24,37 +24,20 @@ function HeaderMockup() {
   return (
     <div>
       <StyledHeaderMockup>
-        <div
-          className="move-mockup"
-          style={{ paddingTop: (64 / 400) * (400 - scrollLocation) }}
-        >
-          <Mockup
-            isVideo={false}
-            screen={themeScreen}
-            isRotate={false}
-          ></Mockup>
+        <div className="move-mockup" style={{ paddingTop: (64 / 400) * (400 - scrollLocation) }}>
+          <Mockup isVideo={false} screen={themeScreen} isRotate={false}></Mockup>
         </div>
         <div>
           <Mockup isVideo={true} screen={homeScreen} isRotate={false}></Mockup>
         </div>
-        <div
-          className="move-mockup"
-          style={{ paddingTop: (64 / 400) * (400 - scrollLocation) }}
-        >
+        <div className="move-mockup" style={{ paddingTop: (64 / 400) * (400 - scrollLocation) }}>
           <Mockup isVideo={false} screen={splashImg} isRotate={false}></Mockup>
         </div>
         <div>
           <Mockup isVideo={true} screen={voiceScreen} isRotate={false}></Mockup>
         </div>
-        <div
-          className="move-mockup"
-          style={{ paddingTop: (64 / 400) * (400 - scrollLocation) }}
-        >
-          <Mockup
-            isVideo={false}
-            screen={recipeScreen}
-            isRotate={false}
-          ></Mockup>
+        <div className="move-mockup" style={{ paddingTop: (64 / 400) * (400 - scrollLocation) }}>
+          <Mockup isVideo={false} screen={recipeScreen} isRotate={false}></Mockup>
         </div>
       </StyledHeaderMockup>
     </div>

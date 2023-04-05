@@ -1,28 +1,23 @@
 import styled from "styled-components";
-import mockupImg from "../../assets/image/mockupImg.png";
+import mockupImg from "@/image/mockupImg.png";
 
 interface Iprops {
-  isVideo: boolean;
+  isVideo?: boolean;
   screen: string;
   isRotate: boolean;
 }
 
-function Mockup(props: Iprops) {
+function Mockup({ isVideo = true, screen, isRotate }: Iprops) {
   return (
-    <StyledMockup isRotate={props.isRotate}>
+    <StyledMockup isRotate={isRotate}>
       <img className="mockup-img" src={mockupImg} alt="" />
       <div className="mockup-screen">
-        {props.isVideo ? (
-          <video
-            className="mockup-screen-img"
-            autoPlay={true}
-            loop={true}
-            muted={true}
-          >
-            <source src={props.screen} type="video/webm"></source>
+        {isVideo ? (
+          <video className="mockup-screen-img" autoPlay={true} loop={true} muted={true}>
+            <source src={screen} type="video/mp4"></source>
           </video>
         ) : (
-          <img className="mockup-screen-img" src={props.screen} alt="screen" />
+          <img className="mockup-screen-img" src={screen} alt="screen" />
         )}
       </div>
     </StyledMockup>

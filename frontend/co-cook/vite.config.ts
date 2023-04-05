@@ -6,7 +6,9 @@ import svgr from "vite-plugin-svgr";
 export default defineConfig({
   plugins: [react(), svgr()],
   define: {
-    "process.env.REACT_APP_EMAILJS_PUBLIC_KEY":
-      process.env.REACT_APP_EMAILJS_PUBLIC_KEY,
+    "process.env.REACT_APP_EMAILJS_PUBLIC_KEY": process.env.REACT_APP_EMAILJS_PUBLIC_KEY,
+  },
+  resolve: {
+    alias: [{ find: "@", replacement: "/src/assets" }],
   },
 });

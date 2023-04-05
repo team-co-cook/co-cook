@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { QRCodeSVG } from "qrcode.react";
-import appIcon from "../../assets/logo/appIcon.png";
+import appIcon from "@/logo/appIcon.png";
 
 function DownloadPc() {
   return (

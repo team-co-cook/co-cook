@@ -1,54 +1,54 @@
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import styled from "styled-components";
 import { useInView } from "react-intersection-observer";
 import Mockup from "../common/Mockup";
 import voiceSearch from "@/videos/voiceSearch.mp4";
 import { useEffect, useState } from "react";
-
 function VoiceSearch() {
   const { ref, inView, entry } = useInView({
     threshold: 0.8,
     triggerOnce: true,
   });
-
-  const [scrollLocation, setScrollLocation] = useState<number>(0);
-
-  const windowScrollListener = (e: Event) => {
+  const [scrollLocation, setScrollLocation] = useState(0);
+  const windowScrollListener = (e) => {
     setScrollLocation((document.documentElement.scrollTop / 6) * -1);
   };
-
   useEffect(() => {
     window.addEventListener("scroll", windowScrollListener);
     return () => {
       window.removeEventListener("scroll", windowScrollListener);
     };
   }, []);
-
-  return (
-    <StyledVoiceSearch id="voice-search-section" ref={ref} inView={inView}>
-      <div>
-        <div className="title">
-          <h2>"양파, 당근, 브로콜리..."</h2>
-          <p>냉장고 속이 두려울 때,</p>
-          <p>재료를 말하면 레시피를 추천해드립니다.</p>
-        </div>
-        <div
-          style={{
+  return _jsx(StyledVoiceSearch, {
+    id: "voice-search-section",
+    ref: ref,
+    inView: inView,
+    children: _jsxs("div", {
+      children: [
+        _jsxs("div", {
+          className: "title",
+          children: [
+            _jsx("h2", { children: '"\uC591\uD30C, \uB2F9\uADFC, \uBE0C\uB85C\uCF5C\uB9AC..."' }),
+            _jsx("p", { children: "\uB0C9\uC7A5\uACE0 \uC18D\uC774 \uB450\uB824\uC6B8 \uB54C," }),
+            _jsx("p", {
+              children:
+                "\uC7AC\uB8CC\uB97C \uB9D0\uD558\uBA74 \uB808\uC2DC\uD53C\uB97C \uCD94\uCC9C\uD574\uB4DC\uB9BD\uB2C8\uB2E4.",
+            }),
+          ],
+        }),
+        _jsx("div", {
+          style: {
             transform: `translateY(${scrollLocation}px)`,
-          }}
-          className="mockup"
-        >
-          <Mockup isVideo={true} screen={voiceSearch} isRotate={false}></Mockup>
-        </div>
-      </div>
-    </StyledVoiceSearch>
-  );
+          },
+          className: "mockup",
+          children: _jsx(Mockup, { isVideo: true, screen: voiceSearch, isRotate: false }),
+        }),
+      ],
+    }),
+  });
 }
-
 export default VoiceSearch;
-
-const StyledVoiceSearch = styled.section<{
-  inView: boolean;
-}>`
+const StyledVoiceSearch = styled.section`
   height: 500px;
   display: flex;
   align-items: center;
