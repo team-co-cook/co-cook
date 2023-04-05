@@ -112,13 +112,13 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   Future<void> _getImage(ImageSource source) async {
-    setState(() {
-      _isLoading = true;
-    });
     final pickedFile = await ImagePicker().pickImage(source: source);
     if (pickedFile == null) {
       return;
     }
+    setState(() {
+      _isLoading = true;
+    });
     imgFile = XFile(pickedFile.path);
 
     getImgData();

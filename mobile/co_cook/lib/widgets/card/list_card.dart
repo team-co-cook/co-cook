@@ -47,6 +47,7 @@ class _ListCardState extends State<ListCard> {
   void toggleIsAdd() {
     setState(() {
       isAdd = !isAdd;
+      widget.data!["isFavorite"] = !widget.data!["isFavorite"];
     });
   }
 

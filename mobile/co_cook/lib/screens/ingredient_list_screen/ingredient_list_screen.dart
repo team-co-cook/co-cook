@@ -64,9 +64,10 @@ class _IngredientListScreenState extends State<IngredientListScreen> {
       physics:
           const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
       scrollDirection: Axis.horizontal,
-      child: Container(
-        width: MediaQuery.of(context).size.width,
+      child: ConstrainedBox(
+        constraints: BoxConstraints(minHeight: 48.0), // 최소 높이 설정
         child: Row(
+          mainAxisSize: MainAxisSize.min, // Row의 mainAxisSize 설정
           mainAxisAlignment: MainAxisAlignment.start,
           children: widget.ingredients.map((ingredient) {
             return Padding(

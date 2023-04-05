@@ -42,6 +42,7 @@ class _GridCardState extends State<GridCard> {
   void toggleIsAdd() {
     setState(() {
       isAdd = !isAdd;
+      widget.data!["isFavorite"] = !widget.data!["isFavorite"];
     });
   }
 

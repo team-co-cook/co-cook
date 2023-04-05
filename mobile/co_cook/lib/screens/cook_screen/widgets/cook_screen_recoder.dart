@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:async';
+import 'dart:convert'; // decode 가져오기
 import 'package:dio/dio.dart';
 import 'package:record/record.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +9,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:co_cook/styles/colors.dart';
 import 'package:co_cook/styles/text_styles.dart';
@@ -35,7 +37,7 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
   @override
   void initState() {
     super.initState();
-    setTempDir();
+    _fetchNameSetTemp();
     _audioPlayer = AudioPlayer();
     startWakeWordRecord();
     widget.isTtsPlaying.addListener(_onTtsPlayingChanged); // tts play 리스너
@@ -53,12 +55,36 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
     widget.isTtsPlaying.removeListener(_onTtsPlayingChanged); // tts play 리스너
   }
 
+  //////////////
+  String _nickname = '';
+
+  // 닉네임 가져오기
+  Future<void> _fetchNickname() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String prefsUserData =
+        prefs.getString('userData') ?? ''; // 기본값으로 빈 문자열을 사용합니다.
+    Map<String, dynamic> decodePrefs = jsonDecode(prefsUserData);
+    String? nickname = decodePrefs['nickname'];
+
+    if (nickname != null) {
+      setState(() {
+        _nickname = nickname;
+      });
+    }
+  }
+
+  void _fetchNameSetTemp() async {
+    await _fetchNickname();
+    await setTempDir();
+  }
+
   // tts play 리스너
   void _onTtsPlayingChanged() {
     if (widget.isTtsPlaying.value) {
       _recognitionSubscription.pause();
     } else {
-      _recognitionSubscription.resume();
+      Future.delayed(const Duration(milliseconds: 700))
+          .then((_) => {_recognitionSubscription.resume()});
     }
   }
 
@@ -73,7 +99,7 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
         sampleRate: 44100,
         bufferSize: 20000,
         numOfInferences: 100000,
-        detectionThreshold: 0.1);
+        detectionThreshold: 0.6);
     _recognitionSubscription = recognitionStream.listen((event) {
       if (event["recognitionResult"] == '2 헤이코쿡') {
         _recognitionSubscription.cancel();
@@ -125,7 +151,7 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
         await Future.delayed(const Duration(microseconds: 300));
         await _recorder
             .start(
-          path: '${cookTempDir.path}/$audioFilePk.m4a',
+          path: '${cookTempDir.path}/$_nickname-$audioFilePk.m4a',
           encoder: AudioEncoder.aacLc,
           bitRate: 128000,
           samplingRate: 44100,
@@ -151,7 +177,7 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
           if (_isSay) {
             // 사용자가 말 했을 때
             await Future.delayed(const Duration(milliseconds: 500));
-            await postAudio('${cookTempDir.path}/$audioFilePk.m4a');
+            await postAudio('${cookTempDir.path}/$_nickname-$audioFilePk.m4a');
             setState(() {
               _isSay = false;
             });
