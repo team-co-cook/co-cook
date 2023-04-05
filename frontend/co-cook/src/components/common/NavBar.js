@@ -1,22 +1,16 @@
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { NavLink } from "react-router-dom";
 import styled from "styled-components";
 import { ReactComponent as LogoRed } from "@/logo/logoRed.svg";
-
 function NavBar() {
-  return (
-    <StyledNavBar>
-      <NavLink to={"/"}>
-        <LogoRed className="nav-logo" />
-      </NavLink>
-      <NavLink to={"/install"} className="nav-link">
-        Download
-      </NavLink>
-    </StyledNavBar>
-  );
+  return _jsxs(StyledNavBar, {
+    children: [
+      _jsx(NavLink, { to: "/", children: _jsx(LogoRed, { className: "nav-logo" }) }),
+      _jsx(NavLink, { to: "/install", className: "nav-link", children: "Download" }),
+    ],
+  });
 }
-
 export default NavBar;
-
 const StyledNavBar = styled.nav`
   display: flex;
   justify-content: space-between;

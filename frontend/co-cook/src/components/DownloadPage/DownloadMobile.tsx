@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 import { isAndroid } from "react-device-detect";
-import appIcon from "../../assets/logo/appIcon.png";
+import appIcon from "@/logo/appIcon.png";
 import emailjs from "@emailjs/browser";
 
 type IEmailData = {
@@ -27,12 +27,9 @@ function DownloadMobile() {
     status: 0,
   });
   async function request() {
-    const response = await fetch(
-      "http://j8b302.p.ssafy.io:8080/api/v1/search/url",
-      {
-        method: "GET",
-      }
-    );
+    const response = await fetch("http://j8b302.p.ssafy.io:8080/api/v1/search/url", {
+      method: "GET",
+    });
     setData(await response.json());
   }
 
@@ -44,11 +41,7 @@ function DownloadMobile() {
     let newEmailData = emailData;
     newEmailData[type] = data;
     setEmailData(newEmailData);
-    if (
-      newEmailData["udid"] &&
-      newEmailData["name"] &&
-      newEmailData["reply_email"]
-    ) {
+    if (newEmailData["udid"] && newEmailData["name"] && newEmailData["reply_email"]) {
       setAllInput(true);
     } else {
       setAllInput(false);
@@ -78,10 +71,7 @@ function DownloadMobile() {
           <p>⚠️인증된 iPhone만 설치가 가능합니다.</p>
           <h2>인증 요청 가이드</h2>
           <div className="submit-form">
-            <p>
-              아래 프로파일을 설치하고, 확인된 UDID를 아래에 입력 후
-              전송해주세요.
-            </p>
+            <p>아래 프로파일을 설치하고, 확인된 UDID를 아래에 입력 후 전송해주세요.</p>
             <a
               className="download-btn"
               href="https://udid.tech/static/configs/udid_tech.signed.mobileconfig"
@@ -117,10 +107,7 @@ function DownloadMobile() {
             <ul>
               <li>수집목적 : AD HOC 배포를 통한 앱 설치 가능 여부 회신</li>
               <li>수집항목 : 이름, 이메일, UDID</li>
-              <li>
-                보유 및 이용기간 : 입력일로부터 해당 프로젝트 종료일(2023. 4.
-                7.(금))까지
-              </li>
+              <li>보유 및 이용기간 : 입력일로부터 해당 프로젝트 종료일(2023. 4. 7.(금))까지</li>
             </ul>
             <div className="submit-box">
               <input
@@ -134,17 +121,10 @@ function DownloadMobile() {
               <button
                 onClick={() => {
                   emailjs
-                    .send(
-                      "service_283184v",
-                      "template_t579wcq",
-                      emailData,
-                      "KEvNEKeXbvmtjO0QG"
-                    )
+                    .send("service_283184v", "template_t579wcq", emailData, "KEvNEKeXbvmtjO0QG")
                     .then((res) => {
                       console.log(res);
-                      alert(
-                        "신청이 완료되었습니다. 등록 완료시 작성하신 이메일로 회신해드립니다."
-                      );
+                      alert("신청이 완료되었습니다. 등록 완료시 작성하신 이메일로 회신해드립니다.");
                     })
                     .catch((e) => {
                       console.log(e);

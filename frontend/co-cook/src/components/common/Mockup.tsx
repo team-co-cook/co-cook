@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import mockupImg from "../../assets/image/mockupImg.png";
+import mockupImg from "@/image/mockupImg.png";
 
 interface Iprops {
   isVideo: boolean;
@@ -13,12 +13,7 @@ function Mockup(props: Iprops) {
       <img className="mockup-img" src={mockupImg} alt="" />
       <div className="mockup-screen">
         {props.isVideo ? (
-          <video
-            className="mockup-screen-img"
-            autoPlay={true}
-            loop={true}
-            muted={true}
-          >
+          <video className="mockup-screen-img" autoPlay={true} loop={true} muted={true}>
             <source src={props.screen} type="video/webm"></source>
           </video>
         ) : (

@@ -1,3 +1,4 @@
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import styled from "styled-components";
 import { useInView } from "react-intersection-observer";
 import Mockup from "../common/Mockup";
@@ -5,57 +6,61 @@ import timer from "@/videos/timer.webm";
 import recipeNext from "@/videos/recipeNext.webm";
 import audioWave from "@/videos/audioWave.webm";
 import { useEffect, useState } from "react";
-
 function VoiceRecipe() {
   const { ref, inView, entry } = useInView({
     threshold: 0.8,
     triggerOnce: true,
   });
-
-  const [scrollLocation, setScrollLocation] = useState<number>(0);
-
-  const windowScrollListener = (e: Event) => {
+  const [scrollLocation, setScrollLocation] = useState(0);
+  const windowScrollListener = (e) => {
     setScrollLocation(document.documentElement.scrollTop);
     setWordIdx(Math.ceil(document.documentElement.scrollTop / 100) % 4);
   };
-
   useEffect(() => {
     window.addEventListener("scroll", windowScrollListener);
     return () => {
       window.removeEventListener("scroll", windowScrollListener);
     };
   }, []);
-
-  const wordComponent: JSX.Element[] = [
-    <h2>"코쿡, 타이머"</h2>,
-    <h2>"코쿡, 다음"</h2>,
-    <h2>"코쿡, 다시"</h2>,
-    <h2>"코쿡, 이전"</h2>,
+  const wordComponent = [
+    _jsx("h2", { children: '"\uCF54\uCFE1, \uD0C0\uC774\uBA38"' }),
+    _jsx("h2", { children: '"\uCF54\uCFE1, \uB2E4\uC74C"' }),
+    _jsx("h2", { children: '"\uCF54\uCFE1, \uB2E4\uC2DC"' }),
+    _jsx("h2", { children: '"\uCF54\uCFE1, \uC774\uC804"' }),
   ];
-  const [wordIdx, setWordIdx] = useState<number>(0);
-
-  return (
-    <StyledVoiceRecipe ref={ref} inView={inView}>
-      <div className="mockup">
-        <div style={{ paddingLeft: scrollLocation / 7 }}>
-          <Mockup isVideo={true} screen={timer} isRotate={true}></Mockup>
-        </div>
-        <div style={{ paddingLeft: scrollLocation / 30 }}>
-          <Mockup isVideo={true} screen={recipeNext} isRotate={true}></Mockup>
-        </div>
-      </div>
-      <div>
-        <video src={audioWave} autoPlay loop muted></video>
-        {wordComponent[wordIdx]}
-        <p>요리 중 손을 쓰기 힘들다면 언제든 말만 하세요.</p>
-      </div>
-    </StyledVoiceRecipe>
-  );
+  const [wordIdx, setWordIdx] = useState(0);
+  return _jsxs(StyledVoiceRecipe, {
+    ref: ref,
+    inView: inView,
+    children: [
+      _jsxs("div", {
+        className: "mockup",
+        children: [
+          _jsx("div", {
+            style: { paddingLeft: scrollLocation / 7 },
+            children: _jsx(Mockup, { isVideo: true, screen: timer, isRotate: true }),
+          }),
+          _jsx("div", {
+            style: { paddingLeft: scrollLocation / 30 },
+            children: _jsx(Mockup, { isVideo: true, screen: recipeNext, isRotate: true }),
+          }),
+        ],
+      }),
+      _jsxs("div", {
+        children: [
+          _jsx("video", { src: audioWave, autoPlay: true, loop: true, muted: true }),
+          wordComponent[wordIdx],
+          _jsx("p", {
+            children:
+              "\uC694\uB9AC \uC911 \uC190\uC744 \uC4F0\uAE30 \uD798\uB4E4\uB2E4\uBA74 \uC5B8\uC81C\uB4E0 \uB9D0\uB9CC \uD558\uC138\uC694.",
+          }),
+        ],
+      }),
+    ],
+  });
 }
-
 export default VoiceRecipe;
-
-const StyledVoiceRecipe = styled.section<{ inView: boolean }>`
+const StyledVoiceRecipe = styled.section`
   display: flex;
   align-items: center;
   height: 650px;

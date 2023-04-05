@@ -1,35 +1,40 @@
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import cocookAi from "@/image/cocookAi.png";
 import { useInView } from "react-intersection-observer";
 import { ReactComponent as LogoWhite } from "@/logo/logoWhite.svg";
-
 function Footer() {
   const { ref, inView, entry } = useInView({
     threshold: 0.8,
     triggerOnce: true,
   });
-  return (
-    <StyledFooter ref={ref} inView={inView}>
-      <div className="ai">
-        <img src={cocookAi} alt="" />
-      </div>
-      <h2>코쿡만의 음성AI 기술</h2>
-      <p>AI로 손쉬운 요리를 경험하세요.</p>
-      <div className="download">
-        <LogoWhite className="nav-logo" />
-        <Link to={"/install"} className="nav-link">
-          지금 다운로드 받기
-        </Link>
-      </div>
-      <div className="spacer"></div>
-    </StyledFooter>
-  );
+  return _jsxs(StyledFooter, {
+    ref: ref,
+    inView: inView,
+    children: [
+      _jsx("div", { className: "ai", children: _jsx("img", { src: cocookAi, alt: "" }) }),
+      _jsx("h2", { children: "\uCF54\uCFE1\uB9CC\uC758 \uC74C\uC131AI \uAE30\uC220" }),
+      _jsx("p", {
+        children: "AI\uB85C \uC190\uC26C\uC6B4 \uC694\uB9AC\uB97C \uACBD\uD5D8\uD558\uC138\uC694.",
+      }),
+      _jsxs("div", {
+        className: "download",
+        children: [
+          _jsx(LogoWhite, { className: "nav-logo" }),
+          _jsx(Link, {
+            to: "/install",
+            className: "nav-link",
+            children: "\uC9C0\uAE08 \uB2E4\uC6B4\uB85C\uB4DC \uBC1B\uAE30",
+          }),
+        ],
+      }),
+      _jsx("div", { className: "spacer" }),
+    ],
+  });
 }
-
 export default Footer;
-
-const StyledFooter = styled.header<{ inView: boolean }>`
+const StyledFooter = styled.header`
   @keyframes fadeUp1 {
     0% {
       opacity: 0;
