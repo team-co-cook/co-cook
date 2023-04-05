@@ -1,9 +1,10 @@
 FROM python:3.8.10
 
+RUN mkdir ai
 COPY ./ /ai
 WORKDIR /ai
 
-RUN pip install -r requirements.txt
+RUN sudo pip install -r requirements.txt
 
 EXPOSE 3000
 
