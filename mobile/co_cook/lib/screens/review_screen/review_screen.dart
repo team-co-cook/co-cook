@@ -92,6 +92,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
   void _deleteImage() {
     setState(() {
       _image = null;
+      isSend = false;
     });
   }
 
