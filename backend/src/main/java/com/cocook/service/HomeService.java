@@ -76,7 +76,7 @@ public class HomeService {
         List<Recipe> fourthRecommend;
         if (timeSlot.equals("아침")) {
             fourthRecommend = recipeRepository.findByIdIn(List.of(11L, 18L, 33L));
-        } else if (timeSlot.equals("점식") || timeSlot.equals("저녁")) {
+        } else if (timeSlot.equals("점심") || timeSlot.equals("저녁")) {
             fourthRecommend = recipeRepository.findByIdIn(List.of(6L, 20L, 22L));
         } else {
             fourthRecommend = recipeRepository.findByIdIn(List.of(25L, 28L, 47L));
