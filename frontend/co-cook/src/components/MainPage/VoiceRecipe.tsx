@@ -3,7 +3,8 @@ import { useInView } from "react-intersection-observer";
 import Mockup from "../common/Mockup";
 import timer from "../../assets/videos/timer.webm";
 import recipeNext from "../../assets/videos/recipeNext.webm";
-import audioWave from "../../assets/videos/audioWave.mp4";
+import audioWave from "../../assets/videos/audioWave.webm";
+import { useEffect, useState } from "react";
 
 function VoiceRecipe() {
   const { ref, inView, entry } = useInView({
@@ -11,20 +12,41 @@ function VoiceRecipe() {
     triggerOnce: true,
   });
 
+  const [scrollLocation, setScrollLocation] = useState<number>(0);
+
+  const windowScrollListener = (e: Event) => {
+    setScrollLocation(document.documentElement.scrollTop);
+    setWordIdx(Math.ceil(document.documentElement.scrollTop / 100) % 4);
+  };
+
+  useEffect(() => {
+    window.addEventListener("scroll", windowScrollListener);
+    return () => {
+      window.removeEventListener("scroll", windowScrollListener);
+    };
+  }, []);
+
+  const wordComponent: JSX.Element[] = [
+    <h2>"코쿡, 타이머"</h2>,
+    <h2>"코쿡, 다음"</h2>,
+    <h2>"코쿡, 다시"</h2>,
+    <h2>"코쿡, 이전"</h2>,
+  ];
+  const [wordIdx, setWordIdx] = useState<number>(0);
+
   return (
     <StyledVoiceRecipe ref={ref} inView={inView}>
-      <div className="mockup-box">
-        <div className="mockup">
-          <Mockup isVideo={true} screen={timer}></Mockup>
+      <div className="mockup">
+        <div style={{ paddingLeft: scrollLocation / 7 }}>
+          <Mockup isVideo={true} screen={timer} isRotate={true}></Mockup>
         </div>
-        <div className="mockup">
-          <Mockup isVideo={true} screen={recipeNext}></Mockup>
+        <div style={{ paddingLeft: scrollLocation / 30 }}>
+          <Mockup isVideo={true} screen={recipeNext} isRotate={true}></Mockup>
         </div>
       </div>
-
       <div>
-        <video className="bg-video" src={audioWave} loop autoPlay muted></video>
-        <h2>"코쿡, 타이머"</h2>
+        <video src={audioWave} autoPlay loop muted></video>
+        {wordComponent[wordIdx]}
         <p>요리 중 손을 쓰기 힘들다면 언제든 말만 하세요.</p>
       </div>
     </StyledVoiceRecipe>
@@ -34,121 +56,85 @@ function VoiceRecipe() {
 export default VoiceRecipe;
 
 const StyledVoiceRecipe = styled.section<{ inView: boolean }>`
-  @keyframes contentFade {
-    0% {
-      opacity: 0;
-      transform: translateY(50px);
-    }
-    100% {
-      opacity: 1;
-      transform: translateY(0px);
-    }
-  }
-  @keyframes contentFadeH {
-    0% {
-      opacity: 0;
-      transform: translatex(-50px) rotate(90deg);
-    }
-    100% {
-      opacity: 1;
-      transform: translateX(0px) rotate(90deg);
-    }
-  }
-  height: 500px;
-  width: 100%;
-  max-width: 980px;
-  justify-content: space-between;
   display: flex;
+  align-items: center;
+  height: 650px;
+  width: 100%;
+  text-align: right;
+
   @media (max-width: 734px) {
     flex-direction: column-reverse;
     justify-content: center;
-    align-items: center;
-    height: 650px;
   }
+
   & > div {
+    width: 40%;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: end;
-    height: 100%;
-    text-align: end;
+    align-items: center;
     @media (max-width: 734px) {
-      align-items: center;
-      text-align: center;
+      width: 100%;
     }
-    & > h2 {
-      margin-block: 16px;
-      word-break: keep-all;
-      ${({ theme }) => theme.fontStyles.subtitle1}
-      font-size: 2.5rem;
+    flex-shrink: 0;
+
+    & > video {
+      width: 200px;
+      margin-bottom: 16px;
+      mix-blend-mode: multiply;
       ${({ inView }) =>
-        inView
-          ? "animation: contentFade 0.5s ease-out;"
-          : "opacity: 0; transform: translateY(50px);"}
+        inView ? "animation: fadeUp1 0.5s ease-out;" : "opacity: 0;"}
+    }
+
+    & > h2 {
+      word-break: keep-all;
+      ${({ theme }) => theme.fontStyles.subtitle2}
+      font-size: 2.5rem;
+      text-align: center;
       color: ${({ theme }) => theme.Colors.MONOTONE_BLACK};
+      ${({ inView }) =>
+        inView ? "animation: fadeUp1 0.5s ease-out;" : "opacity: 0;"}
     }
     & > p {
+      margin-top: 16px;
       word-break: keep-all;
       ${({ theme }) => theme.fontStyles.body1}
-      font-size: 1.5rem;
+      font-size: 1rem;
+      text-align: center;
       color: ${({ theme }) => theme.Colors.MONOTONE_BLACK};
+      animation: fadeUp1 0.5s ease-out;
       ${({ inView }) =>
-        inView
-          ? "animation: contentFade 0.5s ease-out;"
-          : "opacity: 0; transform: translateY(50px);"}
+        inView ? "animation: fadeUp1 0.5s ease-out;" : "opacity: 0;"}
     }
   }
-
-  & .mockup-box {
+  .mockup {
+    width: 60%;
+    height: 100%;
     display: flex;
-    flex-direction: column;
-    margin-left: 80px;
-    & > div:first-child {
-      margin-bottom: 24px;
-      animation-duration: 1s;
-    }
-    & > div:last-child {
-      margin-right: 90px;
-    }
+    justify-content: center;
+    align-items: start;
     @media (max-width: 734px) {
+      width: 100%;
+      height: 50%;
+      margin-left: 30px;
+    }
+    & > div {
+      width: 60%;
+      height: 30%;
+      display: flex;
+
       align-items: center;
-      justify-content: center;
-      margin-left: 450px;
-      & > div:last-child {
-        margin-right: 300px;
+      @media (max-width: 734px) {
+        justify-content: center;
+        width: 100%;
+        margin-left: -60px;
+      }
+      @media (min-width: 734px) {
+        margin-left: 20px;
+      }
+      @media (min-width: 1068px) {
+        margin-left: 100px;
       }
     }
-  }
-
-  & .mockup {
-    height: 150px;
-    transform: rotate(90deg);
-    position: relative;
-    bottom: 0px;
-    ${({ inView }) =>
-      inView
-        ? "animation: contentFadeH 0.5s ease-out;"
-        : "opacity: 0; transform: translateY(50px);"}
-    z-index: 1;
-    width: 250px;
-    margin-top: 50px;
-    @media (max-width: 734px) {
-      width: 200px;
-      height: 150px;
-      margin-top: -10px;
-      align-items: center;
-      justify-content: center;
-    }
-  }
-
-  .bg-video {
-    z-index: -2;
-    width: 100%;
-    mix-blend-mode: darken;
-    max-width: 600px;
-    height: 80px;
-    left: 0;
-    object-fit: cover;
-    margin-bottom: 16px;
   }
 `;

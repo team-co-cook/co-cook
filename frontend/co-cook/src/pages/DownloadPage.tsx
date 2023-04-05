@@ -4,6 +4,7 @@ import styled from "styled-components";
 import NavBar from "../components/common/NavBar";
 import DownloadMobile from "../components/DownloadPage/DownloadMobile";
 import DownloadPc from "../components/DownloadPage/DownloadPc";
+import { useEffect } from "react";
 
 function DownloadPage() {
   return (

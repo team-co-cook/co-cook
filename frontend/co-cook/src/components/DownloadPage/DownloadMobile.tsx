@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
 import { isAndroid } from "react-device-detect";
 import appIcon from "../../assets/logo/appIcon.png";
@@ -17,6 +17,29 @@ function DownloadMobile() {
     reply_email: "",
   });
 
+  let [data, setData] = useState({
+    data: {
+      androidUrl: "",
+      iosUrl: "",
+      id: 0,
+    },
+    message: "",
+    status: 0,
+  });
+  async function request() {
+    const response = await fetch(
+      "http://j8b302.p.ssafy.io:8080/api/v1/search/url",
+      {
+        method: "GET",
+      }
+    );
+    setData(await response.json());
+  }
+
+  useEffect(() => {
+    request();
+  }, []);
+
   const typeInputData = (type: string, data: string) => {
     let newEmailData = emailData;
     newEmailData[type] = data;
@@ -30,7 +53,6 @@ function DownloadMobile() {
     } else {
       setAllInput(false);
     }
-    console.log(emailData);
   };
 
   return (
@@ -41,10 +63,7 @@ function DownloadMobile() {
           {/* android */}
           <h1>Android에서</h1>
           <h1>Co-cook! 앱 사용하기</h1>
-          <a
-            className="download-btn"
-            href="https://dl.dropboxusercontent.com/s/brv9ul1vfrxn2c7/co-cook.apk"
-          >
+          <a className="download-btn" href={data.data.androidUrl}>
             다운로드
           </a>
         </div>
@@ -53,10 +72,7 @@ function DownloadMobile() {
           {/* ios */}
           <h1>iPhone에서</h1>
           <h1>Co-cook! 앱 사용하기</h1>
-          <a
-            className="download-btn"
-            href="itms-services://?action=download-manifest&url=https://dl.dropboxusercontent.com/s/z0fy07jb23ly50f/manifest.plist"
-          >
+          <a className="download-btn" href={data.data.iosUrl}>
             다운로드
           </a>
           <p>⚠️인증된 iPhone만 설치가 가능합니다.</p>
@@ -81,7 +97,7 @@ function DownloadMobile() {
               type="text"
               placeholder="00000000-XXXXXXXXXXXXXXXX"
             />
-            <span>이름</span>
+            <span>성함</span>
             <input
               onChange={(e) => {
                 typeInputData("name", e.target.value);
@@ -119,16 +135,20 @@ function DownloadMobile() {
                 onClick={() => {
                   emailjs
                     .send(
-                      "service_k99echh",
-                      "template_mvrpvlq",
+                      "service_283184v",
+                      "template_t579wcq",
                       emailData,
-                      import.meta.env.VITE_EMAILJS_PUBLIC_KEY
+                      "KEvNEKeXbvmtjO0QG"
                     )
                     .then((res) => {
                       console.log(res);
+                      alert(
+                        "신청이 완료되었습니다. 등록 완료시 작성하신 이메일로 회신해드립니다."
+                      );
                     })
                     .catch((e) => {
                       console.log(e);
+                      alert("요청 실패");
                     });
                 }}
                 disabled={!agree || !allInput}
