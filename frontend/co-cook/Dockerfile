@@ -8,7 +8,7 @@ WORKDIR /front_app
 # make directory /front_app/build 
 RUN mkdir ./build
 
-ADD ./build ./build
+ADD ./dist ./build
 
 # delete nginx default.conf
 RUN rm /etc/nginx/conf.d/default.conf
