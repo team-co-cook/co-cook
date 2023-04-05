@@ -247,8 +247,13 @@ class _ReviewScreenState extends State<ReviewScreen> {
                     SizedBox(height: 24),
                     Center(
                         child: isSend
-                            ? CircularProgressIndicator(
-                                color: CustomColors.redPrimary)
+                            ? Container(
+                                width: 20.0,
+                                height: 20.0,
+                                child: CircularProgressIndicator(
+                                  color: CustomColors.redPrimary,
+                                ),
+                              )
                             : CommonButton(
                                 label: '저장',
                                 color: ButtonType.red,
