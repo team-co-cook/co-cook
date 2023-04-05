@@ -14,7 +14,7 @@ function Mockup(props) {
               autoPlay: true,
               loop: true,
               muted: true,
-              children: _jsx("source", { src: props.screen, type: "video/webm" }),
+              children: _jsx("source", { src: props.screen, type: "video/mp4" }),
             })
           : _jsx("img", { className: "mockup-screen-img", src: props.screen, alt: "screen" }),
       }),
