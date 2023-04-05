@@ -24,15 +24,17 @@ class CookScreen extends StatefulWidget {
 class _CookScreenState extends State<CookScreen> {
   final ValueNotifier<String> controlNotifier =
       ValueNotifier<String>(''); // 음성명령어 상태를 전달하기 위한 노티파이어
+  final ValueNotifier<bool> isTtsPlaying =
+      ValueNotifier<bool>(false); // tts 상태관리 노티파이어
   late StreamSubscription<AccelerometerEvent> _accelerometerSub;
   bool isRotated = false;
   Map _recipeData = {};
 
   @override
   void initState() {
+    super.initState();
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     startAccelerometerListener();
-    super.initState();
     getDetailBasic(widget.recipeIdx);
   }
 
@@ -132,7 +134,8 @@ class _CookScreenState extends State<CookScreen> {
                         CookScreenRecoder(
                             controlNotifier: controlNotifier,
                             isPowerMode: isPowerMode,
-                            setPowerMode: setPowerMode),
+                            setPowerMode: setPowerMode,
+                            isTtsPlaying: isTtsPlaying),
                         CommonButton(
                             label: "종료",
                             color: ButtonType.red,
@@ -150,7 +153,8 @@ class _CookScreenState extends State<CookScreen> {
                     controlNotifier: controlNotifier,
                     recipeIdx: widget.recipeIdx,
                     recipeName: _recipeData['recipeName'],
-                    isPowerMode: isPowerMode)
+                    isPowerMode: isPowerMode,
+                    isTtsPlaying: isTtsPlaying)
                 : Container());
   }
 }

@@ -19,11 +19,13 @@ class CookScreenRecoder extends StatefulWidget {
       {Key? key,
       required this.controlNotifier,
       required this.isPowerMode,
-      required this.setPowerMode})
+      required this.setPowerMode,
+      required this.isTtsPlaying})
       : super(key: key);
   final ValueNotifier<String> controlNotifier;
   final bool isPowerMode;
   final Function setPowerMode;
+  final ValueNotifier<bool> isTtsPlaying;
 
   @override
   State<CookScreenRecoder> createState() => _CookScreenRecoderState();
@@ -33,20 +35,34 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
   @override
   void initState() {
     super.initState();
-    loadWakeWordModel();
     setTempDir();
-    setState(() {
-      _audioPlayer = AudioPlayer();
-    });
+    _audioPlayer = AudioPlayer();
     startWakeWordRecord();
+    widget.isTtsPlaying.addListener(_onTtsPlayingChanged); // tts play 리스너
   }
 
-  Future<void> loadWakeWordModel() async {
-    await TfliteAudio.loadModel(
-        model: 'assets/models/wake_word.tflite',
-        label: 'assets/models/wake_word_labels.txt',
-        inputType: 'rawAudio');
+  @override
+  void dispose() {
+    super.dispose();
+    _diposeRecord();
+    if (cookTempDir.existsSync()) {
+      cookTempDir.listSync().forEach((file) => file.deleteSync());
+    }
+    _recognitionSubscription.cancel();
+    TfliteAudio.stopAudioRecognition();
+    widget.isTtsPlaying.removeListener(_onTtsPlayingChanged); // tts play 리스너
   }
+
+  // tts play 리스너
+  void _onTtsPlayingChanged() {
+    if (widget.isTtsPlaying.value) {
+      _recognitionSubscription.pause();
+    } else {
+      _recognitionSubscription.resume();
+    }
+  }
+
+  ////////////////////////////////////////////////////////////////////////////
 
   late Stream<Map<dynamic, dynamic>> recognitionStream;
   late StreamSubscription<Map<dynamic, dynamic>> _recognitionSubscription;
@@ -59,13 +75,13 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
         numOfInferences: 100000,
         detectionThreshold: 0.1);
     _recognitionSubscription = recognitionStream.listen((event) {
-      if (event["recognitionResult"] == '2 코쿡') {
-        TfliteAudio.stopAudioRecognition();
+      if (event["recognitionResult"] == '2 헤이코쿡') {
         _recognitionSubscription.cancel();
+        TfliteAudio.stopAudioRecognition();
         _startRecord();
-      } else if (event["recognitionResult"] == '1 성운') {
-        TfliteAudio.stopAudioRecognition();
+      } else if (event["recognitionResult"] == '1 야윤성운') {
         _recognitionSubscription.cancel();
+        TfliteAudio.stopAudioRecognition();
         widget.setPowerMode(true);
         _startRecord();
       }
@@ -214,19 +230,6 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
 
   int volume0to(int maxVolumeToDisplay) {
     return (volume * maxVolumeToDisplay).round().abs();
-  }
-
-  /////////////////////////////////////////////////////////////////////////////
-
-  @override
-  void dispose() {
-    _diposeRecord();
-    if (cookTempDir.existsSync()) {
-      cookTempDir.listSync().forEach((file) => file.deleteSync());
-    }
-    TfliteAudio.stopAudioRecognition();
-    _recognitionSubscription.cancel();
-    super.dispose();
   }
 
   @override

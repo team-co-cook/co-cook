@@ -22,12 +22,14 @@ class CookScreenBody extends StatefulWidget {
       required this.recipeIdx,
       required this.recipeName,
       required this.controlNotifier,
-      required this.isPowerMode})
+      required this.isPowerMode,
+      required this.isTtsPlaying})
       : super(key: key);
   final int recipeIdx;
   final String recipeName;
   final ValueNotifier<String> controlNotifier;
   final bool isPowerMode;
+  final ValueNotifier<bool> isTtsPlaying;
 
   @override
   State<CookScreenBody> createState() => _CookScreenBodyState();
@@ -60,8 +62,7 @@ class _CookScreenBodyState extends State<CookScreenBody>
   @override
   void initState() {
     super.initState();
-
-    flutterTts = FlutterTts();
+    initTts();
 
     _waveAnimationController = AnimationController(
       vsync: this,
@@ -119,9 +120,37 @@ class _CookScreenBodyState extends State<CookScreenBody>
     super.dispose();
   }
 
-  Future<void> speakText(String text) async {
-    // 한국어 TTS 사용 예시
+  // TTS 초기화 메소드
+  Future<void> initTts() async {
+    flutterTts = FlutterTts();
+
+    // iOS에서 공유 오디오 세션 사용
+    if (Platform.isIOS) {
+      await flutterTts.setSharedInstance(true);
+      await flutterTts
+          .setIosAudioCategory(IosTextToSpeechAudioCategory.playAndRecord, [
+        IosTextToSpeechAudioCategoryOptions.allowBluetooth,
+        IosTextToSpeechAudioCategoryOptions.allowBluetoothA2DP,
+        IosTextToSpeechAudioCategoryOptions.mixWithOthers,
+        IosTextToSpeechAudioCategoryOptions.defaultToSpeaker
+      ]);
+    }
+
+    // 언어 설정
     await flutterTts.setLanguage("ko-KR");
+
+    flutterTts.setStartHandler(() {
+      print("TTS started");
+      widget.isTtsPlaying.value = true;
+    });
+
+    flutterTts.setCompletionHandler(() {
+      print("TTS completed");
+      widget.isTtsPlaying.value = false;
+    });
+  }
+
+  Future<void> speakText(String text) async {
     await flutterTts.speak(text);
   }
 
@@ -334,7 +363,7 @@ class _CookScreenBodyState extends State<CookScreenBody>
                                                 child: Container(
                                                   child: Center(
                                                     child: _buildWaveText(
-                                                        '"코쿡, 다음"이라고 말해보세요.'),
+                                                        '"Hey 코쿡, 다음"이라고 말해보세요.'),
                                                   ),
                                                 ),
                                               ),

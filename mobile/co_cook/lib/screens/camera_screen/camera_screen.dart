@@ -47,6 +47,7 @@ class _CameraScreenState extends State<CameraScreen> {
     await _cameraController.pausePreview();
 
     try {
+      _cameraController.pausePreview();
       imgFile = await _cameraController.takePicture();
     } on CameraException catch (e) {
       print('error: $e');
