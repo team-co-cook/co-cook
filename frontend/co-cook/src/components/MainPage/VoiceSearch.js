@@ -2,7 +2,7 @@ import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import styled from "styled-components";
 import { useInView } from "react-intersection-observer";
 import Mockup from "../common/Mockup";
-import voiceSearch from "@/videos/voiceSearch.webm";
+import voiceSearch from "@/videos/voiceSearch.mp4";
 import { useEffect, useState } from "react";
 function VoiceSearch() {
   const { ref, inView, entry } = useInView({

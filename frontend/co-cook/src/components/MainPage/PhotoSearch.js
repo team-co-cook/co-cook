@@ -2,7 +2,7 @@ import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import styled from "styled-components";
 import { useInView } from "react-intersection-observer";
 import Mockup from "../common/Mockup";
-import cameraSearch from "@/videos/cameraSearch.webm";
+import cameraSearch from "@/videos/cameraSearch.mp4";
 import { useEffect, useState } from "react";
 import cocookLens from "@/image/cocookLens.png";
 function PhotoSearch() {

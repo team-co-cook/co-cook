@@ -4,8 +4,8 @@ import Mockup from "../common/Mockup";
 import splashImg from "@/image/splashImg.png";
 import recipeScreen from "@/image/recipeScreen.png";
 import themeScreen from "@/image/themeScreen.png";
-import voiceScreen from "@/videos/voiceScreen.webm";
-import homeScreen from "@/videos/homeScreen.webm";
+import voiceScreen from "@/videos/voiceScreen.mp4";
+import homeScreen from "@/videos/homeScreen.mp4";
 import { useEffect, useState } from "react";
 function HeaderMockup() {
   const [scrollLocation, setScrollLocation] = useState(0);

@@ -1,9 +1,9 @@
 import styled from "styled-components";
 import { useInView } from "react-intersection-observer";
 import Mockup from "../common/Mockup";
-import timer from "@/videos/timer.webm";
-import recipeNext from "@/videos/recipeNext.webm";
-import audioWave from "@/videos/audioWave.webm";
+import timer from "@/videos/timer.mp4";
+import recipeNext from "@/videos/recipeNext.mp4";
+import audioWave from "@/videos/audioWave.mp4";
 import { useEffect, useState } from "react";
 
 function VoiceRecipe() {

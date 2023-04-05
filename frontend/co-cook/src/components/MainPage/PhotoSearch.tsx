@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { useInView } from "react-intersection-observer";
 import Mockup from "../common/Mockup";
-import cameraSearch from "@/videos/cameraSearch.webm";
+import cameraSearch from "@/videos/cameraSearch.mp4";
 import { useEffect, useState } from "react";
 import cocookLens from "@/image/cocookLens.png";
 
