@@ -1,26 +1,21 @@
-# nginx 이미지를 사용합니다. 뒤에 tag가 없으면 latest 를 사용합니다.
-FROM nginx:latest
+#use nginx image
+FROM nginx
 
-# root 에 app 폴더를 생성
-RUN mkdir /app
+RUN mkdir /front_app
 
-# work dir 고정
-WORKDIR /app
+WORKDIR /front_app
 
-# work dir 에 dist 폴더 생성 /app/dist
-RUN mkdir ./dist
+# make directory /front_app/build 
+RUN mkdir ./build
 
-# host pc의 현재경로의 dist 폴더를 workdir 의 dist 폴더로 복사
-ADD ./dist ./dist
+ADD ./build ./build
 
-# nginx 의 default.conf 를 삭제
+# delete nginx default.conf
 RUN rm /etc/nginx/conf.d/default.conf
 
-# host pc 의 default.conf 를 아래 경로에 복사
-COPY ./default.conf /etc/nginx/conf.d
+# cp nginx.conf in host PC
+COPY ./nginx.conf /etc/nginx/conf.d
 
-# 80 포트 오픈
 EXPOSE 80
 
-# container 실행 시 자동으로 실행할 command. nginx 시작함
 CMD ["nginx", "-g", "daemon off;"]
