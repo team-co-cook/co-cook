@@ -1,6 +1,6 @@
 FROM python:3.8.10
 
-COPY /ai /ai
+COPY ./ /ai
 WORKDIR /ai
 
 RUN pip install -r requirements.txt
