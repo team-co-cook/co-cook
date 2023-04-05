@@ -50,15 +50,16 @@ public class ReviewService {
             review.setResizedImgPath(s3Uploader.uploadResizedImage(reviewImg,"images"));
             review.setImgPath(s3Uploader.upload(reviewImg, "images"));
         } catch (IOException e) {
-            throw new RuntimeException(e.getMessage());
+            System.out.println(e.getMessage());
+        } finally {
+            review.setCommentCnt(0);
+            review.setLikeCnt(0);
+            review.setRunningTime(reviewReqDto.getRunningTime());
+            review.setReportCnt(0);
+            review.setUser(user);
+            review.setRecipe(recipe);
+            reviewRepository.save(review);
         }
-        review.setCommentCnt(0);
-        review.setLikeCnt(0);
-        review.setRunningTime(reviewReqDto.getRunningTime());
-        review.setReportCnt(0);
-        review.setUser(user);
-        review.setRecipe(recipe);
-        reviewRepository.save(review);
     }
 
     public void deleteReview(Long reviewIdx, String authToken) {
