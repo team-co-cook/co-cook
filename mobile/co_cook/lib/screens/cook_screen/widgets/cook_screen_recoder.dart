@@ -73,7 +73,7 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
         sampleRate: 44100,
         bufferSize: 20000,
         numOfInferences: 100000,
-        detectionThreshold: 0.1);
+        detectionThreshold: 0.5);
     _recognitionSubscription = recognitionStream.listen((event) {
       if (event["recognitionResult"] == '2 헤이코쿡') {
         _recognitionSubscription.cancel();
