@@ -2,7 +2,7 @@
 
 # 1. 개요
 
-![ezgif.com-video-to-gif-3.gif](/porting-Manual/ezgif.com-video-to-gif-3.gif)
+![ezgif.com-video-to-gif-3.gif](porting-Manual/ezgif.com-video-to-gif-3.gif)
 
 ### 1-1. 프로젝트 사용 도구
 
@@ -22,11 +22,7 @@
 - Python : 3.8.10
 - SERVER : AWS EC2 Ubuntu 20.04.5 LTS
 - DB : MySQL (AWS RDS)
-
-Flutter 3.8.0-17.0.pre.27 • channel master • [https://github.com/flutter/flutter.git](https://github.com/flutter/flutter.git)
-Framework • revision 275ab9c69b (2 weeks ago) • 2023-02-27 15:46:53 -0800
-Engine • revision 8857c39c96
-Tools • Dart 3.0.0 (build 3.0.0-277.0.dev) • DevTools 2.22.1
+- Flutter 3.8.0-17.0.pre.27 
 
 ### 1-3. 깃랩 제외된 정보
 
@@ -51,7 +47,7 @@ Tools • Dart 3.0.0 (build 3.0.0-277.0.dev) • DevTools 2.22.1
 
 - [다운로드](https://fasttext.cc/docs/en/pretrained-vectors.html)
 
-![Untitled](/%ED%8F%AC%ED%8C%85%20%EB%A9%94%EB%89%B4%EC%96%BC/Untitled.png)
+![Untitled](porting-Manual/Untitled.png)
 
 - 저장 위치
     - 스프링부트 폴더 내 /S08P22B302/backend/src/main/resources/wiki.ko.bin 으로 저장
