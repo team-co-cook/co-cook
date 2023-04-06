@@ -111,7 +111,7 @@ async def upload_audio3(audio: UploadFile = File(...)):
     if result == "음성 인식을 할 수 없습니다.":
         return {"message" : result, 'status' : 400, 'data' : None}
 
-    response = requests.get('https://j8b302.p.ssafy.io:8080/api/v1/search/ingredient/'+ result)
+    response = requests.get('http://j8b302.p.ssafy.io/:8080/api/v1/search/ingredient/'+ result)
     data = response.json()
     isIn = data['status']
 
