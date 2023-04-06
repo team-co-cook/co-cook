@@ -203,7 +203,7 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
     AudioService searchService = AudioService();
     Response? response = widget.isPowerMode
         ? await searchService.postAudio(path)
-        : await searchService.postAudioDJ(path);
+        : await searchService.postAudio(path);
     print(response);
     if (response?.statusCode == 200) {
       if (response != null) {
