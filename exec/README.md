@@ -2,7 +2,7 @@
 
 # 1. 개요
 
-![ezgif.com-video-to-gif-3.gif](/%ED%8F%AC%ED%8C%85%20%EB%A9%94%EB%89%B4%EC%96%BC//ezgif.com-video-to-gif-3.gif)
+![ezgif.com-video-to-gif-3.gif](/porting-Manual/ezgif.com-video-to-gif-3.gif)
 
 ### 1-1. 프로젝트 사용 도구
 
