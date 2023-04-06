@@ -47,7 +47,7 @@ public class ReviewService {
         Review review = new Review();
         review.setContent(reviewReqDto.getContent());
         try {
-            review.setResizedImgPath(s3Uploader.uploadResizedImage(reviewImg,"images"));
+//            review.setResizedImgPath(s3Uploader.uploadResizedImage(reviewImg,"images"));
             review.setImgPath(s3Uploader.upload(reviewImg, "images"));
         } catch (IOException e) {
             System.out.println(e.getMessage());

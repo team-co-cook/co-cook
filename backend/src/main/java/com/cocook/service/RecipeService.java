@@ -201,7 +201,7 @@ public class RecipeService {
             Long userIdx = review.getUser().getId();
             LikeReview foundLiked = likeRepository.findByUserIdAndReviewId(user.getId(), review.getId());
             boolean isLiked = foundLiked != null;
-            ReviewResDto recipeReview = new ReviewResDto(review.getId(), userIdx, review.getCreatedDate(), userNickname, review.getContent(), review.getResizedImgPath(),
+            ReviewResDto recipeReview = new ReviewResDto(review.getId(), userIdx, review.getCreatedDate(), userNickname, review.getContent(), review.getImgPath(),
                     review.getLikeCnt(), review.getCommentCnt(), review.getRunningTime(), isLiked);
             recipeReviews.add(recipeReview);
         }

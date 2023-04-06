@@ -14,7 +14,7 @@ public interface MyReview {
 
     String getContent();
 
-    String getResizedImgPath();
+    String getImgPath();
 
     Integer getLikeCnt();
 
