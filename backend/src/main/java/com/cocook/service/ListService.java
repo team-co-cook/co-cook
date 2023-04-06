@@ -100,7 +100,7 @@ public class ListService {
         List<Float> keywordVector = fastText.getVector(keyword);
         relatedRecipes.sort(Comparator.comparingDouble(recipe -> -wordSimilarity.getCosineSimilarity(fastText, keywordVector, recipe.getRecipeName())));
         for (Recipe recipe : relatedRecipes) {
-            if ((wordSimilarity.getCosineSimilarity(fastText, keywordVector, recipe.getRecipeName()) > 0.75)) {
+            if ((wordSimilarity.getCosineSimilarity(fastText, keywordVector, recipe.getRecipeName()) > 0.713)) {
                 if (!foundRecipes.contains(recipe)){
                     foundRecipes.add(recipe);
                 }
