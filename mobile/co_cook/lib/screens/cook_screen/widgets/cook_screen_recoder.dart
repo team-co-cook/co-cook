@@ -1,107 +1,117 @@
 import 'dart:io';
 import 'dart:async';
+import 'dart:convert'; // decode 가져오기
 import 'package:dio/dio.dart';
+import 'package:record/record.dart';
 import 'package:flutter/material.dart';
+import 'package:tflite_audio/tflite_audio.dart';
+import 'package:audioplayers/audioplayers.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:device_info_plus/device_info_plus.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:co_cook/styles/colors.dart';
 import 'package:co_cook/styles/text_styles.dart';
 import 'package:co_cook/services/audio_service.dart';
-
-import 'package:record/record.dart';
-import 'package:audioplayers/audioplayers.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:porcupine_flutter/porcupine.dart';
-import 'package:porcupine_flutter/porcupine_error.dart';
-import 'package:porcupine_flutter/porcupine_manager.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:device_info_plus/device_info_plus.dart';
-
 import 'package:co_cook/widgets/sound_meter/sound_meter.dart';
 
 class CookScreenRecoder extends StatefulWidget {
-  const CookScreenRecoder({Key? key}) : super(key: key);
+  const CookScreenRecoder(
+      {Key? key,
+      required this.controlNotifier,
+      required this.isPowerMode,
+      required this.setPowerMode,
+      required this.isTtsPlaying})
+      : super(key: key);
+  final ValueNotifier<String> controlNotifier;
+  final bool isPowerMode;
+  final Function setPowerMode;
+  final ValueNotifier<bool> isTtsPlaying;
 
   @override
   State<CookScreenRecoder> createState() => _CookScreenRecoderState();
 }
 
 class _CookScreenRecoderState extends State<CookScreenRecoder> {
-  /////////////////////////////////////////////////////////////////////////////
-  ///PicoVioce
-  ///
-  late List apiKeys;
-  late int apiKeyIndex;
-  int maxIndex = 3;
+  @override
+  void initState() {
+    super.initState();
+    _fetchNameSetTemp();
+    _audioPlayer = AudioPlayer();
+    startWakeWordRecord();
+    widget.isTtsPlaying.addListener(_onTtsPlayingChanged); // tts play 리스너
+  }
 
-  final List<String> keywordAssets = Platform.isAndroid
-      ? [
-          "assets/keywords/cocook_ko_android.ppn",
-          "assets/keywords/seongwun_ko_android.ppn"
-        ]
-      : [
-          "assets/keywords/cocook_ko_ios.ppn",
-          "assets/keywords/seongwun_ko_ios.ppn"
-        ];
+  @override
+  void dispose() {
+    super.dispose();
+    _diposeRecord();
+    if (cookTempDir.existsSync()) {
+      cookTempDir.listSync().forEach((file) => file.deleteSync());
+    }
+    _recognitionSubscription.cancel();
+    TfliteAudio.stopAudioRecognition();
+    widget.isTtsPlaying.removeListener(_onTtsPlayingChanged); // tts play 리스너
+  }
 
-  late PorcupineManager _porcupineManager;
+  //////////////
+  String _nickname = '';
 
-  void createPorcupineManager() async {
-    print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
-    print(dotenv.env['PICOVOICE_API_KEY']);
-    apiKeys = [
-      dotenv.env['PICOVOICE_API_KEY_1'],
-      dotenv.env['PICOVOICE_API_KEY_2'],
-      dotenv.env['PICOVOICE_API_KEY_3'],
-      dotenv.env['PICOVOICE_API_KEY_4']
-    ];
+  // 닉네임 가져오기
+  Future<void> _fetchNickname() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String prefsUserData =
+        prefs.getString('userData') ?? ''; // 기본값으로 빈 문자열을 사용합니다.
+    Map<String, dynamic> decodePrefs = jsonDecode(prefsUserData);
+    String? nickname = decodePrefs['nickname'];
 
-    try {
-      // PorcupineManager를 생성하고 키워드 검출을 시작합니다.
-      _porcupineManager = await PorcupineManager.fromKeywordPaths(
-          apiKeys[apiKeyIndex],
-          keywordAssets, // os별 분기처리 해야됨!!
-          _wakeWordCallback,
-          modelPath: "assets/keywords/porcupine_params_ko.pv",
-          sensitivities: [0.8, 0.8] // 기본값은 0.5 높을수록 더 잘 응답한다. 오답일 경우도 늘어난다.
-          );
-      await _porcupineManager.start();
-    } catch (e) {
-      if (e is PorcupineActivationLimitException) {
-        // 다음 인덱스를 사용합니다.
-        apiKeyIndex++;
-
-        // 최대 인덱스에 도달하면 다시 0번 인덱스로 돌아갑니다.
-        if (apiKeyIndex > maxIndex) {
-          apiKeyIndex = 0;
-        }
-
-        // PorcupineManager를 생성하고 키워드 검출을 시작합니다.
-        _porcupineManager = await PorcupineManager.fromKeywordPaths(
-            apiKeys[apiKeyIndex],
-            keywordAssets, // os별 분기처리 해야됨!!
-            _wakeWordCallback,
-            modelPath: "assets/keywords/porcupine_params_ko.pv",
-            sensitivities: [0.8, 0.8] // 기본값은 0.5 높을수록 더 잘 응답한다. 오답일 경우도 늘어난다.
-            );
-        await _porcupineManager.start();
-      } else {
-        // 다른 예외는 다시 throw합니다.
-        throw e;
-      }
+    if (nickname != null) {
+      setState(() {
+        _nickname = nickname;
+      });
     }
   }
 
-  _wakeWordCallback(int value) async {
-    // value는 감지된 키워드의 인덱스입니다. keywordAssets에서 정의한 순서와 일치합니다.
-    if (value == 0) {
-      // 코국 키워드에 대한 작업 수행
-      print('코쿡');
-      await _porcupineManager.stop().then((value) => _startRecord());
-    } else if (value == 1) {
-      // 성운 키워드에 대한 작업 수행
-      print('성운');
-      await _porcupineManager.stop().then((value) => _startRecord());
+  void _fetchNameSetTemp() async {
+    await _fetchNickname();
+    await setTempDir();
+  }
+
+  // tts play 리스너
+  void _onTtsPlayingChanged() {
+    if (widget.isTtsPlaying.value) {
+      _recognitionSubscription.pause();
+    } else {
+      Future.delayed(const Duration(milliseconds: 700))
+          .then((_) => {_recognitionSubscription.resume()});
     }
+  }
+
+  ////////////////////////////////////////////////////////////////////////////
+
+  late Stream<Map<dynamic, dynamic>> recognitionStream;
+  late StreamSubscription<Map<dynamic, dynamic>> _recognitionSubscription;
+  String result = '';
+
+  void startWakeWordRecord() {
+    recognitionStream = TfliteAudio.startAudioRecognition(
+        sampleRate: 44100,
+        bufferSize: 20000,
+        numOfInferences: 100000,
+        detectionThreshold: 0.6);
+    _recognitionSubscription = recognitionStream.listen((event) {
+      if (event["recognitionResult"] == '2 헤이코쿡') {
+        _recognitionSubscription.cancel();
+        TfliteAudio.stopAudioRecognition();
+        _startRecord();
+      } else if (event["recognitionResult"] == '1 야윤성운') {
+        _recognitionSubscription.cancel();
+        TfliteAudio.stopAudioRecognition();
+        widget.setPowerMode(true);
+        _startRecord();
+      }
+    });
   }
 
   /////////////////////////////////////////////////////////////////////////////
@@ -116,21 +126,6 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
   int audioFilePk = 0; // 녹음파일 제목 pk값
 
   late AudioPlayer _audioPlayer; // 음성인식시 효과음 재생할 player 선언
-
-  @override
-  void initState() {
-    super.initState();
-
-    setTempDir();
-    setState(() {
-      _audioPlayer = AudioPlayer();
-    });
-    createPorcupineManager();
-
-    // 오늘자 기준 키  인덱스 설정
-    DateTime now = DateTime.now();
-    apiKeyIndex = now.day % 4;
-  }
 
   Future<void> setTempDir() async {
     final Directory tempDir = await getTemporaryDirectory();
@@ -156,7 +151,7 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
         await Future.delayed(const Duration(microseconds: 300));
         await _recorder
             .start(
-          path: '${cookTempDir.path}/$audioFilePk.m4a',
+          path: '${cookTempDir.path}/$_nickname-$audioFilePk.m4a',
           encoder: AudioEncoder.aacLc,
           bitRate: 128000,
           samplingRate: 44100,
@@ -166,35 +161,35 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
             _isRecording = true;
           });
           startTimer();
-        }).then((_) {
-          Future.delayed(const Duration(milliseconds: 3000)).then((_) {
-            if (ampl > -10) {
-              // 계속 말하는 중이면 더 기다리기
-              return Future.delayed(const Duration(milliseconds: 500));
-            }
-            // 말 안하는 중이면 null return해서 종료
-            return null;
-          }).then((_) {
-            // 녹음 종료
-            _stopRecord().then((_) {
-              _isRecording = false;
-              if (_isSay) {
-                // 사용자가 말 했을 때
-                postAudio('${cookTempDir.path}/$audioFilePk.m4a');
-                _audioPlayer.play(
-                    DeviceFileSource('${cookTempDir.path}/$audioFilePk.m4a'));
-                setState(() {
-                  _isSay = false;
-                });
-              } else {
-                // 안했을 때
-                _audioPlayer.play(AssetSource('audios/ai_cancel.mp3'));
-              }
-            }).then((value) {
-              audioFilePk++;
-              _porcupineManager.start();
+        });
+
+        await Future.delayed(const Duration(milliseconds: 2000)).then((_) {
+          if (ampl > -10) {
+            // 계속 말하는 중이면 더 기다리기
+            return Future.delayed(const Duration(milliseconds: 500));
+          }
+          // 말 안하는 중이면 null return해서 종료
+          return null;
+        });
+        // 녹음 종료
+        await _stopRecord().then((_) async {
+          _isRecording = false;
+          if (_isSay) {
+            // 사용자가 말 했을 때
+            await Future.delayed(const Duration(milliseconds: 500));
+            await postAudio('${cookTempDir.path}/$_nickname-$audioFilePk.m4a');
+            setState(() {
+              _isSay = false;
             });
-          });
+            startWakeWordRecord();
+          } else {
+            // 안했을 때
+            _audioPlayer.play(AssetSource('audios/ai_cancel.mp3'));
+            startWakeWordRecord();
+          }
+        }).then((value) {
+          audioFilePk++;
+          widget.setPowerMode(false);
         });
       }
     } else {
@@ -206,10 +201,17 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
   Future<void> postAudio(String path) async {
     // API 요청
     AudioService searchService = AudioService();
-    Response? response = await searchService.postAudio(path);
+    Response? response = widget.isPowerMode
+        ? await searchService.postAudio(path)
+        : await searchService.postAudio(path);
+    print(response);
     if (response?.statusCode == 200) {
       if (response != null) {
         print("전송 성공 : ${response.data}");
+        setState(() {
+          result = response.data['result'];
+        });
+        widget.controlNotifier.value = response.data['result'];
       }
     }
   }
@@ -254,19 +256,6 @@ class _CookScreenRecoderState extends State<CookScreenRecoder> {
 
   int volume0to(int maxVolumeToDisplay) {
     return (volume * maxVolumeToDisplay).round().abs();
-  }
-
-  /////////////////////////////////////////////////////////////////////////////
-
-  @override
-  void dispose() {
-    _diposeRecord();
-    if (cookTempDir.existsSync()) {
-      cookTempDir.listSync().forEach((file) => file.deleteSync());
-    }
-    _porcupineManager.stop();
-    _porcupineManager.delete();
-    super.dispose();
   }
 
   @override

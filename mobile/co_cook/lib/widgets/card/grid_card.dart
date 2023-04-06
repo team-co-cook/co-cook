@@ -27,11 +27,22 @@ class _GridCardState extends State<GridCard> {
     });
   }
 
+  @override
+  void didUpdateWidget(GridCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.data != widget.data) {
+      setState(() {
+        isAdd = widget.data != null ? widget.data!["isFavorite"] : false;
+      });
+    }
+  }
+
   late bool isAdd;
 
   void toggleIsAdd() {
     setState(() {
       isAdd = !isAdd;
+      widget.data!["isFavorite"] = !widget.data!["isFavorite"];
     });
   }
 
@@ -109,7 +120,7 @@ class _GridCardState extends State<GridCard> {
                     alignment: Alignment.centerLeft,
                     child: const CustomShimmer(
                       width: 160,
-                      height: 24,
+                      height: 20,
                     ),
                   ),
             widget.data != null
@@ -152,7 +163,7 @@ class _GridCardState extends State<GridCard> {
                     alignment: Alignment.centerLeft,
                     child: const CustomShimmer(
                       width: 90,
-                      height: 24,
+                      height: 20,
                     ),
                   ),
           ],

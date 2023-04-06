@@ -1,0 +1,11 @@
+tensorflow==2.12.0
+soundfile==0.12.1
+python-multipart==0.0.6
+librosa==0.10.0.post2
+pydub==0.25.1
+fastapi==0.95.0
+gunicorn==20.1.0
+numpy==1.23.5
+uvicorn
+Pillow==9.4.0
+SpeechRecognition

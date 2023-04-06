@@ -1,6 +1,6 @@
 import { NavLink } from "react-router-dom";
 import styled from "styled-components";
-import { ReactComponent as LogoRed } from "../../assets/logo/logoRed.svg";
+import { ReactComponent as LogoRed } from "@/logo/logoRed.svg";
 
 function NavBar() {
   return (
@@ -31,15 +31,11 @@ const StyledNavBar = styled.nav`
     transition: all 0.3s;
     &:hover {
       scale: 1.1;
-      filter: drop-shadow(
-        -2px 4px 0px ${({ theme }) => theme.Colors.RED_TERTIARY}
-      );
+      filter: drop-shadow(-2px 4px 0px ${({ theme }) => theme.Colors.RED_TERTIARY});
     }
     &:active {
       transition: all 0.1s;
-      filter: drop-shadow(
-        0px 0px 0px ${({ theme }) => theme.Colors.RED_TERTIARY}
-      );
+      filter: drop-shadow(0px 0px 0px ${({ theme }) => theme.Colors.RED_TERTIARY});
     }
   }
 

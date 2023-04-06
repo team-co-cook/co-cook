@@ -81,18 +81,16 @@ class _MyReviewScreenState extends State<MyReviewScreen> {
         body: listData.isNotEmpty
             ? Container(
                 color: CustomColors.monotoneLight,
-                child: Stack(children: [
-                  ListView.builder(
-                    shrinkWrap: true,
-                    padding: EdgeInsets.fromLTRB(24.0, 24.0, 24.0, 24.0),
-                    physics: NeverScrollableScrollPhysics(),
-                    itemCount: listData.length,
-                    itemBuilder: (context, index) => RecipeComment(
-                        panelController: _panelController,
-                        review: listData[index],
-                        reGet: reGet),
-                  ),
-                ]),
+                child: ListView.builder(
+                  padding: EdgeInsets.fromLTRB(24.0, 24.0, 24.0, 24.0),
+                  physics: const BouncingScrollPhysics(
+                      parent: AlwaysScrollableScrollPhysics()),
+                  itemCount: listData.length,
+                  itemBuilder: (context, index) => RecipeComment(
+                      panelController: _panelController,
+                      review: listData[index],
+                      reGet: reGet),
+                ),
               )
             : Container());
   }

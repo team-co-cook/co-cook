@@ -40,6 +40,9 @@ dependencies:
   gallery_saver: ^2.3.2
   share_plus: ^6.3.1
   flutter_tts: ^3.5.0
+  image_crop: ^0.4.1
+  image: ^4.0.15
+  wakelock: ^0.6.2
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -60,6 +63,7 @@ dependencies:
   sensors:
   sensors_plus: ^2.0.2
   shimmer: ^2.0.0
+  tflite_audio: ^0.3.0
 
 dev_dependencies:
   flutter_test:
@@ -86,7 +90,6 @@ flutter:
   assets:
     # .env
     - .env
-    - .env.local
 
     # images
     - assets/
@@ -98,13 +101,8 @@ flutter:
     # audios
     - assets/audios/
 
-    # picovoice keyword
-    - assets/keywords/
-    - assets/keywords/cocook_ko_android.ppn
-    - assets/keywords/cocook_ko_ios.ppn
-    - assets/keywords/seongwun_ko_android.ppn
-    - assets/keywords/seongwun_ko_ios.ppn
-    - assets/keywords/porcupine_params_ko.pv
+    # tensor flow lite
+    - assets/models/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

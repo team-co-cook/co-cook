@@ -100,7 +100,7 @@ public class ListService {
         List<Float> keywordVector = fastText.getVector(keyword);
         relatedRecipes.sort(Comparator.comparingDouble(recipe -> -wordSimilarity.getCosineSimilarity(fastText, keywordVector, recipe.getRecipeName())));
         for (Recipe recipe : relatedRecipes) {
-            if ((wordSimilarity.getCosineSimilarity(fastText, keywordVector, recipe.getRecipeName()) > 0.75)) {
+            if ((wordSimilarity.getCosineSimilarity(fastText, keywordVector, recipe.getRecipeName()) > 0.713)) {
                 if (!foundRecipes.contains(recipe)){
                     foundRecipes.add(recipe);
                 }
@@ -184,9 +184,13 @@ public class ListService {
         return new RecipeListResDto(newRecipes);
     }
 
-    public List<RecipeWithIngredientResDto> getRecipesByIngredients(String authToken, List<String> ingredientNames) {
+    public List<RecipeWithIngredientResDto> getRecipesByIngredients(String authToken, List<String> ingredients) {
         Long userIdx = jwtTokenProvider.getUserIdx(authToken);
-        List<RecipesContainingIngredientsCnt> recipesContainingIngredientsCnts = recipeRepository.findRecipesByIngredients(ingredientNames, userIdx);
+        List<String> notBlankIngredients = new ArrayList<>();
+        for (String ingredient : ingredients) {
+            notBlankIngredients.add(ingredient.replace(" ", ""));
+        }
+        List<RecipesContainingIngredientsCnt> recipesContainingIngredientsCnts = recipeRepository.findRecipesByIngredients(notBlankIngredients, userIdx);
         List<RecipeWithIngredientResDto> recipeWithIngredientResDtos = new ArrayList<>();
         for (RecipesContainingIngredientsCnt r : recipesContainingIngredientsCnts) {
             Boolean isFavorite = r.getIsFavorite() == 1;

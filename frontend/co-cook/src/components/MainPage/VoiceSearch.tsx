@@ -1,13 +1,27 @@
 import styled from "styled-components";
 import { useInView } from "react-intersection-observer";
 import Mockup from "../common/Mockup";
-import voiceSearch from "../../assets/videos/voiceSearch.webm";
+import voiceSearch from "@/videos/voiceSearch.mp4";
+import { useEffect, useState } from "react";
 
 function VoiceSearch() {
   const { ref, inView, entry } = useInView({
     threshold: 0.8,
     triggerOnce: true,
   });
+
+  const [scrollLocation, setScrollLocation] = useState<number>(0);
+
+  const windowScrollListener = (e: Event) => {
+    setScrollLocation((document.documentElement.scrollTop / 6) * -1);
+  };
+
+  useEffect(() => {
+    window.addEventListener("scroll", windowScrollListener);
+    return () => {
+      window.removeEventListener("scroll", windowScrollListener);
+    };
+  }, []);
 
   return (
     <StyledVoiceSearch id="voice-search-section" ref={ref} inView={inView}>
@@ -17,8 +31,13 @@ function VoiceSearch() {
           <p>냉장고 속이 두려울 때,</p>
           <p>재료를 말하면 레시피를 추천해드립니다.</p>
         </div>
-        <div className="mockup">
-          <Mockup isVideo={true} screen={voiceSearch}></Mockup>
+        <div
+          style={{
+            transform: `translateY(${scrollLocation}px)`,
+          }}
+          className="mockup"
+        >
+          <Mockup isVideo={true} screen={voiceSearch} isRotate={false}></Mockup>
         </div>
       </div>
     </StyledVoiceSearch>
@@ -30,93 +49,72 @@ export default VoiceSearch;
 const StyledVoiceSearch = styled.section<{
   inView: boolean;
 }>`
-  @keyframes contentFade {
-    0% {
-      opacity: 0;
-      transform: translateY(50px);
-    }
-    100% {
-      opacity: 1;
-      transform: translateY(0px);
-    }
-  }
-  display: flex;
-  justify-content: center;
   height: 500px;
-  width: 100vw;
-  background-image: url("/src/assets/image/refrigerator.jpg");
-  background-size: auto 100vh;
-
-  background-position: 50% 20%;
-  @media (max-width: 734px) {
-    height: 700px;
-  }
-
+  display: flex;
+  align-items: center;
+  width: 100%;
+  text-align: left;
   & > div {
     display: flex;
-    justify-content: space-between;
-    margin-inline: 24px;
+    z-index: -3;
     width: 100%;
-    max-width: 980px;
+    height: 100%;
+    background-size: cover;
+    border-radius: 16px;
     @media (max-width: 734px) {
       flex-direction: column;
-      justify-content: start;
-      align-items: center;
     }
-
-    & .title {
-      height: 100%;
+    & > div {
+      width: 65%;
       display: flex;
       flex-direction: column;
-      align-items: start;
       justify-content: center;
-      text-align: start;
+      align-items: center;
       @media (max-width: 734px) {
-        align-items: center;
-        justify-content: center;
-        height: 40%;
-        text-align: center;
+        width: 100%;
+        height: 50%;
       }
+      flex-shrink: 0;
+
+      & > video {
+        width: 100px;
+        margin-bottom: 16px;
+        mix-blend-mode: darken;
+        ${({ inView }) => (inView ? "animation: fadeUp1 0.5s ease-out;" : "opacity: 0;")}
+      }
+
       & > h2 {
-        margin-block: 16px;
         word-break: keep-all;
-        line-height: 1.2;
-        ${({ theme }) => theme.fontStyles.subtitle1}
+        ${({ theme }) => theme.fontStyles.subtitle2}
         font-size: 2.5rem;
-        transition: all ease-out 0.2s;
-        ${({ inView }) =>
-          inView
-            ? "animation: contentFade 0.5s ease-out;"
-            : "opacity: 0; transform: translateY(50px);"}
-        color: ${({ theme }) => theme.Colors.MONOTONE_LIGHT};
-        text-shadow: 0px 0px 16px ${({ theme }) => theme.Colors.MONOTONE_BLACK};
+        text-align: center;
+        color: ${({ theme }) => theme.Colors.MONOTONE_BLACK};
+        margin-bottom: 16px;
+        line-height: 1.2;
+        ${({ inView }) => (inView ? "animation: fadeUp1 0.5s ease-out;" : "opacity: 0;")}
       }
       & > p {
-        margin-block: 4px;
-        line-height: 1.2;
+        margin-bottom: 8px;
         word-break: keep-all;
         ${({ theme }) => theme.fontStyles.body1}
-        font-size: 1.5rem;
-        color: ${({ theme }) => theme.Colors.MONOTONE_LIGHT};
-        text-shadow: 0px 0px 16px ${({ theme }) => theme.Colors.MONOTONE_BLACK};
-        ${({ inView }) =>
-          inView
-            ? "animation: contentFade 0.5s ease-out;"
-            : "opacity: 0; transform: translateY(50px);"}
+        font-size: 1rem;
+        text-align: center;
+        color: ${({ theme }) => theme.Colors.MONOTONE_BLACK};
+        animation: fadeUp1 0.5s ease-out;
+        ${({ inView }) => (inView ? "animation: fadeUp1 0.5s ease-out;" : "opacity: 0;")}
       }
     }
-    & .mockup {
-      position: relative;
-      bottom: 0px;
-      ${({ inView }) =>
-        inView
-          ? "animation: contentFade 1s ease-out;"
-          : "opacity: 0; transform: translateY(50px);"}
-      z-index: 1;
-      width: 250px;
-      margin-top: 50px;
+    .mockup {
+      width: 30%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: start;
+      margin-top: 200px;
       @media (max-width: 734px) {
-        margin-top: -20px;
+        align-items: center;
+        width: 100%;
+        height: 50%;
       }
     }
   }

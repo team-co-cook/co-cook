@@ -157,7 +157,7 @@ public class UserService {
                     .userIdx(review.getUserIdx())
                     .createdAt(review.getCreatedAt())
                     .userNickname(review.getUserNickname())
-                    .imgPath(review.getResizedImgPath())
+                    .imgPath(review.getImgPath())
                     .isLiked(isLiked)
                     .commentCnt(review.getCommentCnt())
                     .recipeIdx(review.getRecipeIdx()).build();
