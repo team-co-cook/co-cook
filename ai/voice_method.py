@@ -11,20 +11,19 @@ with open('label_encoder.pkl', 'rb') as f:
 model = load_model('model.h5')
 
 def cut_voice(file_path):
-    # Load audio data
+    # 불러오기
     y, sample_rate = librosa.load(file_path, sr=None)
     
-    # Compute the energy of each frame
-    frame_size = 0.025 # seconds
-    frame_stride = 0.01 # seconds
+    # 계산 부분
+    frame_size = 0.025
+    frame_stride = 0.01
     frame_length = int(round(frame_size * sample_rate))
     frame_step = int(round(frame_stride * sample_rate))
     energy = np.array([sum(abs(y[i:i+frame_length]**2)) for i in range(0, len(y)-frame_length, frame_step)])
 
-    # Compute the threshold for speech activity
-    threshold = np.mean(energy) * 0.1 # adjust the factor as needed
+    threshold = np.mean(energy) * 0.1
 
-    # Detect speech and non-speech activity
+    # 말하는 부분 찾기
     speech = []
     non_speech = []
     for i, e in enumerate(energy):
@@ -33,7 +32,7 @@ def cut_voice(file_path):
         else:
             non_speech.append(i)
 
-    # Extract the speech segments
+    # 하나로 만들기
     segments = []
     start = speech[0]
     for i in range(1, len(speech)):
@@ -42,7 +41,7 @@ def cut_voice(file_path):
             start = speech[i]
     segments.append((start, speech[-1]))
 
-    # Concatenate the speech and non-speech segments separately
+    # 결과
     samples = np.concatenate([y[start*frame_step:end*frame_step] for start, end in segments])
 
     return samples, sample_rate
@@ -62,7 +61,7 @@ def extract_features(audio, sample_rate, flag=0):
         elif flag == 4: # 길이 줄이기
             audio = librosa.effects.time_stretch(audio, rate=0.8)
 
-        # Apply Mel-spectrogram transform
+        # 멜스펙트럼으로 변환
         mel_spec = librosa.feature.melspectrogram(y=audio, sr=sample_rate, n_mels=128)
         mel_spec_db = librosa.power_to_db(mel_spec, ref=np.max)
         mel_spec_processed = np.mean(mel_spec_db.T, axis=0)
